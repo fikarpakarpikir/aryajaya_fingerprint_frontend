@@ -153,7 +153,7 @@ class FingerprintController extends Controller
                     // 'data' => Fingerprint::where('id_karyawan', $req->id_karyawan)->first()
                 ], 400);
             }
-            return $req;
+            // return $req;
 
             if ($req->hasFile('template_dat')) {
                 try {
