@@ -490,11 +490,11 @@ export default function FPScanner() {
         setLoading(true);
         setGetMessage(true);
         try {
-            // const res = await axios.post(
-            //     `${urlScanner}/fitur`,
-            //     { fiturId, id_karyawan },
-            //     { headers: { "Content-Type": "application/json" } }
-            // );
+            const res = await axios.post(
+                `${urlScanner}/fitur`,
+                { fiturId, id_karyawan },
+                { headers: { "Content-Type": "application/json" } }
+            );
             setfloatButtonFitur(false);
         } catch (error) {
             console.error(error);
@@ -988,7 +988,7 @@ export default function FPScanner() {
 
     return (
         <GuestLayout>
-            <div className="text-center mx-auto">
+            <div className="text-center mx-auto bg-white">
                 <div className="absolute top-2 end-2">
                     <FontAwesomeIcon
                         icon={maintenance ? faWrench : faCheckCircle}
