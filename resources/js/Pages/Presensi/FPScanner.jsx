@@ -306,21 +306,22 @@ export default function FPScanner() {
         isFetching.current = true;
         try {
             const response = await axios.get(`${urlScanner}/enrollment_status`);
-            setStatus(response.data.status);
+            const thisState = Number(response.data?.status);
+            setStatus(thisState);
             setActiveFP(!!response.data.message);
             // setCountdownScanning(response.data.countdown);
             setGetMessage(
                 response.data.countdown > 0 ? response.data.active : false
             );
-            // console.log(response.data.fiturId);
+            console.log("id", response.data.fiturId);
             switch (response.data.fiturId) {
                 case 1:
-                    if (response.data.status === 4) {
+                    if (thisState === 4) {
                         findKaryawan(response.data.newData);
                         setTimeout(() => {
                             getFitur(1);
                         }, 3000); // Delay for 3 seconds (3000 milliseconds)
-                    } else if (response.data.status === 3) {
+                    } else if (thisState === 3) {
                         setKaryawan(null);
                         setTimeout(() => {
                             getFitur(1);
@@ -328,12 +329,13 @@ export default function FPScanner() {
                     }
                     break;
                 case 2:
-                    if (response.data.status === 4) {
+                    if (thisState === 4) {
                         dispatch(registeredAdd(response.data.newData));
                     }
                     break;
                 case 3:
-                    if (response.data.status === 4) {
+                    console.log("id", response.data.newData);
+                    if (thisState === 4) {
                         dispatch(registeredDelete(response.data.newData));
                     }
                     break;
