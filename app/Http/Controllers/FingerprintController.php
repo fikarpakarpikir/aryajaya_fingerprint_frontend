@@ -147,31 +147,38 @@ class FingerprintController extends Controller
         ]);
         try {
             $alat = $this->getIdAlat($req->ip_alat);
-            // return $alat;
             if (Fingerprint::where('id_karyawan', $req->id_karyawan)->where('alat_id', $alat->id)->first()) {
                 return response()->json([
                     'message' => 'Gagal, Karyawan sudah terdaftar',
                     // 'data' => Fingerprint::where('id_karyawan', $req->id_karyawan)->first()
                 ], 400);
             }
+            return $req;
 
             if ($req->hasFile('template_dat')) {
-                $filename = 'template_' . $alat->id . '_' . $req->template_id . '.' . $req['template_dat']->getClientOriginalExtension();
+                try {
+                    $filename = 'template_' . $alat->id . '_' . $req->template_id . '.' . $req['template_dat']->getClientOriginalExtension();
 
-                $req['template_dat']->move(public_path('assets/fingerprint/template/'), $filename);
+                    $req['template_dat']->move(public_path('assets/fingerprint/template/'), $filename);
 
-                $fingerprint = Fingerprint::create([
-                    'alat_id' => $alat->id,
-                    'id_karyawan' => $req->id_karyawan,
-                    'template_id' => $req->template_id,
-                    'template_dat' => $filename,
-                ]);
+                    $fingerprint = Fingerprint::create([
+                        'alat_id' => $alat->id,
+                        'id_karyawan' => $req->id_karyawan,
+                        'template_id' => $req->template_id,
+                        'template_dat' => $filename,
+                    ]);
 
-                // Return the newly created fingerprint record in JSON format
-                return response()->json([
-                    'message' => 'Fingerprint successfully registered',
-                    'data' => $fingerprint->load('org')  // Load any relationships if needed (e.g. 'org')
-                ], 200);
+                    // Return the newly created fingerprint record in JSON format
+                    return response()->json([
+                        'message' => 'Fingerprint berhasil didaftarkan',
+                        'data' => $fingerprint->load('org')  // Load any relationships if needed (e.g. 'org')
+                    ], 200);
+                } catch (\Throwable $th) {
+
+                    return response()->json([
+                        'message' => $th->getMessage()
+                    ], 400);
+                }
             } else {
                 return response()->json([
                     'message' => 'File upload failed'
