@@ -37,6 +37,8 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import fullWaktuIndo from "@/Functions/waktuIndo";
+import { Link } from "@inertiajs/react";
+import ApplicationLogo from "@/Components/ApplicationLogo";
 
 export default function FPScanner() {
     const { props } = useAuth();
@@ -153,8 +155,8 @@ export default function FPScanner() {
     const isFetching = useRef(false); // Ref to prevent concurrent fetches
     const [countdownScanning, setCountdownScanning] = useState(0);
 
-    // const [activeFP, setActiveFP] = useState(true);
-    const [activeFP, setActiveFP] = useState(false);
+    const [activeFP, setActiveFP] = useState(true);
+    // const [activeFP, setActiveFP] = useState(false);
 
     const [floatButtonFitur, setfloatButtonFitur] = useState(false);
 
@@ -286,7 +288,7 @@ export default function FPScanner() {
                 setMessage("Alat tidak terhubung, silakan hubungi Tim IT");
             }
         };
-        fetchAlat();
+        // fetchAlat();
         setLoading(false);
     }, [urlScanner]);
 
@@ -410,6 +412,7 @@ export default function FPScanner() {
     };
 
     const openCloseFitur = useCallback((itemId) => {
+        stopFetching();
         setListFitur((prevListFitur) =>
             prevListFitur.map((item) => ({
                 ...item,
@@ -537,7 +540,7 @@ export default function FPScanner() {
         const waktu = Clock();
 
         return (
-            <div className="relative min-h-[480px]">
+            <div className="relative ">
                 <span className="badge bg-primary text-white text-md font-bold">
                     Presensi
                 </span>
@@ -676,7 +679,9 @@ export default function FPScanner() {
 
         return (
             <>
-                <span className="badge badge-info fs-6">Daftar</span>
+                <span className="badge bg-primary text-white font-bold text-md px-8">
+                    Daftar
+                </span>
                 <Formik
                     initialValues={{
                         idKar: "",
@@ -751,7 +756,9 @@ export default function FPScanner() {
         }
         return (
             <>
-                <span className="badge badge-danger fs-6">Hapus</span>
+                <span className="badge bg-red-500 text-white font-bold text-md px-8">
+                    Hapus
+                </span>
 
                 <Formik
                     initialValues={{
@@ -946,6 +953,11 @@ export default function FPScanner() {
         const waktu = Clock();
         return (
             <div className="relative min-h-[480px]">
+                <div className="absolute left-0 top-0">
+                    <Link href="/">
+                        <ApplicationLogo className="h-24 fill-current text-gray-500 " />
+                    </Link>
+                </div>
                 <span className="badge bg-red-500 text-white text-md font-bold">
                     Maintenance
                 </span>
@@ -988,7 +1000,7 @@ export default function FPScanner() {
 
     return (
         <GuestLayout>
-            <div className="text-center mx-auto bg-white">
+            <div className="text-center mx-auto bg-white min-h-[480px]">
                 <div className="absolute top-2 end-2">
                     <FontAwesomeIcon
                         icon={maintenance ? faWrench : faCheckCircle}
@@ -999,6 +1011,11 @@ export default function FPScanner() {
                     <NotifMaintenance />
                 ) : (
                     <FullScreen handle={fullScreenRef}>
+                        <div className="absolute left-0 top-0">
+                            <Link href="/">
+                                <ApplicationLogo className="h-24 fill-current text-gray-500 " />
+                            </Link>
+                        </div>
                         {floatButtonFitur && (
                             <div
                                 className={`bg-white shadow-lg fixed bottom-8 text-white p-3 end-4 rounded-lg z-40 m-0`}
