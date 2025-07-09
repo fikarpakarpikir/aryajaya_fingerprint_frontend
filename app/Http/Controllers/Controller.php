@@ -38,9 +38,9 @@ class Controller extends BaseController
     public function home()
     {
         // dd();
-        $ipAddress = '192.168.0.200';
+        // $ipAddress = '192.168.0.200';
         // $port = '5000';
-        // $ipAddress = request()->ip();
+        $ipAddress = request()->ip();
         $port = request()->getPort();
         $fullAddress = $ipAddress . ':' . $port;
         // dd(Alat::where('ip_device', $fullAddress)
