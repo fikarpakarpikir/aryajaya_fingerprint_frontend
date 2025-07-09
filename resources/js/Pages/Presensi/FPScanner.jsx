@@ -254,7 +254,7 @@ export default function FPScanner() {
 
         fetchData();
         // getFitur(1);
-        // findKaryawan(dummyKar);
+        findKaryawan(dummyKar);
 
         const handleResize = () => {
             setScreenWidth(window.innerWidth);
@@ -570,7 +570,7 @@ export default function FPScanner() {
                                         {fotoProfil ? (
                                             <img
                                                 src={fotoProfil}
-                                                className="rounded-full cover"
+                                                className="rounded-full cover  w-[440px] h-[440px]"
                                                 alt="..."
                                             />
                                         ) : (
