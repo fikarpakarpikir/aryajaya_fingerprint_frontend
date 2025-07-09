@@ -4,7 +4,6 @@ namespace App\Providers;
 
 use App\Events\PengajuanNotifEvent;
 use App\Listeners\SendPengajuanIzinNotif;
-use App\Notifications\PengajuanIzinNotif;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;

@@ -4,15 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Record;
 use App\Models\User;
-use App\Notifications\GeneralNotif;
-use App\Notifications\PengajuanIzinNotif;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Notification as FacadesNotification;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -164,11 +161,11 @@ class AccessController extends Controller
                 }
             );
 
-            $user = User::where('email', $request->email)->first();
-            Notification::send($user, new GeneralNotif([
-                'kode_aktifitas' => 21,
-                'pesan_notif' => 'Anda baru saja mengganti password.'
-            ]));
+            // $user = User::where('email', $request->email)->first();
+            // Notification::send($user, new GeneralNotif([
+            //     'kode_aktifitas' => 21,
+            //     'pesan_notif' => 'Anda baru saja mengganti password.'
+            // ]));
 
             return $status == Password::PASSWORD_RESET
                 // ? redirect()->route('login')->with('status', __($status))
