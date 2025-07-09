@@ -799,10 +799,10 @@ export default function FPScanner() {
                             <div className="col-12 mt-3 d-flex">
                                 <button
                                     type="submit"
-                                    className="btn btn-primary mx-auto"
+                                    className="btn btn-danger mx-auto"
                                     onClick={handleSubmit}
                                 >
-                                    Scan
+                                    Hapus
                                 </button>
                             </div>
                         </form>
