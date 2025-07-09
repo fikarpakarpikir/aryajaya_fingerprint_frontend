@@ -57,6 +57,10 @@
 /* .rdp-day_marked { */
 /* } */
 
+/* fullscren-react  */
+.fullscreen-enabled {
+    background: #fff;
+}
 body {
     color: var(--foreground);
     background: var(--background);
