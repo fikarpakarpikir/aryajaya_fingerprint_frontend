@@ -28,8 +28,11 @@ import useAuth from "@/Functions/useAuth";
 import GuestLayout from "@/Layouts/GuestLayout";
 import {
     faBars,
+    faCheckCircle,
     faFingerprint,
+    faGear,
     faImagePortrait,
+    faWrench,
     faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -135,6 +138,7 @@ export default function FPScanner() {
         },
     };
 
+    const [maintenance, setMaintenance] = useState(false);
     const [karyawan, setKaryawan] = useState(null);
     // const [karyawan, setKaryawan] = useState(dummyKar);
     const [fotoProfil, setFotoProfil] = useState(null);
@@ -237,8 +241,8 @@ export default function FPScanner() {
         const fetchData = async () => {
             try {
                 const response = await axios.get(
-                    "http://127.0.0.1:8000/api/Karyawan/Presensi/Fingerprint"
-                    // "https://hrd.aryajaya.co.id/api/Karyawan/Presensi/Fingerprint"
+                    // "http://127.0.0.1:8000/api/Karyawan/Presensi/Fingerprint"
+                    "https://hrd.aryajaya.co.id/api/Karyawan/Presensi/Fingerprint"
                 );
                 // const response = await axios.get("/Get/Karyawan/Fingerprint");
                 setListKaryawans(response.data.listKaryawan);
@@ -938,49 +942,102 @@ export default function FPScanner() {
         { id: 3, title: "Hapus", status: false },
     ]);
 
+    const NotifMaintenance = () => {
+        const waktu = Clock();
+        return (
+            <div className="relative min-h-[480px]">
+                <span className="badge bg-red-500 text-white text-md font-bold">
+                    Maintenance
+                </span>
+                <div className="flex justify-center">
+                    <div className="grid grid-cols-2 shadow-lg rounded-lg mx-auto items-center">
+                        <div className="text-end py-5 pr-2 pl-10">
+                            <span className="fw-bold fs-5">
+                                {hariIndo(waktu)},
+                            </span>
+                            <br />
+                            <span className="fw-bold fs-6">
+                                {tanggalIndo(waktu)}
+                            </span>
+                        </div>
+                        <div className="p-4 pr-10 mr-2 text-start bg-primary shadow fs-3 font-bold text-white rounded-lg">
+                            <span className="mt-2">{jamIndo(waktu)}</span>
+                        </div>
+                    </div>
+                </div>
+                <div className="mt-4 mt-10 text-3xl">
+                    <span className="badge bg-amber-400 px-4 py-1 text-md font-bold">
+                        Mohon Maaf
+                    </span>
+                    <br />
+                    Alat sedang dalam perbaikan
+                    <DotLottieReact
+                        src={`/GIF/Fingerprint/search_scanner.lottie`}
+                        className="mx-auto w-64 h-48 shadow border border-amber-500 border-4 rounded-lg"
+                        loop
+                        autoplay
+                        style={{
+                            height: 10,
+                            width: 10,
+                        }}
+                    />
+                </div>
+            </div>
+        );
+    };
+
     return (
         <GuestLayout>
             <div className="text-center mx-auto">
-                <FullScreen handle={fullScreenRef}>
-                    {floatButtonFitur && (
-                        <div
-                            className={`bg-white shadow-lg fixed bottom-8 text-white p-3 end-4 rounded-lg z-40 m-0`}
-                        >
-                            <div className="flex flex-col gap-1">
-                                {activeFP ? (
-                                    listFitur?.map((item, i) => (
+                <div className="absolute top-2 end-2">
+                    <FontAwesomeIcon
+                        icon={maintenance ? faWrench : faCheckCircle}
+                        onClick={() => setMaintenance(!maintenance)}
+                    />
+                </div>
+                {maintenance ? (
+                    <NotifMaintenance />
+                ) : (
+                    <FullScreen handle={fullScreenRef}>
+                        {floatButtonFitur && (
+                            <div
+                                className={`bg-white shadow-lg fixed bottom-8 text-white p-3 end-4 rounded-lg z-40 m-0`}
+                            >
+                                <div className="flex flex-col gap-1">
+                                    {activeFP ? (
+                                        listFitur?.map((item, i) => (
+                                            <button
+                                                className={`${
+                                                    item.status
+                                                        ? "btn-" +
+                                                          (item.id != 3
+                                                              ? "primary"
+                                                              : "danger")
+                                                        : "btn-" +
+                                                          (item.id != 3
+                                                              ? "outline-primary"
+                                                              : "outline-danger")
+                                                }`}
+                                                onClick={() => {
+                                                    openCloseFitur(item.id);
+                                                    setfloatButtonFitur(false);
+                                                }}
+                                                key={i}
+                                            >
+                                                {item.title}
+                                            </button>
+                                        ))
+                                    ) : (
                                         <button
-                                            className={`${
-                                                item.status
-                                                    ? "btn-" +
-                                                      (item.id != 3
-                                                          ? "primary"
-                                                          : "danger")
-                                                    : "btn-" +
-                                                      (item.id != 3
-                                                          ? "outline-primary"
-                                                          : "outline-danger")
+                                            className={`btn btn-${
+                                                activeFP ? "primary" : "danger"
                                             }`}
-                                            onClick={() => {
-                                                openCloseFitur(item.id);
-                                                setfloatButtonFitur(false);
-                                            }}
-                                            key={i}
+                                            onClick={() => cekFP()}
                                         >
-                                            {item.title}
+                                            Cek Alat
                                         </button>
-                                    ))
-                                ) : (
-                                    <button
-                                        className={`btn btn-${
-                                            activeFP ? "primary" : "danger"
-                                        }`}
-                                        onClick={() => cekFP()}
-                                    >
-                                        Cek Alat
-                                    </button>
-                                )}
-                                {/* <button
+                                    )}
+                                    {/* <button
                                     className="btn btn-primary"
                                     onClick={() =>
                                         location.replace(
@@ -990,69 +1047,70 @@ export default function FPScanner() {
                                 >
                                     Kehadiran Hari Ini
                                 </button> */}
-                                <button
-                                    className="btn btn-danger"
-                                    onClick={() => stopFetching()}
-                                >
-                                    Stop Sensor
-                                </button>
-                                {fullScreenRef.active ? (
                                     <button
-                                        className="btn btn-secondary"
-                                        onClick={fullScreenRef.exit}
+                                        className="btn btn-danger"
+                                        onClick={() => stopFetching()}
                                     >
-                                        Exit Fullscreen
+                                        Stop Sensor
                                     </button>
-                                ) : (
-                                    <button
-                                        className="btn btn-primary"
-                                        onClick={fullScreenRef.enter}
-                                    >
-                                        Enter Fullscreen
-                                    </button>
-                                )}
-                                <div className="text-end">
-                                    <button
-                                        className={`text-xl text-primary`}
-                                        onClick={() =>
-                                            setfloatButtonFitur(false)
-                                        }
-                                        aria-expanded={!floatButtonFitur}
-                                    >
-                                        <FontAwesomeIcon icon={faXmark} />
-                                    </button>
+                                    {fullScreenRef.active ? (
+                                        <button
+                                            className="btn btn-secondary"
+                                            onClick={fullScreenRef.exit}
+                                        >
+                                            Exit Fullscreen
+                                        </button>
+                                    ) : (
+                                        <button
+                                            className="btn btn-primary"
+                                            onClick={fullScreenRef.enter}
+                                        >
+                                            Enter Fullscreen
+                                        </button>
+                                    )}
+                                    <div className="text-end">
+                                        <button
+                                            className={`text-xl text-primary`}
+                                            onClick={() =>
+                                                setfloatButtonFitur(false)
+                                            }
+                                            aria-expanded={!floatButtonFitur}
+                                        >
+                                            <FontAwesomeIcon icon={faXmark} />
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    )}
-                    {!floatButtonFitur && (
-                        <button
-                            className={`${
-                                activeFP ? "btn-primary" : "btn-danger"
-                            } border border-5 border-white text-white fixed w-12 h-12 end-0 bottom-8 mb-4 me-3 z-40 rounded-full`}
-                            onClick={() => setfloatButtonFitur(true)}
-                            aria-expanded={floatButtonFitur}
-                        >
-                            <FontAwesomeIcon
-                                icon={activeFP ? faBars : faFingerprint}
-                                size="xl"
-                            />
-                        </button>
-                    )}
-                    {listFitur.map(
-                        (item, i) =>
-                            item.status && (
-                                // <React.Fragment key={item.id}>
-                                //     {item.children}
-                                // </React.Fragment>
-                                <div key={item.id} className="mt-3">
-                                    {item.id == 1 && <Presensi />}
-                                    {item.id == 2 && <Daftar />}
-                                    {item.id == 3 && <Hapus />}
-                                </div>
-                            )
-                    )}
-                </FullScreen>
+                        )}
+                        {!floatButtonFitur && (
+                            <button
+                                className={`${
+                                    activeFP ? "btn-primary" : "btn-danger"
+                                } border border-5 border-white text-white fixed w-12 h-12 end-0 bottom-8 mb-4 me-3 z-40 rounded-full`}
+                                onClick={() => setfloatButtonFitur(true)}
+                                aria-expanded={floatButtonFitur}
+                            >
+                                <FontAwesomeIcon
+                                    icon={activeFP ? faBars : faFingerprint}
+                                    size="xl"
+                                />
+                            </button>
+                        )}
+                        {listFitur.map(
+                            (item, i) =>
+                                item.status && (
+                                    // <React.Fragment key={item.id}>
+                                    //     {item.children}
+                                    // </React.Fragment>
+                                    <div key={item.id} className="mt-3">
+                                        {item.id == 1 && <Presensi />}
+                                        {item.id == 2 && <Daftar />}
+                                        {item.id == 3 && <Hapus />}
+                                    </div>
+                                )
+                        )}
+                    </FullScreen>
+                )}
             </div>
         </GuestLayout>
     );
