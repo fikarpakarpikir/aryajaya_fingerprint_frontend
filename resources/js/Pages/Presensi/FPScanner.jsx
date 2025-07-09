@@ -288,7 +288,7 @@ export default function FPScanner() {
                 setMessage("Alat tidak terhubung, silakan hubungi Tim IT");
             }
         };
-        // fetchAlat();
+        fetchAlat();
         setLoading(false);
     }, [urlScanner]);
 
@@ -414,7 +414,7 @@ export default function FPScanner() {
     };
 
     const openCloseFitur = useCallback((itemId) => {
-        stopFetching();
+        // stopFetching();
         setListFitur((prevListFitur) =>
             prevListFitur.map((item) => ({
                 ...item,
