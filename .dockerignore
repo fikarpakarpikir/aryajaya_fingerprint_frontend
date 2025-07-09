@@ -1,0 +1,11 @@
+node_modules
+/public/assets/fingerprint
+/public/storage
+/storage/*.key
+/storage/pail
+dist
+*.log
+
+.env.testing
+.env.backup
+.env.production
