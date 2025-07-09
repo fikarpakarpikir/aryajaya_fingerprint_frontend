@@ -45,7 +45,7 @@ class Fingerprint extends Model
 {
     use HasApiTokens, HasFactory;
 
-    protected $fillable = ['ip_alat', 'template_id'];
+    // protected $fillable = ['ip_alat', 'template_id'];
     protected $guarded = ['id'];
 
     public function org()
