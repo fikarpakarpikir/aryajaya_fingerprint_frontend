@@ -254,7 +254,7 @@ export default function FPScanner() {
 
         fetchData();
         // getFitur(1);
-        findKaryawan(dummyKar);
+        // findKaryawan(dummyKar);
 
         const handleResize = () => {
             setScreenWidth(window.innerWidth);
