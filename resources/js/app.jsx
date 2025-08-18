@@ -11,8 +11,13 @@ import store from "./redux/store";
 import ErrorBoundary from "./Components/ErrorBoundary";
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { initDB } from "react-indexed-db-hook";
+import { FaceAPIDBConfig } from "./Functions/indexedDBConfig";
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
+
+initDB(FaceAPIDBConfig);
+
 const AppWrapper = ({ App, props }) => {
     const [isLoaded, setIsLoaded] = useState(import.meta.env.DEV);
 

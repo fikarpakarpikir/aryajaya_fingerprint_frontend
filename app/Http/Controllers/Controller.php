@@ -38,7 +38,7 @@ class Controller extends BaseController
 
         try {
             return Inertia::render(
-                'Presensi/FPScanner',
+                'Presensi/index',
                 [
                     'ip_alat' => Alat::where('ip_device', $fullAddress)
                         ->pluck('ip_alat')->first(),
