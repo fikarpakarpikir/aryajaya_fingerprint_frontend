@@ -244,7 +244,9 @@ export default function FPScanner() {
             try {
                 const response = await axios.get(
                     // "http://127.0.0.1:8000/api/Karyawan/Presensi/Fingerprint"
-                    "https://hrd.aryajaya.co.id/api/Karyawan/Presensi/Fingerprint"
+                    `${
+                        import.meta.env.VITE_API_SERVER
+                    }/Karyawan/Presensi/Fingerprint`
                 );
                 // const response = await axios.get("/Get/Karyawan/Fingerprint");
                 setListKaryawans(response.data.listKaryawan);
@@ -929,7 +931,6 @@ export default function FPScanner() {
     ]);
 
     const NotifMaintenance = () => {
-        const waktu = Clock();
         return (
             <div className="relative min-h-[480px]">
                 <div className="mt-10 text-3xl">

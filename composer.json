@@ -12,7 +12,7 @@
         "inertiajs/inertia-laravel": "^2.0",
         "itsgoingd/clockwork": "^5.3",
         "laravel/framework": "12.*",
-        "laravel/reverb": "^1.0",
+        "laravel/reverb": "*",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.9",
         "phpdocumentor/type-resolver": "^1.10",

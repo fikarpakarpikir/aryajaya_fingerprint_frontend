@@ -9,6 +9,7 @@ use App\Http\Controllers\SistemController;
 use App\Http\Controllers\BirokrasiController;
 use App\Http\Controllers\FaceRecognitionController;
 use App\Http\Controllers\PresensiController;
+use App\Http\Controllers\SinkronisasiController;
 
 /*
 |--------------------------------------------------------------------------
@@ -33,7 +34,17 @@ use App\Http\Controllers\PresensiController;
 //     });
 // });
 
+Route::get('/test-broadcast', function () {
+    broadcast(new \App\Events\SyncProgressEvent([
+        'jenis_data' => 2,
+        'done' => 1,
+        'total' => 5,
+        'id_karyawan' => 99,
+        'ekspresi_wajah_id' => 1,
+    ]));
 
+    return "ok";
+});
 // Route::group(['middleware' =>  'auth'], function () {
 Route::get('/', [Controller::class, 'home'])->name('home');
 
@@ -59,6 +70,7 @@ Route::group(['prefix' => 'Presensi', 'as' => 'Presensi.'], function () {
     //     Route::post('/registStore', 'registStore')->name('registStore');
     // });
 });
+Route::post('/sync_data', [SinkronisasiController::class, 'sync_data'])->name('sync_data');
 
 Route::group(['prefix' => 'Sistem', 'as' => 'Sistem.'], function () {
     Route::get('/{Sistem}', [SistemController::class, 'index'])->name('index');

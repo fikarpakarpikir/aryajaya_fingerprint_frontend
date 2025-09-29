@@ -1,49 +1,52 @@
 import * as faceapi from "face-api.js";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
+import axios from "axios";
 import LoadingSystem from "@/Components/pre-load/loading-system";
-import { timeDiff } from "@/Functions/fullDateDiff";
+import fullDateDiff, { DateDiff, timeDiff } from "@/Functions/fullDateDiff";
 import { usePage } from "@inertiajs/react";
+import AuthenticatedLayout from "@/Layouts/AuthenticatedLayout";
+import ToastProses from "@/Components/ReactStrap/ToastProses";
+import fullWaktuIndo, {
+    hariIndo,
+    jamIndo,
+    modifyTime,
+    tanggalIndo,
+} from "@/Functions/waktuIndo";
+import ProgressBarFR from "@/Components/ProgressBar";
+import { encLaravel } from "@/Functions/crypt";
+import ModalStatic from "@/Components/ReactStrap/ModalStatic";
+import { checkCameraPermission } from "@/Functions/reqPermission";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
     faCircleCheck,
     faCircleXmark,
 } from "@fortawesome/free-regular-svg-icons";
 import sendDataGeneral from "@/Functions/sendDataGeneral";
-// import Clock from "@/Functions/clock";
+import Clock from "@/Functions/clock";
 import {
     processMessageFailedReducer,
     processStateReducer,
 } from "@/redux/slices/ProcessStateSlice";
-// import { RealTimeClock } from "./Clock";
+import {
+    getModelFromIndexedDB,
+    saveModelToIndexedDB,
+} from "@/Functions/indexexDB-model-cache";
+import { RealTimeClock } from "./Clock";
+import { useIndexedDB } from "react-indexed-db-hook";
 import { useFaceApiCache } from "@/Functions/indexedDBConfig";
-import { NotifRulesDaftar } from "./NotifRulesDaftar";
-import { NotifCameraNotAllowed } from "./NotifCameraNotAllowed";
-import { LoadingProgressBar } from "./LoadingProgressBar";
-import { NotifGeneral } from "./NotifGeneral";
-import { RefreshButton } from "./RefreshButton";
-import useCameraAndModels from "@/hooks/useCameraAndModels";
-import useFaceDetection from "@/hooks/useFaceDetection";
-import usePresensiCheck from "@/hooks/usePresensiCheck";
-import { RealTimeClock } from "../Clock";
-import { FaceProvider, useFaceContext } from "@/context/FaceContext";
-import { faSync } from "@fortawesome/free-solid-svg-icons";
-import fullWaktuIndo from "@/Functions/waktuIndo";
-import SyncFaceID from "./SyncFaceID";
+import { NotifRulesDaftar } from "../js/Pages/Presensi/FaceRec/NotifRulesDaftar";
+import { NotifCameraNotAllowed } from "../js/Pages/Presensi/FaceRec/NotifCameraNotAllowed";
+import { LoadingProgressBar } from "../js/Pages/Presensi/FaceRec/LoadingProgressBar";
+import { NotifGeneral } from "../js/Pages/Presensi/FaceRec/NotifGeneral";
+import { RefreshButton } from "../js/Pages/Presensi/FaceRec/RefreshButton";
 
-function FaceRecog() {
+function PresensiUser() {
     const props = usePage().props;
     const org = usePage().props?.org;
-    const {
-        videoRef,
-        loading,
-        setLoading,
-        message,
-        setMessage,
-        subMessage,
-        setSubMessage,
-    } = useFaceContext();
-
+    const videoRef = useRef();
+    const webcamRef = useRef(null);
+    const canvasRef = useRef();
     const isSendingRef = useRef(false);
     const hasDetectedRef = useRef(false);
     useFaceApiCache();
@@ -54,11 +57,14 @@ function FaceRecog() {
     const [presensi, setPresensi] = useState(props.jadwalKerja?.presensi?.[0]);
 
     const [showCamera, setShowCamera] = useState(false);
+    const [loading, setLoading] = useState(true);
     const [done, setDone] = useState(false);
     const [buttonRefresh, setButtonRefresh] = useState(false);
     const [notif, setNotif] = useState(false);
     const [notifKosong, setNotifKosong] = useState(false);
     const [notifError, setNotifError] = useState(false);
+    const [message, setMessage] = useState("---");
+    const [subMessage, setSubMessage] = useState("---");
     const [messageError, setMessageError] = useState(
         "Pemindaian mengalami masalah"
     );
@@ -93,36 +99,211 @@ function FaceRecog() {
         document.body.clientWidth;
     const newWidth = viewportWidth * 0.7; // Adjust this value as needed
     const [isCameraDenied, setIsCameraDenied] = useState(false);
+    useEffect(() => {
+        let isMounted = true;
+        const fetchData = async () => {
+            try {
+                const images = [];
 
-    usePresensiCheck(presensi);
-    useFaceDetection(faceMyDetect);
-    useCameraAndModels(dataUser, { loadModels, fetchData });
-    async function fetchData() {
-        try {
-            const images = [];
+                for (let i = 1; i <= 2; i++) {
+                    const img = await faceapi.fetchImage(
+                        `/assets/face_rec/${dataUser.id}/${i}.png`
+                    );
 
-            for (let i = 1; i <= 2; i++) {
-                const img = await faceapi.fetchImage(
-                    `/assets/face_rec/${dataUser.id}/${i}.png`
+                    // Pastikan gambar telah dimuat sebelum diproses
+                    await img.decode();
+                    images.push(img);
+                }
+
+                // console.log(images, dataUser?.face, dataUser?.face.length);
+                if (images.length > 1) {
+                    setDataFaceID(images);
+                    return images;
+                }
+                // setShowCamera(true);
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
+        if (presensi) {
+            const diff = fullDateDiff(presensi.mulai, new Date());
+            // console.log(
+            //     "🚀 ~ useEffect ~ diff:",
+            //     diff,
+            //     diff.totalMinutes < 10 && diff.isEarly
+            // );
+
+            if (diff.totalMinutes < 10 && diff.isEarly) {
+                setLoading(false);
+                setMessage("Anda baru saja presensi");
+
+                setSubMessage(
+                    <>
+                        Presensi Anda hari ini telah dilakukan pada: <br />
+                        Masuk:
+                        <br />
+                        <span className="badge bg-primary text-white text-sm font-bold ms-2">
+                            {fullWaktuIndo(presensi?.mulai)}
+                        </span>
+                        <br />
+                        silakan tunggu 10 menit dari waktu presensi masuk untuk
+                        pulang
+                    </>
                 );
-
-                // Pastikan gambar telah dimuat sebelum diproses
-                await img.decode();
-                images.push(img);
+                setNotif(true);
+                goToHome(5000);
+                return;
             }
-
-            // console.log(images, dataUser?.face, dataUser?.face.length);
-            if (images.length > 1) {
-                setDataFaceID(images);
-                return images;
-            }
-            // setShowCamera(true);
-        } catch (error) {
-            console.error("Error fetching user data:", error);
         }
-    }
+        if (dataUser?.id) {
+            const checkSpeed = measureNetworkSpeed();
+            setSpeedNetwork(checkSpeed);
 
-    async function loadModels() {
+            checkCameraPermission().then(async (access) => {
+                if (!isMounted) return;
+
+                if (access) {
+                    // console.log("cek");
+
+                    if (dataUser?.face?.length >= 2) {
+                        if (dataUser && jadwal) {
+                            if (
+                                cekJadwal == 2 &&
+                                props.jadwalKerja?.jadwal != "libur"
+                            ) {
+                                const presensi =
+                                    props.jadwalKerja?.presensi?.[0];
+                                setLoading(false);
+                                setMessage("Anda hari ini telah presensi");
+
+                                setSubMessage(
+                                    <>
+                                        Presensi Anda hari ini telah dilakukan
+                                        pada: <br />
+                                        Masuk:
+                                        <br />
+                                        <span className="badge bg-primary text-white text-sm font-bold ms-2">
+                                            {fullWaktuIndo(presensi?.mulai)}
+                                        </span>
+                                        <br />
+                                        Pulang:
+                                        <br />
+                                        <span className="badge bg-primary text-white text-sm font-bold ms-2">
+                                            {fullWaktuIndo(presensi?.selesai)}
+                                        </span>
+                                        <br />
+                                    </>
+                                );
+                                setNotif(true);
+                                goToHome(3000);
+                                return;
+                            } else if (
+                                cekJadwal == 3 ||
+                                props.jadwalKerja?.jadwal == "libur"
+                            ) {
+                                setLoading(false);
+                                setNotifKosong(true);
+                                goToHome(5500);
+                                return;
+                            } else if (
+                                cekJadwal == 1 &&
+                                diffHours <= 0 &&
+                                diffMinutes <= 5
+                            ) {
+                                // FIXME
+                                // !FIX absen pulang harus setelah 5 menit dari absen masuk bukan jadwal masuk
+                                setLoading(false);
+                                setMessage("Presensi Pulang masih Ditutup");
+                                setSubMessage(
+                                    <>
+                                        Jam kerja anda hari ini: <br />
+                                        <span className="badge bg-primary text-white text-sm font-bold">
+                                            {jamIndo(jadwal.mulai)} -{" "}
+                                            {jamIndo(jadwal.selesai)}
+                                        </span>
+                                        .
+                                        <br /> Anda baru bisa presensi pulang
+                                        setelah
+                                        <span className="badge bg-primary text-white text-sm font-bold">
+                                            {jamIndo(
+                                                modifyTime(
+                                                    jadwal.mulai,
+                                                    5,
+                                                    "menit"
+                                                )
+                                            )}
+                                        </span>
+                                    </>
+                                );
+                                setNotif(true);
+
+                                // setButtonRefresh(true);
+                                goToHome(5500);
+                                return;
+                            } else {
+                                await loadModels();
+                                await fetchData();
+                            }
+                        } else if (
+                            (!cekJadwal && jadwal) ||
+                            (cekJadwal && !jadwal)
+                        ) {
+                            setLoading(false);
+                            setNotifKosong(true);
+
+                            // setTimeout(() => {
+                            setButtonRefresh(true);
+                            // }, 3000);
+                            // Uncomment the following line if you want to navigate after 3 seconds
+                            // setTimeout(() => location.replace("/"), 3000);
+                            // } else {
+                            //     setLoading(false);
+                            //     setNotifError(true);
+                            //     setSubMessage("Silakan hubungi HC untuk cek jadwal kerja Anda");
+                        }
+                    } else {
+                        // setIsMustRegist(true);
+                        setLoading(false);
+                        loadModels();
+                    }
+                } else {
+                    if (!isCameraDenied) {
+                        setIsCameraDenied(true);
+                    }
+                }
+            });
+        }
+        return () => {
+            isMounted = false; // Cleanup function to avoid unnecessary state updates
+        };
+        // }, [dataUser?.id]);
+    }, [dataUser?.id]);
+
+    useEffect(() => {
+        if (
+            isLoadedModels &&
+            videoRef &&
+            dataUser &&
+            dataFaceID?.length >= 2 &&
+            !notifError &&
+            !hasDetectedRef.current &&
+            !isMustRegist
+        ) {
+            console.log("Menjalankan faceMyDetect()...");
+            hasDetectedRef.current = true;
+            // *NOTE - Turn On this part when ready
+            faceMyDetect(); // Pastikan fungsi ini tersedia
+        }
+    }, [dataFaceID, isLoadedModels]);
+    const resetFaceDetection = () => {
+        hasDetectedRef.current = false; // Allow it to run again
+    };
+    function goToHome(time = 3000) {
+        setTimeout(() => {
+            location.replace(route("home"));
+        }, time);
+    }
+    const loadModels = async () => {
         const models = [
             "tinyFaceDetector",
             "faceLandmark68Net",
@@ -170,7 +351,7 @@ function FaceRecog() {
             console.error("Gagal memuat model:", error);
             setMessage("Terjadi kesalahan saat memuat model.");
         }
-    }
+    };
 
     const startVideo = () => {
         navigator.mediaDevices
@@ -361,7 +542,7 @@ function FaceRecog() {
         }
     };
 
-    async function faceMyDetect() {
+    const faceMyDetect = async () => {
         let countError = 7;
         let kurangCahaya = 15;
         let i = 5;
@@ -578,7 +759,7 @@ function FaceRecog() {
                 }
             }, 3000);
         }
-    }
+    };
 
     const faceMyExp = (idEks_in) => {
         let i = 3;
@@ -738,273 +919,285 @@ function FaceRecog() {
 
     return (
         <>
-            {isCameraDenied && <NotifCameraNotAllowed show={isCameraDenied} />}
-            {loading && <LoadingSystem />}
-
-            {!notifError &&
-                !done &&
-                !notifKosong &&
-                !notif &&
-                !showConfirm &&
-                !screenshotHappy && (
-                    <LoadingProgressBar
-                        progress={loadingProgress}
-                        message={message}
-                        subMessage={subMessage}
-                    />
-                )}
-            {showConfirm && <NotifRulesDaftar handleSiap={() => siap(1)} />}
-
-            {/* {isLoadedModels && "OK"} */}
-
-            {next && screenshotNeutral && (
-                <div className="mx-auto bg-white xl:w-2/3 lg:w-1/3 md:w-2/3 sm:w-1/2 w-full text-center shadow rounded-lg p-3">
-                    <div className="py-4">
-                        Apa anda mau menjadikan foto ini sebagai Face ID pertama
-                        anda?
+            <AuthenticatedLayout>
+                {isMustRegist ? (
+                    <div className="text-center">
+                        <span className="bg-primary font-bold text-white rounded-full px-2 py-1">
+                            Daftar Face ID
+                        </span>
                     </div>
-                    <button
-                        className="btn-tertiary me-2 font-bold"
-                        onClick={() => restartVideo(1)}
-                    >
-                        Tidak, Scan Ulang
-                    </button>
-                    <button
-                        onClick={() => siap(2)}
-                        className="btn-primary font-bold text-white"
-                    >
-                        Lanjut
-                    </button>
-                </div>
-            )}
-            {!showCamera &&
-                screenshotNeutral &&
-                screenshotHappy &&
-                !done &&
-                !notifError && (
-                    <>
-                        <div className="mx-auto bg-white xl:w-2/3 lg:w-1/3 md:w-2/3 sm:w-1/2 w-full text-center shadow rounded-lg p-3">
-                            <div className="py-4">
-                                Apa anda mau menjadikan foto ini sebagai Face ID
-                                kedua anda?
-                            </div>
-                            <div className="flex justify-center gap-3">
-                                <button
-                                    type="button"
-                                    className="btn-tertiary font-bold"
-                                    onClick={() => restartVideo(1)}
-                                >
-                                    Tidak, Ulangi dari awal
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn-tertiary font-bold"
-                                    onClick={() => restartVideo(2)}
-                                >
-                                    Tidak, Scan Ulang
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => sendScreenshotToServer()}
-                                    className="btn-success font-bold text-white"
-                                >
-                                    OK
-                                </button>
-                            </div>
-                        </div>
-                        <div className="md:w-1/2 w-full grid md:grid-cols-2 gap-3 mx-auto my-2 text-center">
-                            {[
-                                {
-                                    exp: "Netral",
-                                    source: screenshotNeutral,
-                                    alt: "Screenshot Neural",
-                                },
-                                {
-                                    exp: "Senyum",
-                                    source: screenshotHappy,
-                                    alt: "Screenshot Happy",
-                                },
-                            ].map(({ exp, source, alt }, i) => (
-                                <div
-                                    className="bg-white rounded-lg shadow p-1"
-                                    key={i}
-                                >
-                                    <span>Ekspresi: {exp}</span>
-                                    <img
-                                        className="rounded-lg -scale-x-100"
-                                        src={source}
-                                        alt={alt}
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    </>
+                ) : (
+                    <span className="bg-primary font-bold text-white rounded-full px-2 py-1">
+                        Presensi
+                    </span>
                 )}
-            {showCamera && (
-                <>
-                    <div
-                        className="items-center mx-auto rounded-lg p-3 my-6 bg-white"
-                        style={{
-                            width: `${newWidth > 568 ? 500 : newWidth}px`,
-                            height: `${newWidth > 568 ? 500 : newWidth}px`,
-                        }}
-                    >
-                        <div className="relative w-full h-full rounded-lg">
-                            {countDown && (
-                                <div className="absolute z-40 inset-0 p-1 mt-3 text-center ">
-                                    <span className="fs-6 font-bold badge text-white px-8 bg-amber-500 mt-5">
-                                        Tahan posisi
-                                    </span>
-                                    <div
-                                        id="status_hasil"
-                                        className="text-center mt-10"
+                {isCameraDenied && (
+                    <NotifCameraNotAllowed show={isCameraDenied} />
+                )}
+                {loading && <LoadingSystem />}
+
+                {!isMustRegist && <RealTimeClock />}
+
+                {!notifError &&
+                    !done &&
+                    !notifKosong &&
+                    !notif &&
+                    !showConfirm &&
+                    !screenshotHappy && (
+                        <LoadingProgressBar
+                            progress={loadingProgress}
+                            message={message}
+                            subMessage={subMessage}
+                        />
+                    )}
+                {showConfirm && <NotifRulesDaftar handleSiap={() => siap(1)} />}
+
+                {/* {isLoadedModels && "OK"} */}
+
+                {next && screenshotNeutral && (
+                    <div className="mx-auto bg-white xl:w-2/3 lg:w-1/3 md:w-2/3 sm:w-1/2 w-full text-center shadow rounded-lg p-3">
+                        <div className="py-4">
+                            Apa anda mau menjadikan foto ini sebagai Face ID
+                            pertama anda?
+                        </div>
+                        <button
+                            className="btn-tertiary me-2 font-bold"
+                            onClick={() => restartVideo(1)}
+                        >
+                            Tidak, Scan Ulang
+                        </button>
+                        <button
+                            onClick={() => siap(2)}
+                            className="btn-primary font-bold text-white"
+                        >
+                            Lanjut
+                        </button>
+                    </div>
+                )}
+                {!showCamera &&
+                    screenshotNeutral &&
+                    screenshotHappy &&
+                    !done &&
+                    !notifError && (
+                        <>
+                            <div className="mx-auto bg-white xl:w-2/3 lg:w-1/3 md:w-2/3 sm:w-1/2 w-full text-center shadow rounded-lg p-3">
+                                <div className="py-4">
+                                    Apa anda mau menjadikan foto ini sebagai
+                                    Face ID kedua anda?
+                                </div>
+                                <div className="flex justify-center gap-3">
+                                    <button
+                                        type="button"
+                                        className="btn-tertiary font-bold"
+                                        onClick={() => restartVideo(1)}
                                     >
-                                        <span
-                                            id="count"
-                                            className="text-7xl opacity-80 font-bold text-white"
-                                        >
-                                            {countDownNumber}
-                                        </span>
+                                        Tidak, Ulangi dari awal
+                                    </button>
+                                    <button
+                                        type="button"
+                                        className="btn-tertiary font-bold"
+                                        onClick={() => restartVideo(2)}
+                                    >
+                                        Tidak, Scan Ulang
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => sendScreenshotToServer()}
+                                        className="btn-success font-bold text-white"
+                                    >
+                                        OK
+                                    </button>
+                                </div>
+                            </div>
+                            <div className="md:w-1/2 w-full grid md:grid-cols-2 gap-3 mx-auto my-2 text-center">
+                                {[
+                                    {
+                                        exp: "Netral",
+                                        source: screenshotNeutral,
+                                        alt: "Screenshot Neural",
+                                    },
+                                    {
+                                        exp: "Senyum",
+                                        source: screenshotHappy,
+                                        alt: "Screenshot Happy",
+                                    },
+                                ].map(({ exp, source, alt }, i) => (
+                                    <div
+                                        className="bg-white rounded-lg shadow p-1"
+                                        key={i}
+                                    >
+                                        <span>Ekspresi: {exp}</span>
+                                        <img
+                                            className="rounded-lg -scale-x-100"
+                                            src={source}
+                                            alt={alt}
+                                        />
                                     </div>
+                                ))}
+                            </div>
+                        </>
+                    )}
+                {showCamera && (
+                    <>
+                        <div
+                            className="items-center mx-auto rounded-lg p-3 my-6 bg-white"
+                            style={{
+                                width: `${newWidth > 568 ? 500 : newWidth}px`,
+                                height: `${newWidth > 568 ? 500 : newWidth}px`,
+                            }}
+                        >
+                            <div className="relative w-full h-full rounded-lg">
+                                {countDown && (
+                                    <div className="absolute z-40 inset-0 p-1 mt-3 text-center ">
+                                        <span className="fs-6 font-bold badge text-white px-8 bg-amber-500 mt-5">
+                                            Tahan posisi
+                                        </span>
+                                        <div
+                                            id="status_hasil"
+                                            className="text-center mt-10"
+                                        >
+                                            <span
+                                                id="count"
+                                                className="text-7xl opacity-80 font-bold text-white"
+                                            >
+                                                {countDownNumber}
+                                            </span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                <img
+                                    src="/assets/instruments/circle-frame-white.png"
+                                    id="frame"
+                                    className="absolute rounded-lg w-full h-full opacity-70 z-30 shadow-lg"
+                                />
+                                <video
+                                    className="cam-face-recog -scale-x-100 w-full h-full rounded-lg"
+                                    crossOrigin="anonymous"
+                                    ref={videoRef}
+                                    autoPlay
+                                    muted
+                                    playsInline
+                                    style={{
+                                        filter: `brightness(${brightnessCam})`,
+                                    }}
+                                ></video>
+                            </div>
+                        </div>
+                        <div className="max-w-[500px] mx-auto">
+                            <div className="relative mt-6 bg-white shadow py-2 px-4 rounded-lg">
+                                Kecepatan Internet Anda:{" "}
+                                {Number(speedNetwork).toFixed(2)} Mbps
+                            </div>
+
+                            {akurasiScan > 0 && (
+                                <div className="relative mt-2 bg-white shadow py-2 px-4 rounded-lg">
+                                    Akurasi: {akurasiScan.toFixed(2)}%
+                                    <span className="ms-3">
+                                        {akurasiScan >= 75 ? (
+                                            <span className="bg-green-500 rounded-full text-white px-2 py-1 font-bold">
+                                                Bagus
+                                            </span>
+                                        ) : (
+                                            <span className="bg-orange-400 rounded-full text-white px-2 py-1 font-bold">
+                                                Kurang Bagus
+                                            </span>
+                                        )}
+                                    </span>
                                 </div>
                             )}
 
-                            <img
-                                src="/assets/instruments/circle-frame-white.png"
-                                id="frame"
-                                className="absolute rounded-lg w-full h-full opacity-70 z-30 shadow-lg"
-                            />
-                            <video
-                                className="cam-face-recog -scale-x-100 w-full h-full rounded-lg"
-                                crossOrigin="anonymous"
-                                ref={videoRef}
-                                autoPlay
-                                muted
-                                playsInline
-                                style={{
-                                    filter: `brightness(${brightnessCam})`,
-                                }}
-                            ></video>
-                        </div>
-                    </div>
-                    <div className="max-w-[500px] mx-auto">
-                        <div className="relative mt-6 bg-white shadow py-2 px-4 rounded-lg">
-                            Kecepatan Internet Anda:{" "}
-                            {Number(speedNetwork).toFixed(2)} Mbps
-                        </div>
-
-                        {akurasiScan > 0 && (
                             <div className="relative mt-2 bg-white shadow py-2 px-4 rounded-lg">
-                                Akurasi: {akurasiScan.toFixed(2)}%
-                                <span className="ms-3">
-                                    {akurasiScan >= 75 ? (
-                                        <span className="bg-green-500 rounded-full text-white px-2 py-1 font-bold">
-                                            Bagus
-                                        </span>
-                                    ) : (
-                                        <span className="bg-orange-400 rounded-full text-white px-2 py-1 font-bold">
-                                            Kurang Bagus
-                                        </span>
-                                    )}
-                                </span>
-                            </div>
-                        )}
-
-                        <div className="relative mt-2 bg-white shadow py-2 px-4 rounded-lg">
-                            <label
-                                htmlFor="brightness-range"
-                                className="block text-sm font-medium text-gray-900 dark:text-white"
-                            >
-                                Atur Kecerahan:{" "}
-                                {Math.round(brightnessCam * 100)}%
-                            </label>
-                            <input
-                                id="brightness-range"
-                                type="range"
-                                min="0"
-                                max="2"
-                                step="0.1"
-                                value={brightnessCam}
-                                onChange={(e) =>
-                                    setBrightnessCam(parseFloat(e.target.value))
-                                }
-                                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
-                            />
-                            <div className="flex justify-between mt-2 text-sm text-gray-500 dark:text-gray-400">
-                                <span>0</span>
-                                <span className="ms-4">50</span>
-                                <span className="ms-2">100</span>
-                                <span>150</span>
-                                <span>200</span>
+                                <label
+                                    htmlFor="brightness-range"
+                                    className="block text-sm font-medium text-gray-900 dark:text-white"
+                                >
+                                    Atur Kecerahan:{" "}
+                                    {Math.round(brightnessCam * 100)}%
+                                </label>
+                                <input
+                                    id="brightness-range"
+                                    type="range"
+                                    min="0"
+                                    max="2"
+                                    step="0.1"
+                                    value={brightnessCam}
+                                    onChange={(e) =>
+                                        setBrightnessCam(
+                                            parseFloat(e.target.value)
+                                        )
+                                    }
+                                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                                />
+                                <div className="flex justify-between mt-2 text-sm text-gray-500 dark:text-gray-400">
+                                    <span>0</span>
+                                    <span className="ms-4">50</span>
+                                    <span className="ms-2">100</span>
+                                    <span>150</span>
+                                    <span>200</span>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                </>
-            )}
+                    </>
+                )}
 
-            {!notifError && done && (
-                <>
-                    <div className="text-center mx-auto md:w-1/2 w-full bg-white rounded-lg p-3 shadow mb-3 border-green-500 border-x-2">
-                        {isMustRegist ? "Pendaftaran Face ID" : "Presensi"} Anda
-                        telah Berhasil
-                        <br />
-                        <FontAwesomeIcon
-                            icon={faCircleCheck}
-                            className="fa-flip fa-4x text-success m-2"
-                        />
-                        <br />
-                        Halaman akan me-refresh otomatis, silakan tunggu
-                    </div>
-                </>
-            )}
-            {(notif || notifKosong) && (
-                <div className="text-center mx-auto md:w-1/2 w-full bg-white rounded-lg p-3 shadow mb-3 border-primary border-x-2">
-                    {notif ? (
-                        <NotifGeneral
-                            subMessage={subMessage}
-                            message={message}
-                        />
-                    ) : (
-                        <>
-                            <span className="bg-primary text-white rounded-full font-bold px-2 py-1">
-                                Anda hari ini tidak ada jadwal kerja
-                            </span>
+                {!notifError && done && (
+                    <>
+                        <div className="text-center mx-auto md:w-1/2 w-full bg-white rounded-lg p-3 shadow mb-3 border-green-500 border-x-2">
+                            {isMustRegist ? "Pendaftaran Face ID" : "Presensi"}{" "}
+                            Anda telah Berhasil
                             <br />
                             <FontAwesomeIcon
                                 icon={faCircleCheck}
                                 className="fa-flip fa-4x text-success m-2"
                             />
-                        </>
-                    )}
-                    <br />
-                    Anda akan dikembalikan ke laman beranda
-                </div>
-            )}
-            {!done && notifError && (
-                <div className="text-center mx-auto md:w-1/2 w-full bg-white rounded-lg p-3 shadow mb-3 border-red-600 border-x-2">
-                    <span className=" bg-red-600 text-white rounded-full font-bold px-2 py-1">
-                        {messageError}
-                    </span>
-                    <p>{subMessage}</p>
-                    <br />
-                    <FontAwesomeIcon
-                        icon={faCircleXmark}
-                        className="fa-flip fa-4x text-red-600 m-2"
-                    />
-                    <br />
-                    silakan refresh halaman untuk mencoba lagi
-                </div>
-            )}
-            <RefreshButton buttonRefresh={buttonRefresh} />
-            <SyncFaceID />
+                            <br />
+                            Halaman akan me-refresh otomatis, silakan tunggu
+                        </div>
+                    </>
+                )}
+                {(notif || notifKosong) && (
+                    <div className="text-center mx-auto md:w-1/2 w-full bg-white rounded-lg p-3 shadow mb-3 border-primary border-x-2">
+                        {notif ? (
+                            <NotifGeneral
+                                subMessage={subMessage}
+                                message={message}
+                            />
+                        ) : (
+                            <>
+                                <span className="bg-primary text-white rounded-full font-bold px-2 py-1">
+                                    Anda hari ini tidak ada jadwal kerja
+                                </span>
+                                <br />
+                                <FontAwesomeIcon
+                                    icon={faCircleCheck}
+                                    className="fa-flip fa-4x text-success m-2"
+                                />
+                            </>
+                        )}
+                        <br />
+                        Anda akan dikembalikan ke laman beranda
+                    </div>
+                )}
+                {!done && notifError && (
+                    <div className="text-center mx-auto md:w-1/2 w-full bg-white rounded-lg p-3 shadow mb-3 border-red-600 border-x-2">
+                        <span className=" bg-red-600 text-white rounded-full font-bold px-2 py-1">
+                            {messageError}
+                        </span>
+                        <p>{subMessage}</p>
+                        <br />
+                        <FontAwesomeIcon
+                            icon={faCircleXmark}
+                            className="fa-flip fa-4x text-red-600 m-2"
+                        />
+                        <br />
+                        silakan refresh halaman untuk mencoba lagi
+                    </div>
+                )}
+                <RefreshButton buttonRefresh={buttonRefresh} />
+            </AuthenticatedLayout>
         </>
     );
 }
 
-export default function FaceRecogPage() {
-    return (
-        <FaceProvider>
-            <FaceRecog />
-        </FaceProvider>
-    );
-}
+export default PresensiUser;
