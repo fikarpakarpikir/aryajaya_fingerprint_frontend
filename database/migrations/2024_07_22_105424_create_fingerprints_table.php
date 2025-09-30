@@ -17,6 +17,7 @@ return new class extends Migration
             $table->integer('alat_id');
             $table->integer('template_id');
             $table->string('template');
+            $table->integer('jari_id')->nullable();
             $table->timestamps();
         });
     }

@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('sinkronisasis', function (Blueprint $table) {
             $table->id();
             $table->unsignedInteger('jenis_data');
+            $table->integer('done')->nullable();
+            $table->integer('total')->nullable();
             $table->timestamp('mulai')->nullable();
             $table->timestamp('selesai')->nullable();
             $table->timestamp('started_at')->nullable();

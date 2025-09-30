@@ -12,19 +12,24 @@ import {
     faFingerprint,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useSelector } from "react-redux";
+import Sync from "./Sync";
 
 const Presensi = () => {
     const fullScreenRef = useFullScreenHandle();
+    const { processState } = useSelector((state) => state.process.default);
 
     const [mode, setMode] = useState("face");
     const listMode = [
-        ["fp", faFingerprint, <FPScanner />],
-        ["face", faCamera, <FaceRecogPage />],
+        ["fp", faFingerprint, <FPScanner />, 1, "Fingerprint"],
+        ["face", faCamera, <FaceRecogPage />, 2, "Face ID"],
     ];
+    const findMode = listMode.find((item) => item[0] === mode);
     const MainPage = () => {
-        const findMode = listMode.find((item) => item[0] === mode);
         return findMode[2];
     };
+    // console.log(findMode[3]);
+
     return (
         <GuestLayout>
             <FullScreen handle={fullScreenRef}>
@@ -41,6 +46,7 @@ const Presensi = () => {
                     <div className="absolute bg-white px-3 py-1 border-s-2 border-primary end-0 shadow rounded-s-lg flex gap-2">
                         {listMode.map((item) => (
                             <button
+                                disabled={processState == "loading"}
                                 className={`${
                                     mode === item[0]
                                         ? "btn-primary"
@@ -54,6 +60,7 @@ const Presensi = () => {
                     </div>
                     <RealTimeClock />
                     <MainPage />
+                    <Sync jenis={findMode?.[3]} title={findMode?.[4]} />
                 </div>
             </FullScreen>
         </GuestLayout>

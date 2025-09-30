@@ -3,9 +3,10 @@ import { createSlice } from "@reduxjs/toolkit";
 const ProcessStateSlice = createSlice({
     name: "processState",
     initialState: {
-        processState: false,
+        processState: null,
         processMessageFailed: "",
         toastState: false,
+        message: "",
     },
     reducers: {
         processCloseAllReducer: (state, action) => {
@@ -14,6 +15,12 @@ const ProcessStateSlice = createSlice({
         },
         processStateReducer: (state, action) => {
             state.processState = action.payload;
+        },
+        setProcess: (state, action) => {
+            state.processState = action.payload;
+        },
+        setMessage: (state, action) => {
+            state.message = action.payload;
         },
         toastStateReducer: (state, action) => {
             state.toastState = action.payload;
@@ -28,6 +35,8 @@ const ProcessStateSlice = createSlice({
 });
 
 export const {
+    setProcess,
+    setMessage,
     processCloseAllReducer,
     processStateReducer,
     processMessageFailedReducer,

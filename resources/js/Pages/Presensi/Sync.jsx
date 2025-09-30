@@ -5,54 +5,35 @@ import { faXmarkCircle } from "@fortawesome/free-regular-svg-icons";
 import { faCheckCircle, faSync } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 
-const SyncFaceID = () => {
+const Sync = ({ jenis, title }) => {
     const { loading, progress, syncing, msg, syncingData, hasClicked } =
         useSyncing();
-    // useEffect(() => {
-    //     console.log(window.Echo.channel("syncProgress"));
+    const { processState, message } = useSelector(
+        (state) => state.process.default
+    );
 
-    //     window.Echo.channel("syncProgress").listen(
-    //         ".SyncProgressEvent",
-    //         (e) => {
-    //             console.log("Progress event:", e);
-    //             const { done, total } = e.progress;
-    //             const percent =
-    //                 total > 0 ? Math.round((done / total) * 100) : 0;
-    //             // setProgress(percent);
-    //         }
-    //     );
-    //     window.Echo.channel("sync-progress").listen(
-    //         "SyncProgressEvent",
-    //         (e) => {
-    //             console.log("Progress event:", e);
-    //             const { done, total } = e.progress;
-    //             const percent =
-    //                 total > 0 ? Math.round((done / total) * 100) : 0;
-    //             // setProgress(percent);
-    //         }
-    //     );
-    // }, []);
+    const newMsg = msg || message;
 
     const IconState = () => {
-        switch (hasClicked) {
+        switch (processState) {
             case "loading":
                 return <FontAwesomeIcon color="primary" icon={faSync} spin />;
             case "success":
                 return <FontAwesomeIcon color="green" icon={faCheckCircle} />;
-                // return <FontAwesomeIcon color="red" icon={faXmarkCircle} />;
-                break;
-
+            case "failed":
+                return <FontAwesomeIcon color="red" icon={faXmarkCircle} />;
             default:
-                break;
+                return null;
         }
     };
     return (
         <div className="absolute end-4 bottom-4 flex items-center gap-2">
-            {loading ? (
+            {processState == "loading" ? (
                 <>
                     <ProgressBarFR
-                        label={msg}
+                        label={newMsg}
                         width="w-72"
                         progress={progress}
                         color="gray-600"
@@ -64,15 +45,17 @@ const SyncFaceID = () => {
                     <div className="text-end text-sm text-gray-500">
                         <IconState />
                         <span className="font-semibold">
-                            Terakhir Sinkronisasi Face ID:
+                            Terakhir Sinkronisasi {title}:
                         </span>
                         <br />
                         {fullWaktuIndo()}
                         <br />
-                        {msg && <span>{msg}</span>}
+                        {newMsg && (
+                            <span className="text-yellow-400">{newMsg}</span>
+                        )}
                     </div>
                     <button
-                        onClick={() => syncingData(2)}
+                        onClick={() => syncingData(jenis)}
                         className="btn-primary rounded-full text-xs"
                     >
                         <FontAwesomeIcon icon={faSync} className="me-0" />
@@ -84,4 +67,4 @@ const SyncFaceID = () => {
     );
 };
 
-export default SyncFaceID;
+export default Sync;

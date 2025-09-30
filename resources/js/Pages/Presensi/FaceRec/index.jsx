@@ -29,7 +29,7 @@ import { RealTimeClock } from "../Clock";
 import { FaceProvider, useFaceContext } from "@/context/FaceContext";
 import { faSync } from "@fortawesome/free-solid-svg-icons";
 import fullWaktuIndo from "@/Functions/waktuIndo";
-import SyncFaceID from "./SyncFaceID";
+import SyncFaceID from "../Sync";
 
 function FaceRecog() {
     const props = usePage().props;
@@ -996,7 +996,6 @@ function FaceRecog() {
                 </div>
             )}
             <RefreshButton buttonRefresh={buttonRefresh} />
-            <SyncFaceID />
         </>
     );
 }

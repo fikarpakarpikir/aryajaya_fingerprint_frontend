@@ -1,6 +1,8 @@
 import sendDataGeneral from "@/Functions/sendDataGeneral";
+import { setMessage, setProcess } from "@/redux/slices/ProcessStateSlice";
 import dayjs from "dayjs";
 import { useState, useRef, useEffect } from "react";
+import { useDispatch } from "react-redux";
 
 export default function useSyncing() {
     const [loading, setLoading] = useState(false);
@@ -8,20 +10,12 @@ export default function useSyncing() {
     const [hasClicked, setHasClicked] = useState(null);
     const [msg, setMsg] = useState(null);
     const intervalRef = useRef(null);
+    const dispatch = useDispatch();
 
     useEffect(() => {
         if (!window.Echo) return;
         // const channel = window.Echo.channel("progress");
         const channel = window.Echo.channel("sync-progress");
-        // const channel2 = window.Echo.channel("syncProgress");
-        // const channel3 = window.Echo.channel(".sync-progress");
-        // const channel4 = window.Echo.channel(".syncProgress");
-
-        // console.log("🚀 ~ useSyncing ~ window.Echo:", window.Echo);
-        // console.log("🚀 ~ useSyncing ~ channel:", channel);
-        // console.log("🚀 ~ useSyncing ~ channel2:", channel2);
-        // console.log("🚀 ~ useSyncing ~ channel3:", channel3);
-        // console.log("🚀 ~ useSyncing ~ channel4:", channel4);
 
         const handler = (e) => {
             try {
@@ -31,10 +25,13 @@ export default function useSyncing() {
                     total > 0 ? Math.round((done / total) * 100) : 0;
 
                 setProgress(percent);
-                setMsg(`Synchronizing... ${done} / ${total}`);
+                dispatch(setMessage(`Synchronizing... ${done} / ${total}`));
+                // setMsg(`Synchronizing... ${done} / ${total}`);
                 if (percent >= 100) {
                     setLoading(false);
                     setHasClicked("success");
+                    dispatch(setProcess("success"));
+                    dispatch(setMessage("Sinkronisasi selesai"));
 
                     if (intervalRef.current) {
                         clearInterval(intervalRef.current);
@@ -55,35 +52,62 @@ export default function useSyncing() {
 
     const syncingData = async (jenisData) => {
         setMsg("");
-        const data = new FormData();
-        data.append("jenis_data", jenisData);
-        data.append("mulai", dayjs().subtract(2, "year").format("YYYY-MM-DD"));
-
+        // setHasClicked("loading");
         setLoading(true);
-        setHasClicked("loading");
+        dispatch(setMessage(""));
+        dispatch(setProcess("loading"));
         setProgress(0);
 
-        const res = await sendDataGeneral({
-            data,
-            route: route("sync_data"),
-            handleClose: () => {},
-            // onProgress: setProgress,
-            useRedux: false,
-            waitUntilFinish: true,
-            slicer: () => {},
-        });
-        // console.log("🚀 ~ syncingData ~ res:", res);
-        if (res.status == 200) {
-            const { done, total, status } = res.data;
-            if (status == "success" && done != total) {
-                setMsg(
-                    `Hanya ${done}/${total}. Tersisa ${
-                        total - done
-                    } data yang tidak berhasil`
-                );
-                setLoading(false);
-                setHasClicked("success");
+        try {
+            const data = new FormData();
+            data.append("jenis_data", jenisData);
+            data.append(
+                "mulai",
+                dayjs().subtract(2, "year").format("YYYY-MM-DD")
+            );
+
+            const res = await sendDataGeneral({
+                data,
+                route: route("sync_data"),
+                handleClose: () => {},
+                useRedux: false, // kalau mau Redux aware, bisa true
+                waitUntilFinish: true,
+                slicer: () => {},
+            });
+
+            if (res.status == 200) {
+                const { done, total, status } = res.data;
+
+                if (status === "success") {
+                    dispatch(setProcess("success"));
+                    if (done !== total) {
+                        dispatch(
+                            setMessage(
+                                `Hanya ${done}/${total}. Tersisa ${
+                                    total - done
+                                } data gagal`
+                            )
+                        );
+                    } else {
+                        dispatch(setMessage("Sinkronisasi berhasil"));
+                    }
+                } else {
+                    dispatch(setProcess("failed"));
+                    dispatch(
+                        setMessage(res.data.message || "Sinkronisasi gagal")
+                    );
+                }
+            } else {
+                dispatch(setProcess("failed"));
+                dispatch(setMessage("Sinkronisasi gagal: " + res.statusText));
+                // setHasClicked("failed");
             }
+        } catch (error) {
+            dispatch(setProcess("failed"));
+            dispatch(setMessage(error.message || "Terjadi kesalahan"));
+            setHasClicked("failed");
+        } finally {
+            setLoading(false);
         }
     };
 
