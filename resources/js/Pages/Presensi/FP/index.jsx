@@ -109,6 +109,13 @@ export default function FPScanner() {
         checkAlat();
     }, [urlScanner]);
 
+    useEffect(() => {
+        if (getMessage) {
+            const intervalId = setInterval(fetchEnrollmentStatus, 1000); // Poll every 1 second
+            fetchEnrollmentStatus(); // Fetch immediately
+            return () => clearInterval(intervalId); // Cleanup interval on component unmount
+        }
+    }, [getMessage]);
     return (
         <>
             <div className="absolute top-2 end-2">
