@@ -67,7 +67,10 @@ const Presensi = () => {
                         Presensi
                     </span>
 
-                    <div className="absolute bg-white px-3 py-1 border-s-2 border-primary end-0 shadow rounded-s-lg flex gap-2">
+                    <div className="absolute bg-white px-3 py-1 border-s-2 border-primary end-0 shadow rounded-s-lg flex flex-col gap-2">
+                        <span className="text-sm font-bold text-neutral-500">
+                            Mode
+                        </span>
                         {listMode.map((item) => (
                             <button
                                 disabled={processState == "loading"}

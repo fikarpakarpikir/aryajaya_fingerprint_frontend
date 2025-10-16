@@ -247,7 +247,7 @@ export default function FPScanner() {
         const kar = listKaryawans?.find(
             (item) => item.id == newData.id_karyawan
         );
-        console.log(kar?.dokumen);
+        // console.log(kar?.dokumen);
 
         fetchFotoProfil(kar?.dokumen?.[0]?.file);
         setKaryawan({

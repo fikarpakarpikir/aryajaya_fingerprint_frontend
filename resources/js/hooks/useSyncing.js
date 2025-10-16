@@ -118,7 +118,7 @@ export default function useSyncing() {
                             listSync,
                             "success",
                             "",
-                            "Sinkronisasi berhasil"
+                            `Sinkronisasi ${done}/${total} berhasil`
                         );
                         dispatch(setMessage("Sinkronisasi berhasil"));
                     }

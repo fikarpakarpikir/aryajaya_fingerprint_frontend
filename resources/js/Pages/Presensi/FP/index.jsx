@@ -13,7 +13,6 @@ import {
     faFingerprint,
     faXmark,
 } from "@fortawesome/free-solid-svg-icons";
-import { cekFP, stopFetching } from "./api";
 import NotifMaintenance from "../Maintenance";
 import {
     registeredReducer,
@@ -21,8 +20,9 @@ import {
 } from "@/redux/slices/FingerprintSlice";
 import axios from "axios";
 import { fetchReg } from "./api";
-import { fetchAlat } from "./api";
+// import { fetchAlat } from "./api";
 import { FPProvider, useFPContext } from "@/context/FPContext";
+import { PlayerGIFLost } from "@/Components/PlayerGIF";
 
 export function FPScanner() {
     const { props } = usePage();
@@ -30,13 +30,24 @@ export function FPScanner() {
     const urlScanner = `//${ipAlat}`;
     const fullScreenRef = useFullScreenHandle();
     const dispatch = useDispatch();
-    const { getMessage, activeFP } = useFPContext();
+    const {
+        message,
+        getMessage,
+        activeFP,
+        setLoading,
+        setGetMessage,
+        setMessage,
+        setActiveFP,
+        setListKaryawans,
+        setStatus,
+        fetchAlat,
+        cekFP,
+        stopFetching,
+    } = useFPContext();
 
     const [screenWidth, setScreenWidth] = useState(window.innerWidth);
     const [maintenance, setMaintenance] = useState(false);
     const [floatButtonFitur, setfloatButtonFitur] = useState(false);
-
-    const [listKaryawans, setListKaryawans] = useState(false);
 
     const [listFitur, setListFitur] = useState([
         { id: 1, title: "Presensi", status: true, comp: <Presensi /> },
@@ -58,7 +69,7 @@ export function FPScanner() {
         //                 import.meta.env.VITE_API_SERVER
         //             }/Karyawan/Presensi/Fingerprint`
         //         );
-        //         setListKaryawans(response.data.listKaryawan);
+        //         setListKaryawans(listKaryawan);
         //         dispatch(registeredReducer(response.data.registered));
         //     } catch (error) {
         //         console.error("Error fetching user data:", error);
@@ -77,40 +88,43 @@ export function FPScanner() {
     }, []);
 
     useEffect(() => {
-        const checkAlat = async () => {
-            if (!urlScanner) {
-                setActiveFP(false);
-                setMessage("URL scanner tidak valid");
-                return;
-            }
+        // const checkAlat = async () => {
+        //     if (!urlScanner) {
+        //         setActiveFP(false);
+        //         setMessage("URL scanner tidak valid");
+        //         return;
+        //     }
 
-            setLoading(true);
-            try {
-                const data = await fetchAlat(urlScanner);
-                setActiveFP(!!data.message);
-                setMessage(
-                    data.message ||
-                        "Alat tidak terhubung, silakan hubungi Tim IT"
-                );
-            } catch (error) {
-                console.error(error);
-                setActiveFP(false);
-                setMessage("Alat tidak terhubung, silakan hubungi Tim IT");
-            } finally {
-                setLoading(false);
-            }
-        };
+        //     setLoading(true);
+        //     try {
+        //         const data = await fetchAlat(urlScanner);
+        //         setActiveFP(!!data.message);
+        //         setMessage(
+        //             data.message ||
+        //                 "Alat tidak terhubung, silakan hubungi Tim IT"
+        //         );
+        //     } catch (error) {
+        //         console.error(error);
+        //         setActiveFP(false);
+        //         setMessage("Alat tidak terhubung, silakan hubungi Tim IT");
+        //     } finally {
+        //         setLoading(false);
+        //     }
+        // };
 
-        checkAlat();
+        // checkAlat();
+        fetchAlat();
     }, [urlScanner]);
 
-    useEffect(() => {
-        if (getMessage) {
-            const intervalId = setInterval(fetchEnrollmentStatus, 1000); // Poll every 1 second
-            fetchEnrollmentStatus(); // Fetch immediately
-            return () => clearInterval(intervalId); // Cleanup interval on component unmount
-        }
-    }, [getMessage]);
+    // ! Ganti dengan Reverb
+    // useEffect(() => {
+    //     if (getMessage) {
+    //         const intervalId = setInterval(fetchEnrollmentStatus, 1000); // Poll every 1 second
+    //         fetchEnrollmentStatus(); // Fetch immediately
+    //         return () => clearInterval(intervalId); // Cleanup interval on component unmount
+    //     }
+    // }, [getMessage]);
+
     return (
         <>
             <div className="absolute top-2 end-2">
@@ -121,7 +135,7 @@ export function FPScanner() {
             </div>
             {maintenance ? (
                 <NotifMaintenance />
-            ) : (
+            ) : activeFP ? (
                 <>
                     {floatButtonFitur && (
                         <div className="bg-white shadow-lg fixed bottom-8 text-white p-3 end-4 rounded-lg z-40 m-0">
@@ -216,6 +230,8 @@ export function FPScanner() {
                         ) : null
                     )}
                 </>
+            ) : (
+                <PlayerGIFLost message={message} />
             )}
         </>
     );

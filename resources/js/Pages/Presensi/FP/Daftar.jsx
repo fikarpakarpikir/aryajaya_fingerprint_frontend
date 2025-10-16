@@ -16,25 +16,25 @@ export default function Daftar() {
 
     const [listKaryawans, setListKaryawans] = useState(null);
 
-    useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const response = await axios.get(
-                    // "http://127.0.0.1:8000/api/Karyawan/Presensi/Fingerprint"
-                    `${
-                        import.meta.env.VITE_API_SERVER
-                    }/Karyawan/Presensi/Fingerprint`
-                );
-                // const response = await axios.get("/Get/Karyawan/Fingerprint");
-                setListKaryawans(response.data.listKaryawan);
-                dispatch(registeredReducer(response.data.registered));
-            } catch (error) {
-                console.error("Error fetching user data:", error);
-            }
-        };
+    // useEffect(() => {
+    //     const fetchData = async () => {
+    //         try {
+    //             const response = await axios.get(
+    //                 // "http://127.0.0.1:8000/api/Karyawan/Presensi/Fingerprint"
+    //                 `${
+    //                     import.meta.env.VITE_API_SERVER
+    //                 }/Karyawan/Presensi/Fingerprint`
+    //             );
+    //             // const response = await axios.get("/Get/Karyawan/Fingerprint");
+    //             setListKaryawans(response.data.listKaryawan);
+    //             dispatch(registeredReducer(response.data.registered));
+    //         } catch (error) {
+    //             console.error("Error fetching user data:", error);
+    //         }
+    //     };
 
-        fetchData();
-    }, []);
+    //     fetchData();
+    // }, []);
     if (!listKaryawans) {
         return <div>Loading...</div>; // Add loading state
     }
