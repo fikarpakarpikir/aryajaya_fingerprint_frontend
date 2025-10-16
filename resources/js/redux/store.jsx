@@ -1,5 +1,6 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import FingerprintSlice from "./slices/FingerprintSlice";
+import syncSlice from "./slices/syncSlice";
 import KaryawanSlice from "./slices/KaryawanSlice";
 import alatSlice from "./slices/Sistem/alatSlice";
 import statusesSlice from "./slices/Sistem/statusesSlice";
@@ -24,6 +25,7 @@ const store = configureStore({
         karyawan: KaryawanSlice,
         sistem: sistemReducer,
         fingerprints: FingerprintSlice,
+        sync: syncSlice,
     },
 });
 

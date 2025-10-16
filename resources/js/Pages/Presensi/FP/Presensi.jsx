@@ -1,10 +1,20 @@
+import { PlayerGIFLost, RenderPlayerGIF } from "@/Components/PlayerGIF";
+import { useFPContext } from "@/context/FPContext";
 import { usePage } from "@inertiajs/react";
+import { useState } from "react";
 import { useSelector } from "react-redux";
+import { getFitur } from "./api";
 
 export default function Presensi() {
     const { props } = usePage();
+
+    const { getMessage, message, activeFP, countdownScanning, status } =
+        useFPContext();
     const { ip_alat: ipAlat, jenis_kehadiran: jenisKehadiran } = props;
     const { urlScanner } = useSelector((state) => state.fingerprints);
+
+    const [karyawan, setKaryawan] = useState(null);
+    const [fotoProfil, setFotoProfil] = useState(null);
     return (
         <div className="relative ">
             {activeFP ? (
@@ -101,7 +111,12 @@ export default function Presensi() {
                     )}
                     {!karyawan && (
                         <div className="w-30 h-25 mx-auto text-wrap">
-                            {renderPlayerGIF(status, message)}
+                            {
+                                <RenderPlayerGIF
+                                    status={status}
+                                    message={message}
+                                />
+                            }
                         </div>
                     )}
                 </>

@@ -2,7 +2,11 @@ import ProgressBarFR from "@/Components/ProgressBar";
 import fullWaktuIndo from "@/Functions/waktuIndo";
 import useSyncing from "@/hooks/useSyncing";
 import { faXmarkCircle } from "@fortawesome/free-regular-svg-icons";
-import { faCheckCircle, faSync } from "@fortawesome/free-solid-svg-icons";
+import {
+    faCheckCircle,
+    faExclamationCircle,
+    faSync,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
@@ -10,16 +14,27 @@ import { useSelector } from "react-redux";
 const Sync = ({ jenis, title }) => {
     const { loading, progress, syncing, msg, syncingData, hasClicked } =
         useSyncing();
-    const { processState, message } = useSelector(
-        (state) => state.process.default
-    );
-
+    const { processState } = useSelector((state) => state.process.default);
+    const { fp, face } = useSelector((state) => state.sync);
+    const listState = {
+        1: fp,
+        2: face,
+    };
+    const active = listState[jenis];
+    const { status, message, waktu } = active;
     const newMsg = msg || message;
 
     const IconState = () => {
-        switch (processState) {
+        switch (status) {
             case "loading":
                 return <FontAwesomeIcon color="primary" icon={faSync} spin />;
+            case "success not all":
+                return (
+                    <FontAwesomeIcon
+                        color="orange"
+                        icon={faExclamationCircle}
+                    />
+                );
             case "success":
                 return <FontAwesomeIcon color="green" icon={faCheckCircle} />;
             case "failed":
@@ -30,7 +45,7 @@ const Sync = ({ jenis, title }) => {
     };
     return (
         <div className="absolute end-4 bottom-4 flex items-center gap-2">
-            {processState == "loading" ? (
+            {status == "loading" ? (
                 <>
                     <ProgressBarFR
                         label={newMsg}
@@ -48,7 +63,7 @@ const Sync = ({ jenis, title }) => {
                             Terakhir Sinkronisasi {title}:
                         </span>
                         <br />
-                        {fullWaktuIndo()}
+                        {fullWaktuIndo(waktu)}
                         <br />
                         {newMsg && (
                             <span className="text-yellow-400">{newMsg}</span>

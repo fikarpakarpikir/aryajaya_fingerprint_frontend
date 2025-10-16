@@ -8,6 +8,7 @@ use App\Models\Dokumen;
 use App\Models\JadwalKerja;
 use App\Models\Kehadiran;
 use App\Models\MacamKehadiran;
+use App\Models\Sinkronisasi;
 use App\Models\Sistem\Alat;
 use App\Models\Status;
 use GuzzleHttp\Client;
@@ -42,13 +43,23 @@ class Controller extends BaseController
         // dd(Alat::where('ip_device', $fullAddress)
         //     ->pluck('ip_alat')->first());
 
+
+        $getSync = function (int $jenis) {
+            return Sinkronisasi::where('jenis_data', $jenis)
+                ->latest('finished_at')
+                ->first();
+        };
         try {
             return Inertia::render(
                 'Presensi/index',
                 [
                     'ip_alat' => Alat::where('ip_device', $fullAddress)
                         ->pluck('ip_alat')->first(),
-                    'jenis_kehadiran' => Kehadiran::all()
+                    'jenis_kehadiran' => Kehadiran::all(),
+                    'last_sync' => [
+                        'fp' => $getSync(1),
+                        'face' => $getSync(2),
+                    ],
                 ]
             );
         } catch (\Throwable $th) {

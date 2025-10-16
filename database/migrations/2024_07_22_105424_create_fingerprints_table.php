@@ -16,7 +16,7 @@ return new class extends Migration
             $table->integer('id_karyawan');
             $table->integer('alat_id');
             $table->integer('template_id');
-            $table->string('template');
+            $table->string('template_dat');
             $table->integer('jari_id')->nullable();
             $table->timestamps();
         });

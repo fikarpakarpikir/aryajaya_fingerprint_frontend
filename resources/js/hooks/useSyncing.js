@@ -1,5 +1,6 @@
 import sendDataGeneral from "@/Functions/sendDataGeneral";
 import { setMessage, setProcess } from "@/redux/slices/ProcessStateSlice";
+import { setSync } from "@/redux/slices/syncSlice";
 import dayjs from "dayjs";
 import { useState, useRef, useEffect } from "react";
 import { useDispatch } from "react-redux";
@@ -50,10 +51,26 @@ export default function useSyncing() {
         };
     }, []); // <- hook ini selalu dipanggil, ga pernah conditional
 
+    function updateSync(jenis, status, waktu, message) {
+        dispatch(
+            setSync({
+                jenis,
+                status,
+                waktu,
+                message,
+            })
+        );
+    }
     const syncingData = async (jenisData) => {
+        const listSync = {
+            1: "fp",
+            2: "face",
+        }[jenisData];
         setMsg("");
         // setHasClicked("loading");
         setLoading(true);
+        updateSync(listSync, "loading", "", "");
+
         dispatch(setMessage(""));
         dispatch(setProcess("loading"));
         setProgress(0);
@@ -76,11 +93,19 @@ export default function useSyncing() {
             });
 
             if (res.status == 200) {
-                const { done, total, status } = res.data;
+                const { done, total, status, message } = res.data;
 
                 if (status === "success") {
                     dispatch(setProcess("success"));
                     if (done !== total) {
+                        updateSync(
+                            listSync,
+                            "success",
+                            "",
+                            `Hanya ${done}/${total}. Tersisa ${
+                                total - done
+                            } data gagal`
+                        );
                         dispatch(
                             setMessage(
                                 `Hanya ${done}/${total}. Tersisa ${
@@ -89,20 +114,67 @@ export default function useSyncing() {
                             )
                         );
                     } else {
+                        updateSync(
+                            listSync,
+                            "success",
+                            "",
+                            "Sinkronisasi berhasil"
+                        );
                         dispatch(setMessage("Sinkronisasi berhasil"));
                     }
+                } else if (status === "success not all") {
+                    dispatch(setProcess("success not all"));
+                    if (done !== total) {
+                        dispatch(
+                            setMessage(
+                                `Hanya ${done}/${total}. Tersisa ${
+                                    total - done
+                                } data gagal`
+                            )
+                        );
+
+                        updateSync(
+                            listSync,
+                            "success not all",
+                            "",
+                            `Hanya ${done}/${total}. Tersisa ${
+                                total - done
+                            } data gagal`
+                        );
+                    } else {
+                        updateSync(listSync, "success not all", "", message);
+                        dispatch(setMessage(message));
+                    }
                 } else {
+                    updateSync(
+                        listSync,
+                        "failed",
+                        "",
+                        res.data.message || "Sinkronisasi gagal"
+                    );
                     dispatch(setProcess("failed"));
                     dispatch(
                         setMessage(res.data.message || "Sinkronisasi gagal")
                     );
                 }
             } else {
+                updateSync(
+                    listSync,
+                    "failed",
+                    "",
+                    "Sinkronisasi gagal: " + res.statusText
+                );
                 dispatch(setProcess("failed"));
                 dispatch(setMessage("Sinkronisasi gagal: " + res.statusText));
                 // setHasClicked("failed");
             }
         } catch (error) {
+            updateSync(
+                listSync,
+                "failed",
+                "",
+                error.message || "Terjadi kesalahan"
+            );
             dispatch(setProcess("failed"));
             dispatch(setMessage(error.message || "Terjadi kesalahan"));
             setHasClicked("failed");

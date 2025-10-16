@@ -1,33 +1,57 @@
 import GuestLayout from "@/Layouts/GuestLayout";
 import FaceRecogPage from "./FaceRec";
-import FPScanner from "./FPScanner";
+// import FPScanner from "./FPScanner";
 import { RealTimeClock } from "./Clock";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 import ApplicationLogo from "@/Components/ApplicationLogo";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
     faCamera,
     faClipboardQuestion,
     faFingerprint,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import Sync from "./Sync";
+import FPScannerPage from "./FP";
+import { setSync } from "@/redux/slices/syncSlice";
 
 const Presensi = () => {
+    const dispatch = useDispatch();
+    const { props } = usePage();
+    const { last_sync } = props;
+
     const fullScreenRef = useFullScreenHandle();
     const { processState } = useSelector((state) => state.process.default);
 
-    const [mode, setMode] = useState("face");
+    const [mode, setMode] = useState("fp");
     const listMode = [
-        ["fp", faFingerprint, <FPScanner />, 1, "Fingerprint"],
+        ["fp", faFingerprint, <FPScannerPage />, 1, "Fingerprint"],
         ["face", faCamera, <FaceRecogPage />, 2, "Face ID"],
     ];
+
     const findMode = listMode.find((item) => item[0] === mode);
     const MainPage = () => {
         return findMode[2];
     };
+
+    useEffect(() => {
+        dispatch(
+            setSync({
+                jenis: "fp",
+                status: last_sync?.fp?.status,
+                waktu: last_sync?.fp?.finished_at,
+            })
+        );
+        dispatch(
+            setSync({
+                jenis: "face",
+                status: last_sync?.face?.status,
+                waktu: last_sync?.face?.finished_at,
+            })
+        );
+    }, []);
     // console.log(findMode[3]);
 
     return (

@@ -1,4 +1,5 @@
-import { DotLottieReact } from "@dotlottie/react";
+// import { DotLottieReact } from "@dotlottie/react";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import { BadgeClass } from "./BadgeClass";
 
 export const PlayerGIFScanning = ({ message, status }) => (
@@ -60,3 +61,18 @@ export const PlayerGIFLost = ({ message }) => (
         />
     </>
 );
+
+export const RenderPlayerGIF = ({ status, message }) => {
+    switch (status) {
+        case 1:
+            return <PlayerGIFScanning message={message} />;
+        case 2:
+            return <PlayerGIFLoading message={message} />;
+        case 3:
+            return <PlayerGIFFailed message={message} />;
+        case 4:
+            return <PlayerGIFSuccess message={message} />;
+        default:
+            return null;
+    }
+};

@@ -50,100 +50,10 @@ export default function FPScanner() {
     // const [listRegistereds, setListRegistereds] = useState(null);
     const { listRegistereds } = useSelector((state) => state.fingerprints);
 
-    const dummyKar = {
-        id: 9728,
-        mulai: "2025-07-09 10:38:40",
-        lokasi_longitude_mulai: "107.6327055",
-        lokasi_latitude_mulai: "-6.9550149",
-        id_jaker: 2157,
-        selesai: null,
-        lokasi_latitude_selesai: null,
-        created_at: "2025-07-09T03:38:40.000000Z",
-        find_jaker: {
-            id: 2157,
-            kode_ket: 1,
-            macam_hadir: 28,
-            mulai: "2024-01-16 08:30:00",
-            created_at: "2024-01-16T02:28:00.000000Z",
-            jenis: {
-                id: 28,
-                title: "Rutin",
-                total_durasi: null,
-                kode_hadir: 1,
-                updated_at: "2023-11-14T04:15:42.000000Z",
-                created_at: "2023-11-14T04:15:42.000000Z",
-            },
-            selesai: "2024-01-16 17:30:00",
-            title: "Kerja - Rutin",
-            kode_status: 3,
-            id_karyawan: 4,
-            encId: "eyJpdiI6Ilo5b1hBeHRqS2g4bnJQckkvalcrM2c9PSIsInZhbHVlIjoiMHlrdGVJSUkxUkhCdW82SEhiOFdBZz09IiwibWFjIjoiYjIyZjUxMGVhYjU1YTI1MzVjZTM2YTI0MzRhMjkzODZmOTNmMzBkMmIzMTgxZGEzOTg3YzYzYTg0MzRiN2JiMiIsInRhZyI6IiJ9",
-            updated_at: "2024-01-16T02:31:36.000000Z",
-            ket: {
-                encId: "eyJpdiI6InlQbWR1QitqWHh6ajgzM1pqM0lGQ0E9PSIsInZhbHVlIjoiMG5UeTFSQ3NmSVNmKzZQT1VTbzdCZz09IiwibWFjIjoiMmZmNDVlNjk4MzExNjA4M2M2NmRhMTdkODM2YzM2MTZlZWY1ZmFlYjI3OGRiMjk2NDQyNjMyZTlmZTc4Y2JlOCIsInRhZyI6IiJ9",
-                id: 1,
-                title: "Kerja",
-                updated_at: "2023-11-12T11:21:48.000000Z",
-                created_at: "2023-05-01T17:26:29.000000Z",
-            },
-            is_archive: null,
-            bukti: '["1","2","3","4","5"]',
-        },
-        id_karyawan: 4,
-        updated_at: "2025-07-09T03:38:40.000000Z",
-        lokasi_longitude_selesai: null,
-        jaker: {
-            id: 2157,
-            kode_ket: 1,
-            macam_hadir: 28,
-            mulai: "2024-01-16 08:30:00",
-            created_at: "2024-01-16T02:28:00.000000Z",
-            jenis: {
-                id: 28,
-                title: "Rutin",
-                total_durasi: null,
-                kode_hadir: 1,
-                updated_at: "2023-11-14T04:15:42.000000Z",
-                created_at: "2023-11-14T04:15:42.000000Z",
-            },
-            selesai: "2024-01-16 17:30:00",
-            title: "Kerja - Rutin",
-            kode_status: 3,
-            id_karyawan: 4,
-            encId: "eyJpdiI6IlVYWFFjR1pBVS91K1Npc2hMd2ZCVVE9PSIsInZhbHVlIjoieFZvRWpWZGdTTE1VOG1mRmtKbUpNUT09IiwibWFjIjoiYjU5NmZiMDFhODU1MWQ3NTk3ODg4YzMyOTgxNWZmYThmYzE5MzZiMmY5M2FjMjU5MWI4NGU3ODgxYjcxNTViOSIsInRhZyI6IiJ9",
-            updated_at: "2024-01-16T02:31:36.000000Z",
-            ket: {
-                encId: "eyJpdiI6IkVHcmVKbTNxeDUrSzVsUXhzY2VUTWc9PSIsInZhbHVlIjoiY3ZaeElWWi9zZ1c0NUxaYmdUa0p4UT09IiwibWFjIjoiNjVkYzE1ZDZiZTgwYjY5ODY4NmNkNmZkZTdlN2U4ZjI0MjgyNzI3NDBjZTYyZTEwMDE5ZjIwYzhlOTYyNjY4ZSIsInRhZyI6IiJ9",
-                id: 1,
-                title: "Kerja",
-                updated_at: "2023-11-12T11:21:48.000000Z",
-                created_at: "2023-05-01T17:26:29.000000Z",
-            },
-            is_archive: null,
-            bukti: '["1","2","3","4","5"]',
-        },
-        org: {
-            encId: "eyJpdiI6IkowcXBaclBjVk5CZ01TRXpNU3JZZkE9PSIsInZhbHVlIjoiVDg3MFh0a0luVnhBcHNtRk9HYWJBZz09IiwibWFjIjoiNmYyYzcxMzlkNjYxZTAwNGQ5YWQwOTA5Nzg0MDc2NDdhZWU3NGM5MTNmYmY2YTU0MGM5MzliZjA5NzEwM2RhMyIsInRhZyI6IiJ9",
-            id: 4,
-            dokumen: [
-                {
-                    no_identity: null,
-                    id: 5,
-                    created_at: "2025-02-14T02:27:13.000000Z",
-                    file: "foto_profil_68638e85e616c.png",
-                    jenis_data_id: 1,
-                    updated_at: "2025-07-01T07:30:13.000000Z",
-                    karyawan_id: 4,
-                },
-            ],
-            nama: "Fikar Mohammad Istiqlalul Wathan",
-        },
-    };
-
     const [maintenance, setMaintenance] = useState(false);
     const [karyawan, setKaryawan] = useState(null);
-    // const [karyawan, setKaryawan] = useState(dummyKar);
     const [fotoProfil, setFotoProfil] = useState(null);
+    // const [karyawan, setKaryawan] = useState(dummyKar);
 
     const [loading, setLoading] = useState(true);
     const [success, setSuccess] = useState(false);
@@ -179,64 +89,6 @@ export default function FPScanner() {
             .filter((part) => !wordsToRemove.includes(part));
         // console.log(panggilan);
         return panggilan;
-    };
-
-    const getIndex = (id) => {
-        let color,
-            text = "white",
-            title = jenisKehadiran?.find((item) => item.id == id)?.title;
-
-        switch (id) {
-            case 1:
-                color = "#00954a";
-                break;
-            case 2:
-                color = "#64748b";
-                break;
-            case 3:
-                color = "#64748b";
-                break;
-            case 4:
-                color = "#64748b";
-                break;
-            case 5:
-                color = "#64748b";
-                break;
-            case 6:
-                color = "#ae0a0a";
-                break;
-            case 7:
-                color = "#ffa151";
-                text = "dark";
-                break;
-            case 8:
-                color = "#ae0a0a";
-                break;
-            case 9:
-                color = "#55a6f8";
-                break;
-            case 10:
-                color = "#ffe421";
-                text = "dark";
-                break;
-            case 11:
-                color = "#55a6f8";
-                break;
-            case 12:
-                color = "#64748b";
-                break;
-            case 13:
-                color = "#64748b";
-                break;
-
-            default:
-                color = "light border border-dark border-2";
-                title = "Ruangan";
-                text = "dark";
-                break;
-        }
-
-        return { color: color, text: text, title: title };
     };
 
     useEffect(() => {

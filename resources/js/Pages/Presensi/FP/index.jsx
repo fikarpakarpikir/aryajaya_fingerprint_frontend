@@ -14,7 +14,6 @@ import {
     faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import { cekFP, stopFetching } from "./api";
-import { PlayerGIFLost } from "./PlayerGIFs";
 import NotifMaintenance from "../Maintenance";
 import {
     registeredReducer,
@@ -23,30 +22,26 @@ import {
 import axios from "axios";
 import { fetchReg } from "./api";
 import { fetchAlat } from "./api";
+import { FPProvider, useFPContext } from "@/context/FPContext";
 
-export default function FPScanner() {
+export function FPScanner() {
     const { props } = usePage();
     const { ip_alat: ipAlat, jenis_kehadiran: jenisKehadiran } = props;
     const urlScanner = `//${ipAlat}`;
     const fullScreenRef = useFullScreenHandle();
     const dispatch = useDispatch();
+    const { getMessage, activeFP } = useFPContext();
+
     const [screenWidth, setScreenWidth] = useState(window.innerWidth);
     const [maintenance, setMaintenance] = useState(false);
-    const [activeFP, setActiveFP] = useState(true);
     const [floatButtonFitur, setfloatButtonFitur] = useState(false);
 
     const [listKaryawans, setListKaryawans] = useState(false);
 
-    const [status, setStatus] = useState(0);
-    const [message, setMessage] = useState("Mohon tunggu...");
-    const [getMessage, setGetMessage] = useState(false);
-    const isFetching = useRef(false); // Ref to prevent concurrent fetches
-    const [countdownScanning, setCountdownScanning] = useState(0);
-
     const [listFitur, setListFitur] = useState([
-        { id: 1, title: "Presensi", status: true },
-        { id: 2, title: "Daftar", status: false },
-        { id: 3, title: "Hapus", status: false },
+        { id: 1, title: "Presensi", status: true, comp: <Presensi /> },
+        { id: 2, title: "Daftar", status: false, comp: <Daftar /> },
+        { id: 3, title: "Hapus", status: false, comp: <Hapus /> },
     ]);
 
     const openCloseFitur = (itemId) => {
@@ -216,14 +211,20 @@ export default function FPScanner() {
                     {listFitur.map((item) =>
                         item.status ? (
                             <div key={item.id} className="mt-3">
-                                {item.id === 1 && <Presensi />}
-                                {item.id === 2 && <Daftar />}
-                                {item.id === 3 && <Hapus />}
+                                {item.comp}
                             </div>
                         ) : null
                     )}
                 </>
             )}
         </>
+    );
+}
+
+export default function FPScannerPage() {
+    return (
+        <FPProvider>
+            <FPScanner />
+        </FPProvider>
     );
 }

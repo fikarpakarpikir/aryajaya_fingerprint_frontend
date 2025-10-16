@@ -8,11 +8,15 @@ use App\Models\Fingerprint;
 use App\Models\Sinkronisasi;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB as FacadesDB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
 class SinkronisasiController extends Controller
 {
+    private $status_pending = 'pending',
+        $status_success = 'success',
+        $status_partial = 'success not all',
+        $status_failed = 'failed';
 
     public function sync_data(Request $req)
     {
@@ -28,17 +32,17 @@ class SinkronisasiController extends Controller
             'finished_at' => 'nullable|date|after_or_equal:started_at',
         ]);
 
+        DB::beginTransaction();
         try {
             $url = "$this->apiServer/sync_data";
             $res = Http::post($url, $req);
+            $sync = Sinkronisasi::create([
+                'jenis_data' => $req->jenis_data,
+                'mulai' => $req->mulai,
+                'selesai' => $req->selesai,
+                'started_at' => now(),
+            ]);
             if ($res->successful()) {
-
-                $sync = Sinkronisasi::create([
-                    'jenis_data' => $req->jenis_data,
-                    'mulai' => $req->mulai,
-                    'selesai' => $req->selesai,
-                    'started_at' => now(),
-                ]);
                 $data = $res->json();
                 $total = count($data);
                 $done = 0;
@@ -47,8 +51,11 @@ class SinkronisasiController extends Controller
                     case 1:
                         $ids = collect($data)->map(fn($item) => [
                             'id_karyawan'       => $item['id_karyawan'],
+                            'jari_id'       => $item['jari_id'],
                             'template_id'       => $item['template_id'],
                             'template_dat'      => $item['template_dat'],
+                            'alat_id'      => $item['alat_id'],
+                            'dat_url'      => $item['dat_url'],
                             'updated_at'        => Carbon::parse($item['updated_at']),
                         ]);
 
@@ -70,36 +77,37 @@ class SinkronisasiController extends Controller
                             return Carbon::parse($found->updated_at)->greaterThanOrEqualTo($req['mulai']);
                             // return Carbon::parse($found->updated_at)->greaterThanOrEqualTo($item['updated_at']);
                         })->values()->all();
-
+                        // dd(($unreg));
                         foreach ($unreg as $item) {
                             $id = $item['id_karyawan'];
                             $template = $item['template_dat'];
+                            $template_id = $item['template_id'];
+                            $alat_id = $item['alat_id'];
+                            $jari = $item['jari_id'];
                             $path = public_path("assets/fingerprint");
-
                             if (!file_exists($path)) {
                                 mkdir($path, 0777, true);
                             }
 
                             $dat = Http::get($item['dat_url']);
-                            // dd($foto->successful());
                             if ($dat->successful()) {
-                                file_put_contents("$path/$template.png", $dat->body());
+                                file_put_contents("$path/$template", $dat->body());
+
 
                                 Fingerprint::updateOrCreate(
                                     [
                                         'id_karyawan' => $id,
+                                        'jari_id' => $jari,
                                     ],
                                     [
-                                        'template' =>  $template,
+                                        'alat_id' =>  $alat_id,
+                                        'template_id' =>  $template_id,
+                                        'template_dat' =>  $template,
                                         'updated_at' => $item['updated_at'],
                                     ]
                                 );
                                 $done++;
                             }
-
-
-                            // Broadcast progress event
-                            // \Log::info("Broadcast progress: done=$done, total=" . count($unreg));
                             broadcast(new SyncProgressEvent([
                                 'jenis_data'        => 1,
                                 'done'              => $done,
@@ -107,9 +115,9 @@ class SinkronisasiController extends Controller
                                 'id_karyawan'       => $id,
                             ]));
                         }
+
                         break;
                     case 2:
-                        // Ambil semua kombinasi id_karyawan & ekspresi_wajah_id dari API
                         $ids = collect($data)->map(fn($item) => [
                             'id_karyawan'       => $item['id_karyawan'],
                             'ekspresi_wajah_id' => $item['ekspresi_wajah_id'],
@@ -228,28 +236,73 @@ class SinkronisasiController extends Controller
                         break;
                 }
 
+                $totalUnreg  = count($unreg);
+                if ($done < $totalUnreg) {
+                    $sync->update([
+                        'status' => $this->status_partial,
+                        'finished_at' => now(),
+                        'done' => $done,
+                        'total' => $totalUnreg,
+                    ]);
+
+                    DB::commit();
+                    return response()->json([
+                        'status' => $this->status_partial,
+                        'message' => "Sinkronisasi selesai tapi tidak semua",
+                        'finished_at' => now(),
+                        'total' => $totalUnreg,
+                        'done' => $done,
+                    ]);
+                }
+
                 $sync->update([
+                    'status' => $this->status_success,
                     'finished_at' => now(),
                     'done' => $done,
-                    'total' => count($unreg),
+                    'total' => $totalUnreg,
                 ]);
 
+                DB::commit();
                 return response()->json([
-                    'status' => 'success',
+                    'status' => $this->status_success,
                     'message' => "Sinkronisasi selesai",
-                    'total' => count($unreg),
+                    'finished_at' => now(),
+                    'total' => $totalUnreg,
                     'done' => $done,
                 ]);
             }
             if ($res->failed()) {
+                $sync->update([
+                    'status' => $this->status_failed,
+                    'finished_at' => now(),
+                    'done' => 0,
+                    'total' => 0,
+                ]);
+                DB::commit();
+
                 return response()->json([
-                    'status' => 'error',
+                    'status' => $this->status_failed,
                     'message' => "Gagal sinkronisasi ke server",
+                    'finished_at' => now(),
                     'error' => $res->body(),
                 ], $res->status());
             }
         } catch (\Throwable $th) {
-            throw $th;
+            $sync = Sinkronisasi::create([
+                'jenis_data' => $req->jenis_data,
+                'mulai' => $req->mulai,
+                'selesai' => $req->selesai,
+                'started_at' => now(),
+                'finished_at' => now(),
+                'status' => $this->status_failed,
+            ]);
+            return response()->json([
+                'status' => $this->status_failed,
+                'jenis_data' => $req->jenis_data,
+                'message' => "Gagal sinkronisasi ke server",
+                'error' => 'error',
+            ]);
+            // throw $th;
         }
         // Sinkronisasi::create($req);
     }
