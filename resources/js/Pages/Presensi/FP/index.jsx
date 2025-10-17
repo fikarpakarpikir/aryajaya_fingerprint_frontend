@@ -43,11 +43,12 @@ export function FPScanner() {
         fetchAlat,
         cekFP,
         stopFetching,
+        floatButtonFitur,
+        setFloatButtonFitur,
     } = useFPContext();
 
     const [screenWidth, setScreenWidth] = useState(window.innerWidth);
     const [maintenance, setMaintenance] = useState(false);
-    const [floatButtonFitur, setfloatButtonFitur] = useState(false);
 
     const [listFitur, setListFitur] = useState([
         { id: 1, title: "Presensi", status: true, comp: <Presensi /> },
@@ -131,7 +132,7 @@ export function FPScanner() {
                                             }`}
                                             onClick={() => {
                                                 openCloseFitur(item.id);
-                                                setfloatButtonFitur(false);
+                                                setFloatButtonFitur(false);
                                             }}
                                             key={i}
                                         >
@@ -160,7 +161,7 @@ export function FPScanner() {
                                     <button
                                         className="text-xl text-primary"
                                         onClick={() =>
-                                            setfloatButtonFitur(false)
+                                            setFloatButtonFitur(false)
                                         }
                                     >
                                         <FontAwesomeIcon icon={faXmark} />
@@ -176,7 +177,7 @@ export function FPScanner() {
                             } border border-5 border-white text-white absolute w-12 h-12 end-0 bottom-0 mb-4 me-3 z-40 rounded-full`}
                             // onClick={() => cekFP(urlScanner, setActiveFP)}
                             onClick={() =>
-                                setfloatButtonFitur(!floatButtonFitur)
+                                setFloatButtonFitur(!floatButtonFitur)
                             }
                         >
                             <FontAwesomeIcon

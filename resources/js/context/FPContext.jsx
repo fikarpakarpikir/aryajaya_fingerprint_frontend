@@ -1,6 +1,16 @@
+import {
+    registeredAdd,
+    registeredDelete,
+} from "@/redux/slices/FingerprintSlice";
 import axios from "axios";
-import React, { createContext, useContext, useRef, useState } from "react";
-import { useSelector } from "react-redux";
+import React, {
+    createContext,
+    useContext,
+    useEffect,
+    useRef,
+    useState,
+} from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const FPContext = createContext({
     videoRef: null,
@@ -9,6 +19,8 @@ const FPContext = createContext({
     setListKaryawans: () => {},
     activeFP: true,
     setActiveFP: () => {},
+    floatButtonFitur: false,
+    setFloatButtonFitur: () => {},
     countdownScanning: 0,
     setCountdownScanning: () => {},
     status: 0,
@@ -35,6 +47,7 @@ const FPContext = createContext({
 });
 
 export function FPProvider({ children }) {
+    const dispatch = useDispatch();
     const videoRef = useRef(null);
     const hasDetectedRef = useRef(false);
     const isFetching = useRef(false); // Ref to prevent concurrent fetches
@@ -45,8 +58,10 @@ export function FPProvider({ children }) {
     const [activeFP, setActiveFP] = useState(true);
     const [countdownScanning, setCountdownScanning] = useState(0);
     const [status, setStatus] = useState(0);
+    const [floatButtonFitur, setFloatButtonFitur] = useState(false);
 
     const [listKaryawans, setListKaryawans] = useState(null);
+    const [newData, setNewData] = useState(null);
     const [notifError, setNotifError] = useState(false);
 
     const [loading, setLoading] = useState(true);
@@ -55,6 +70,70 @@ export function FPProvider({ children }) {
     const [subMessage, setSubMessage] = useState("");
     const [notif, setNotif] = useState(false);
     const [notifKosong, setNotifKosong] = useState(false);
+
+    useEffect(() => {
+        if (!window.Echo) return;
+
+        const channel = window.Echo.channel("status-fp");
+        const handler = (e) => {
+            try {
+                const {
+                    step,
+                    message,
+                    active,
+                    status,
+                    countdown,
+                    fiturId,
+                    newData,
+                } = e;
+                setMessage(message);
+                setActiveFP(active);
+                setStatus(status);
+                setGetMessage(countdown > 0 ? active : false);
+                switch (fiturId) {
+                    case 1:
+                        if (status == 4) {
+                            setNewData(newData);
+                            setTimeout(() => {
+                                getFitur(1);
+                            }, 3000);
+                        } else if (status === 3) {
+                            setNewData(null);
+                            setTimeout(() => {
+                                getFitur(1);
+                            }, 3000);
+                        }
+                        break;
+                    case 2:
+                        if (status === 4) {
+                            dispatch(registeredAdd(newData));
+                        }
+                        break;
+                    case 3:
+                        if (status === 4) {
+                            dispatch(registeredDelete(newData));
+                        }
+                        break;
+                    default:
+                        break;
+                }
+                setMessage(
+                    message || "Alat tidak terhubung, silakan hubungi Tim IT"
+                );
+            } catch (error) {
+                setMessage("Alat tidak terhubung, silakan hubungi Tim IT");
+                setGetMessage(false);
+                setStatus(3);
+                setCountdownScanning(0);
+                setActiveFP(false);
+                console.log(error);
+            }
+        };
+        channel.listen(".StatusFP", handler);
+        return () => {
+            channel.stopListening(".StatusFP", handler);
+        };
+    }, []);
 
     function goToHome(time = 3000) {
         setTimeout(() => {
@@ -71,7 +150,7 @@ export function FPProvider({ children }) {
                 { fiturId, id_karyawan },
                 { headers: { "Content-Type": "application/json" } }
             );
-            setfloatButtonFitur(false);
+            setFloatButtonFitur(false);
         } catch (error) {
             console.error(error);
             setGetMessage(false);
@@ -84,13 +163,13 @@ export function FPProvider({ children }) {
     const cekFP = async () => {
         try {
             const response = await axios.get(`${urlScanner}/check_fingerprint`);
-            const { status, message, countdown, active } = response.data;
-            setStatus(status);
-            setActiveFP(!!message);
-            setGetMessage(countdown > 0 ? active : false);
-            setMessage(
-                message || "Alat tidak terhubung, silakan hubungi Tim IT"
-            );
+            // const { status, message, countdown, active } = response.data;
+            // setStatus(status);
+            // setActiveFP(!!message);
+            // setGetMessage(countdown > 0 ? active : false);
+            // setMessage(
+            //     message || "Alat tidak terhubung, silakan hubungi Tim IT"
+            // );
         } catch (error) {
             setMessage("Alat tidak terhubung, silakan hubungi Tim IT");
             setGetMessage(false);
@@ -107,13 +186,13 @@ export function FPProvider({ children }) {
         isFetching.current = true;
         try {
             const response = await axios.get(`${urlScanner}/stop_fetching`);
-            setStatus(response.data.status);
-            setCountdownScanning(0);
-            setGetMessage(false);
-            setMessage(
-                response.data.message ||
-                    "Alat tidak terhubung, silakan hubungi Tim IT"
-            );
+            // setStatus(response.data.status);
+            // setCountdownScanning(0);
+            // setGetMessage(false);
+            // setMessage(
+            //     response.data.message ||
+            //         "Alat tidak terhubung, silakan hubungi Tim IT"
+            // );
             // setActiveFP(!!response.data.message);
         } catch (error) {
             setMessage("Alat tidak terhubung, silakan hubungi Tim IT");
@@ -135,12 +214,12 @@ export function FPProvider({ children }) {
         }
         try {
             const res = await axios.get(`${urlScanner}/check_fingerprint`);
-            setActiveFP(res.data.message ? true : false);
-            setMessage(
-                res.data.message
-                    ? res.data.message
-                    : "Alat tidak terhubung, silakan hubungi Tim IT"
-            );
+            // setActiveFP(res.data.message ? true : false);
+            // setMessage(
+            //     res.data.message
+            //         ? res.data.message
+            //         : "Alat tidak terhubung, silakan hubungi Tim IT"
+            // );
         } catch (error) {
             console.error(error);
             setActiveFP(false);
@@ -162,6 +241,8 @@ export function FPProvider({ children }) {
         setCountdownScanning,
         status,
         setStatus,
+        floatButtonFitur,
+        setFloatButtonFitur,
 
         notifError,
         setNotifError,

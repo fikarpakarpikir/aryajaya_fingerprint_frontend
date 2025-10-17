@@ -14,12 +14,13 @@ class StatusFPEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public $status;
     /**
      * Create a new event instance.
      */
-    public function __construct()
+    public function __construct($status)
     {
-        //
+        $this->status = $status;
     }
 
     /**
@@ -30,7 +31,17 @@ class StatusFPEvent
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('channel-name'),
+            new Channel('status-fp'),
         ];
+    }
+
+    public function broadcastAs()
+    {
+        return 'StatusFP';
+    }
+
+    public function broadcastWith()
+    {
+        return $this->status;
     }
 }

@@ -308,13 +308,25 @@ class FingerprintController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $req) {
-        
+    public function updateStatus(Request $req)
+    {
+        $req->validate([
+            'step' => 'required|numeric',
+            'message' => 'required|string',
+            'active' => 'required|boolean',
+            'status' => 'required|numeric',
+            'countdown' => 'required|numeric',
+            'fiturId' => 'required|numeric',
+            'newData' => 'nullable|array'
+        ]);
         broadcast(new StatusFPEvent([
-            'jenis_data'        => 1,
-            'done'              => $done,
-            'total'             => count($unreg),
-            'id_karyawan'       => $id,
+            'step'        => $req->step,
+            'message'        => $req->message,
+            'active'        => $req->active,
+            'status'        => $req->status,
+            'countdown'        => $req->countdown,
+            'fiturId'        => $req->fiturId,
+            'newData'        => $req->newData,
         ]));
     }
 }
