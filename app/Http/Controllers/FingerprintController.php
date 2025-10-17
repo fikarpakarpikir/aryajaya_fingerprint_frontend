@@ -14,6 +14,7 @@ use App\Models\Sistem\Alat;
 use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
+use App\Events\StatusFPEvent;
 
 #[AsController]
 class FingerprintController extends Controller
@@ -305,5 +306,15 @@ class FingerprintController extends Controller
                 ->get(),
             'registered' => Fingerprint::all()->load(['org']),
         ]);
+    }
+
+    public function updateStatus(Request $req) {
+        
+        broadcast(new StatusFPEvent([
+            'jenis_data'        => 1,
+            'done'              => $done,
+            'total'             => count($unreg),
+            'id_karyawan'       => $id,
+        ]));
     }
 }
