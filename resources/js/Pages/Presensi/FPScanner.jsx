@@ -52,8 +52,8 @@ export default function FPScanner() {
 
     const [maintenance, setMaintenance] = useState(false);
     const [karyawan, setKaryawan] = useState(null);
-    const [fotoProfil, setFotoProfil] = useState(null);
     // const [karyawan, setKaryawan] = useState(dummyKar);
+    const [fotoProfil, setFotoProfil] = useState(null);
 
     const [loading, setLoading] = useState(true);
     const [success, setSuccess] = useState(false);
@@ -247,7 +247,7 @@ export default function FPScanner() {
         const kar = listKaryawans?.find(
             (item) => item.id == newData.id_karyawan
         );
-        // console.log(kar?.dokumen);
+        console.log(kar?.dokumen);
 
         fetchFotoProfil(kar?.dokumen?.[0]?.file);
         setKaryawan({

@@ -9,6 +9,8 @@ import { useEffect, useState } from "react";
 import {
     faCamera,
     faClipboardQuestion,
+    faCompress,
+    faExpand,
     faFingerprint,
 } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -16,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import Sync from "./Sync";
 import FPScannerPage from "./FP";
 import { setSync } from "@/redux/slices/syncSlice";
+import { HR, Tooltip } from "flowbite-react";
 
 const Presensi = () => {
     const dispatch = useDispatch();
@@ -67,7 +70,7 @@ const Presensi = () => {
                         Presensi
                     </span>
 
-                    <div className="absolute bg-white px-3 py-1 border-s-2 border-primary end-0 shadow rounded-s-lg flex flex-col gap-2">
+                    <div className="absolute bg-white px-3 py-1 border-s-2 border-primary end-0 shadow rounded-s-lg flex flex-col justify-center gap-2">
                         <span className="text-sm font-bold text-neutral-500">
                             Mode
                         </span>
@@ -84,6 +87,39 @@ const Presensi = () => {
                                 <FontAwesomeIcon icon={item[1]} />
                             </button>
                         ))}
+                        <div className="flex flex-col justify-center text-center">
+                            <HR className="mt-0 mb-2" />
+
+                            <Tooltip
+                                content={
+                                    fullScreenRef?.active
+                                        ? "Kecilkan Layar"
+                                        : "Fullscreen"
+                                }
+                            >
+                                <div className="mx-1.5">
+                                    {fullScreenRef.active ? (
+                                        <button
+                                            className="btn btn-secondary inline-flex items-center gap-2 w-full"
+                                            onClick={fullScreenRef.exit}
+                                        >
+                                            <FontAwesomeIcon
+                                                icon={faCompress}
+                                            />
+                                            {/* Exit Fullscreen */}
+                                        </button>
+                                    ) : (
+                                        <button
+                                            className="btn btn-primary inline-flex items-center gap-2 w-full"
+                                            onClick={fullScreenRef.enter}
+                                        >
+                                            <FontAwesomeIcon icon={faExpand} />
+                                            {/* Enter Fullscreen */}
+                                        </button>
+                                    )}
+                                </div>
+                            </Tooltip>
+                        </div>
                     </div>
                     <RealTimeClock />
                     <MainPage />

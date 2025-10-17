@@ -88,31 +88,6 @@ export function FPScanner() {
     }, []);
 
     useEffect(() => {
-        // const checkAlat = async () => {
-        //     if (!urlScanner) {
-        //         setActiveFP(false);
-        //         setMessage("URL scanner tidak valid");
-        //         return;
-        //     }
-
-        //     setLoading(true);
-        //     try {
-        //         const data = await fetchAlat(urlScanner);
-        //         setActiveFP(!!data.message);
-        //         setMessage(
-        //             data.message ||
-        //                 "Alat tidak terhubung, silakan hubungi Tim IT"
-        //         );
-        //     } catch (error) {
-        //         console.error(error);
-        //         setActiveFP(false);
-        //         setMessage("Alat tidak terhubung, silakan hubungi Tim IT");
-        //     } finally {
-        //         setLoading(false);
-        //     }
-        // };
-
-        // checkAlat();
         fetchAlat();
     }, [urlScanner]);
 
@@ -135,10 +110,10 @@ export function FPScanner() {
             </div>
             {maintenance ? (
                 <NotifMaintenance />
-            ) : activeFP ? (
+            ) : (
                 <>
                     {floatButtonFitur && (
-                        <div className="bg-white shadow-lg fixed bottom-8 text-white p-3 end-4 rounded-lg z-40 m-0">
+                        <div className="bg-white shadow-lg absolute bottom-4 text-white p-3 end-4 rounded-lg z-40 m-0">
                             <div className="flex flex-col gap-1">
                                 {activeFP ? (
                                     listFitur?.map((item, i) => (
@@ -181,21 +156,6 @@ export function FPScanner() {
                                 >
                                     Stop Sensor
                                 </button>
-                                {fullScreenRef.active ? (
-                                    <button
-                                        className="btn btn-secondary"
-                                        onClick={fullScreenRef.exit}
-                                    >
-                                        Exit Fullscreen
-                                    </button>
-                                ) : (
-                                    <button
-                                        className="btn btn-primary"
-                                        onClick={fullScreenRef.enter}
-                                    >
-                                        Enter Fullscreen
-                                    </button>
-                                )}
                                 <div className="text-end">
                                     <button
                                         className="text-xl text-primary"
@@ -213,8 +173,11 @@ export function FPScanner() {
                         <button
                             className={`${
                                 activeFP ? "btn-primary" : "btn-danger"
-                            } border border-5 border-white text-white fixed w-12 h-12 end-0 bottom-8 mb-4 me-3 z-40 rounded-full`}
-                            onClick={() => cekFP(urlScanner, setActiveFP)}
+                            } border border-5 border-white text-white absolute w-12 h-12 end-0 bottom-0 mb-4 me-3 z-40 rounded-full`}
+                            // onClick={() => cekFP(urlScanner, setActiveFP)}
+                            onClick={() =>
+                                setfloatButtonFitur(!floatButtonFitur)
+                            }
                         >
                             <FontAwesomeIcon
                                 icon={activeFP ? faBars : faFingerprint}
@@ -222,16 +185,20 @@ export function FPScanner() {
                             />
                         </button>
                     )}
-                    {listFitur.map((item) =>
-                        item.status ? (
-                            <div key={item.id} className="mt-3">
-                                {item.comp}
-                            </div>
-                        ) : null
+                    {activeFP ? (
+                        <>
+                            {listFitur.map((item) =>
+                                item.status ? (
+                                    <div key={item.id} className="mt-3">
+                                        {item.comp}
+                                    </div>
+                                ) : null
+                            )}
+                        </>
+                    ) : (
+                        <PlayerGIFLost message={message} />
                     )}
                 </>
-            ) : (
-                <PlayerGIFLost message={message} />
             )}
         </>
     );

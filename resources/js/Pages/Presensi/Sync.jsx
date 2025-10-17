@@ -22,6 +22,7 @@ const Sync = ({ jenis, title }) => {
     };
     const active = listState[jenis];
     const { status, message, waktu } = active;
+    // const status = "loading";
     const newMsg = msg || message;
 
     const IconState = () => {
@@ -44,40 +45,56 @@ const Sync = ({ jenis, title }) => {
         }
     };
     return (
-        <div className="absolute end-4 bottom-4 flex items-center gap-2">
-            {status == "loading" ? (
-                <>
-                    <ProgressBarFR
-                        label={newMsg}
-                        width="w-72"
-                        progress={progress}
-                        color="gray-600"
-                        size="sm"
-                    />
-                </>
-            ) : (
-                <>
-                    <div className="text-end text-sm text-gray-500">
-                        <IconState />
-                        <span className="font-semibold">
-                            Terakhir Sinkronisasi {title}:
-                        </span>
-                        <br />
-                        {fullWaktuIndo(waktu)}
-                        <br />
-                        {newMsg && (
-                            <span className="text-yellow-400">{newMsg}</span>
-                        )}
-                    </div>
-                    <button
-                        onClick={() => syncingData(jenis)}
-                        className="btn-primary rounded-full text-xs"
-                    >
-                        <FontAwesomeIcon icon={faSync} className="me-0" />
-                        {/* Update Face ID */}
-                    </button>
-                </>
-            )}
+        <div
+            className={`transition-all duration-200 ease-in-out
+                ${
+                    status === "loading"
+                        ? "absolute inset-0 flex items-center justify-center bg-gray-800/50 backdrop-blur-md z-50"
+                        : "absolute left-0 bottom-0"
+                }
+            `}
+            //   className="absolute left-4 bottom-4 flex items-center gap-2"
+        >
+            <div
+                className={`transition-all duration-200 ease-in rounded-lg p-4 flex items-center gap-2
+                    ${status == "loading" ? "bg-white" : "bg-neutral-50/0"}
+                `}
+            >
+                {status == "loading" ? (
+                    <>
+                        <ProgressBarFR
+                            label={newMsg}
+                            width="w-72"
+                            progress={progress}
+                            color="gray-600"
+                            size="sm"
+                        />
+                    </>
+                ) : (
+                    <>
+                        <button
+                            onClick={() => syncingData(jenis)}
+                            className="btn-primary rounded-full text-xs"
+                        >
+                            <FontAwesomeIcon icon={faSync} />
+                        </button>
+                        <div className="text-start text-sm text-gray-500">
+                            <IconState />
+                            <span className="font-semibold ml-1">
+                                Terakhir Sinkronisasi {title}:
+                            </span>
+                            <br />
+                            {fullWaktuIndo(waktu)}
+                            <br />
+                            {newMsg && (
+                                <span className="text-yellow-400">
+                                    {newMsg}
+                                </span>
+                            )}
+                        </div>
+                    </>
+                )}
+            </div>
         </div>
     );
 };
