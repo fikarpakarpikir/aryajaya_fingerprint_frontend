@@ -49,6 +49,7 @@ export function FPScanner() {
 
     const [screenWidth, setScreenWidth] = useState(window.innerWidth);
     const [maintenance, setMaintenance] = useState(false);
+    const [isFetched, setIsFetched] = useState(false);
 
     const [listFitur, setListFitur] = useState([
         { id: 1, title: "Presensi", status: true, comp: <Presensi /> },
@@ -63,19 +64,6 @@ export function FPScanner() {
     };
 
     useEffect(() => {
-        // const fetchData = async () => {
-        //     try {
-        //         const response = await axios.get(
-        //             `${
-        //                 import.meta.env.VITE_API_SERVER
-        //             }/Karyawan/Presensi/Fingerprint`
-        //         );
-        //         setListKaryawans(listKaryawan);
-        //         dispatch(registeredReducer(response.data.registered));
-        //     } catch (error) {
-        //         console.error("Error fetching user data:", error);
-        //     }
-        // };
 
         // fetchData();
         fetchReg().then((data) => {
@@ -89,17 +77,12 @@ export function FPScanner() {
     }, []);
 
     useEffect(() => {
-        fetchAlat();
-    }, [urlScanner]);
-
-    // ! Ganti dengan Reverb
-    // useEffect(() => {
-    //     if (getMessage) {
-    //         const intervalId = setInterval(fetchEnrollmentStatus, 1000); // Poll every 1 second
-    //         fetchEnrollmentStatus(); // Fetch immediately
-    //         return () => clearInterval(intervalId); // Cleanup interval on component unmount
-    //     }
-    // }, [getMessage]);
+        console.log('ok')
+  if (!isFetched) {
+    fetchAlat();
+    setIsFetched(true);
+  }
+}, [isFetched]);
 
     return (
         <>

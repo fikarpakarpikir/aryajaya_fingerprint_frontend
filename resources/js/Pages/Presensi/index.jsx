@@ -5,7 +5,7 @@ import { RealTimeClock } from "./Clock";
 import { FullScreen, useFullScreenHandle } from "react-full-screen";
 import { Link, usePage } from "@inertiajs/react";
 import ApplicationLogo from "@/Components/ApplicationLogo";
-import { useEffect, useState } from "react";
+import { useEffect, useState, memo } from "react";
 import {
     faCamera,
     faClipboardQuestion,
@@ -20,6 +20,10 @@ import FPScannerPage from "./FP";
 import { setSync } from "@/redux/slices/syncSlice";
 import { HR, Tooltip } from "flowbite-react";
 
+const MainPage = memo(({ PageComponent }) => {
+    return <PageComponent />;
+});
+
 const Presensi = () => {
     const dispatch = useDispatch();
     const { props } = usePage();
@@ -30,14 +34,13 @@ const Presensi = () => {
 
     const [mode, setMode] = useState("fp");
     const listMode = [
-        ["fp", faFingerprint, <FPScannerPage />, 1, "Fingerprint"],
-        ["face", faCamera, <FaceRecogPage />, 2, "Face ID"],
+        ["fp", faFingerprint, FPScannerPage, 1, "Fingerprint"],
+        ["face", faCamera, FaceRecogPage, 2, "Face ID"],
     ];
 
-    const findMode = listMode.find((item) => item[0] === mode);
-    const MainPage = () => {
-        return findMode[2];
-    };
+    
+const findMode = listMode.find((item) => item[0] === mode);
+const PageComponent = findMode[2];
 
     useEffect(() => {
         dispatch(
@@ -122,7 +125,7 @@ const Presensi = () => {
                         </div>
                     </div>
                     <RealTimeClock />
-                    <MainPage />
+                    <MainPage PageComponent={PageComponent} />
                     <Sync jenis={findMode?.[3]} title={findMode?.[4]} />
                 </div>
             </FullScreen>

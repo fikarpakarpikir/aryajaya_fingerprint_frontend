@@ -75,6 +75,10 @@ export function FPProvider({ children }) {
         if (!window.Echo) return;
 
         const channel = window.Echo.channel("status-fp");
+
+    channel.error((err) => {
+        console.error("⚠️ Channel error:", err);
+    });
         const handler = (e) => {
             try {
                 const {
@@ -92,16 +96,11 @@ export function FPProvider({ children }) {
                 setGetMessage(countdown > 0 ? active : false);
                 switch (fiturId) {
                     case 1:
-                        if (status == 4) {
-                            setNewData(newData);
-                            setTimeout(() => {
-                                getFitur(1);
-                            }, 3000);
-                        } else if (status === 3) {
-                            setNewData(null);
-                            setTimeout(() => {
-                                getFitur(1);
-                            }, 3000);
+                        if (status === 4 || status === 3) {
+                            setNewData(status === 4 ? newData : null);
+                            setTimeout(() => getFitur(1), 3000);
+                            setGetMessage(false);
+                            setCountdownScanning(0);
                         }
                         break;
                     case 2:
@@ -117,9 +116,9 @@ export function FPProvider({ children }) {
                     default:
                         break;
                 }
-                setMessage(
-                    message || "Alat tidak terhubung, silakan hubungi Tim IT"
-                );
+                // setMessage(
+                //     message || "Alat tidak terhubung, silakan hubungi Tim IT"
+                // );
             } catch (error) {
                 setMessage("Alat tidak terhubung, silakan hubungi Tim IT");
                 setGetMessage(false);
@@ -131,7 +130,7 @@ export function FPProvider({ children }) {
         };
         channel.listen(".StatusFP", handler);
         return () => {
-            channel.stopListening(".StatusFP", handler);
+            channel.stopListening(".StatusFP");
         };
     }, []);
 
@@ -214,6 +213,7 @@ export function FPProvider({ children }) {
         }
         try {
             const res = await axios.get(`${urlScanner}/check_fingerprint`);
+            console.log('ini');
             // setActiveFP(res.data.message ? true : false);
             // setMessage(
             //     res.data.message

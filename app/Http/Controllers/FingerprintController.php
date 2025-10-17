@@ -15,8 +15,9 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use App\Events\StatusFPEvent;
+use Illuminate\Support\Facades\Log;
 
-#[AsController]
+// #[AsController]
 class FingerprintController extends Controller
 {
     public  function getIdAlat($ip)
@@ -310,23 +311,31 @@ class FingerprintController extends Controller
 
     public function updateStatus(Request $req)
     {
-        $req->validate([
-            'step' => 'required|numeric',
-            'message' => 'required|string',
-            'active' => 'required|boolean',
-            'status' => 'required|numeric',
-            'countdown' => 'required|numeric',
-            'fiturId' => 'required|numeric',
-            'newData' => 'nullable|array'
-        ]);
-        broadcast(new StatusFPEvent([
-            'step'        => $req->step,
-            'message'        => $req->message,
-            'active'        => $req->active,
-            'status'        => $req->status,
-            'countdown'        => $req->countdown,
-            'fiturId'        => $req->fiturId,
-            'newData'        => $req->newData,
-        ]));
+        try {
+            $req->merge([
+    'active' => strtolower($req->active) === 'true' || $req->active == 1,
+]);
+            $req->validate([
+                'step' => 'required|numeric',
+                'message' => 'required|string',
+                'active' => 'required|boolean',
+                'status' => 'required|numeric',
+                'countdown' => 'required|numeric',
+                'fiturId' => 'required|numeric',
+                'newData' => 'nullable|array'
+            ]);
+            broadcast(new StatusFPEvent([
+                'step'        => $req->step,
+                'message'        => $req->message,
+                'active'        => $req->active,
+                'status'        => $req->status,
+                'countdown'        => $req->countdown,
+                'fiturId'        => $req->fiturId,
+                'newData'        => $req->newData,
+            ]));
+            return $req;
+        } catch (\Throwable $th) {
+            dd($th);
+        }
     }
 }
