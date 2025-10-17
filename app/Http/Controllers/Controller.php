@@ -37,12 +37,12 @@ class Controller extends BaseController
         // dd($this->apiServer);
         // $ipAddress = '192.168.0.200';
         // $port = '5000';
-        $ipAddress = request()->ip();
+        $ipAddress = env('APP_URL');
+        // $ipAddress = request()->ip();
         $port = request()->getPort();
         $fullAddress = $ipAddress . ':' . $port;
         // dd(Alat::where('ip_device', $fullAddress)
         //     ->pluck('ip_alat')->first());
-
 
         $getSync = function (int $jenis) {
             return Sinkronisasi::where('jenis_data', $jenis)

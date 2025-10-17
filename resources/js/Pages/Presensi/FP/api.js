@@ -4,6 +4,7 @@ import axios from "axios";
 const API_BASE = import.meta.env.VITE_API_SERVER;
 
 export const fetchReg = async () => {
+    // console.log(API_BASE);
     try {
         const response = await axios.get(
             `${API_BASE}/Karyawan/Presensi/Fingerprint`
