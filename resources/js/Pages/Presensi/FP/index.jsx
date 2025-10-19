@@ -77,12 +77,11 @@ export function FPScanner() {
     }, []);
 
     useEffect(() => {
-        console.log('ok')
-  if (!isFetched) {
-    fetchAlat();
-    setIsFetched(true);
-  }
-}, [isFetched]);
+        if (!isFetched) {
+            fetchAlat();
+            setIsFetched(true);
+        }
+    }, [isFetched]);
 
     return (
         <>

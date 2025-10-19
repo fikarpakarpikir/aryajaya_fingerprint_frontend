@@ -152,6 +152,8 @@ export function FPProvider({ children }) {
             setFloatButtonFitur(false);
         } catch (error) {
             console.error(error);
+            setActiveFP(false)
+            setMessage('Sensor Mati, Silakan Coba Klik Cek Alat')
             setGetMessage(false);
             setCountdownScanning(0);
         } finally {
