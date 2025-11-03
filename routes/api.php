@@ -38,6 +38,7 @@ Route::group(['prefix' => 'Karyawan', 'as' => 'Kar.'], function () {
 });
 // routes/api.php
 Route::post('/status-fingerprint', [FingerprintController::class, 'updateStatus'])->name('updateStatus');
+Route::post('/status-fingerprint-sync', [FingerprintController::class, 'updateStatusSync'])->name('updateStatusSync');
 
 // Route::group(['as' => 'api.'], function () {
 //     Route::group(['prefix' => 'LMS'], function () {

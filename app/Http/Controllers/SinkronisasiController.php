@@ -6,6 +6,7 @@ use App\Events\SyncProgressEvent;
 use App\Models\Auth\FaceRecognition;
 use App\Models\Fingerprint;
 use App\Models\Sinkronisasi;
+use App\Http\Controllers\FingerprintController;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -47,6 +48,7 @@ class SinkronisasiController extends Controller
                 $total = count($data);
                 $done = 0;
                 $unreg = [];
+                $step = 1;
                 switch ($req->jenis_data) {
                     case 1:
                         $ids = collect($data)->map(fn($item) => [
@@ -113,7 +115,15 @@ class SinkronisasiController extends Controller
                                 'done'              => $done,
                                 'total'             => count($unreg),
                                 'id_karyawan'       => $id,
+                                'step'              => 1,
                             ]));
+                        }
+                        try {
+                            (new FingerprintController())->getFitur(4);
+                            $step =2;
+
+                        } catch (\Throwable $th) {
+                            return $th->getMessage();
                         }
 
                         break;
@@ -236,6 +246,7 @@ class SinkronisasiController extends Controller
                         break;
                 }
 
+
                 $totalUnreg  = count($unreg);
                 if ($done < $totalUnreg) {
                     $sync->update([
@@ -254,7 +265,6 @@ class SinkronisasiController extends Controller
                         'done' => $done,
                     ]);
                 }
-
                 $sync->update([
                     'status' => $this->status_success,
                     'finished_at' => now(),
@@ -270,6 +280,8 @@ class SinkronisasiController extends Controller
                     'total' => $totalUnreg,
                     'done' => $done,
                 ]);
+
+
             }
             if ($res->failed()) {
                 $sync->update([
@@ -300,7 +312,7 @@ class SinkronisasiController extends Controller
                 'status' => $this->status_failed,
                 'jenis_data' => $req->jenis_data,
                 'message' => "Gagal sinkronisasi ke server",
-                'error' => 'error',
+                'error' => $th->getMessage(),
             ]);
             // throw $th;
         }

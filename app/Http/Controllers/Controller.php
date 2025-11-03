@@ -25,24 +25,21 @@ use Inertia\Inertia;
 class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
-    public $apiServer;
+    public $apiServer, $ipAlat;
 
     public function __construct()
     {
         $this->apiServer = env('VITE_API_SERVER');
-    }
-
-    public function home()
-    {
-        // dd($this->apiServer);
-        // $ipAddress = '192.168.0.200';
-        // $port = '5000';
         $ipAddress = env('APP_URL');
         // $ipAddress = request()->ip();
         $port = request()->getPort();
         $fullAddress = $ipAddress . ':' . $port;
-        // dd(Alat::where('ip_device', $fullAddress)
-        //     ->pluck('ip_alat')->first());
+        $this->apiAlat = Alat::where('ip_device', $fullAddress)
+                        ->pluck('ip_alat')->first();
+    }
+
+    public function home()
+    {
 
         $getSync = function (int $jenis) {
             return Sinkronisasi::where('jenis_data', $jenis)
@@ -53,8 +50,7 @@ class Controller extends BaseController
             return Inertia::render(
                 'Presensi/index',
                 [
-                    'ip_alat' => Alat::where('ip_device', $fullAddress)
-                        ->pluck('ip_alat')->first(),
+                    'ip_alat' => $this->apiAlat,
                     'jenis_kehadiran' => Kehadiran::all(),
                     'last_sync' => [
                         'fp' => $getSync(1),

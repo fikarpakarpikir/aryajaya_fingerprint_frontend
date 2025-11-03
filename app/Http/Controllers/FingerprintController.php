@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\SyncProgressEvent;
 use App\Http\Controllers\API\UserController;
 use App\Models\Presensi;
 use App\Models\Fingerprint;
@@ -16,6 +17,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use App\Events\StatusFPEvent;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
 
 // #[AsController]
 class FingerprintController extends Controller
@@ -313,8 +315,8 @@ class FingerprintController extends Controller
     {
         try {
             $req->merge([
-    'active' => strtolower($req->active) === 'true' || $req->active == 1,
-]);
+                'active' => strtolower($req->active) === 'true' || $req->active == 1,
+            ]);
             $req->validate([
                 'step' => 'required|numeric',
                 'message' => 'required|string',
@@ -338,4 +340,37 @@ class FingerprintController extends Controller
             dd($th);
         }
     }
+    public function updateStatusSync(Request $req)
+    {
+        try {
+            $req->validate([
+                'done' => 'required|numeric',
+                'total' => 'required|numeric',
+            ]);
+            
+            // * NOTE step:
+            // 1. downloading
+            // 2. migrating
+
+            broadcast(new SyncProgressEvent([
+                'jenis_data'        => 1,
+                'done'              => $req->done,
+                'total'             => $req->total,
+                'step'              => 2,
+            ]));
+            return $req;
+        } catch (\Throwable $th) {
+            dd($th);
+        }
+    }
+
+    public function getFitur($target_function)
+    {
+        $response = Http::post("{$this->apiAlat}/fitur", [
+            'fiturId' => $target_function,
+        ]);
+
+        return $response->json();
+    }
+
 }

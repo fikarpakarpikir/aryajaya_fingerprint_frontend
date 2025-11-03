@@ -1,4 +1,5 @@
 import sendDataGeneral from "@/Functions/sendDataGeneral";
+
 import { setMessage, setProcess } from "@/redux/slices/ProcessStateSlice";
 import { setSync } from "@/redux/slices/syncSlice";
 import dayjs from "dayjs";
@@ -20,19 +21,40 @@ export default function useSyncing() {
 
         const handler = (e) => {
             try {
-                // console.log("🚀 ~ handler ~ e:", e);
-                const { done, total } = e;
+                const { done, total, step, status } = e;
                 const percent =
                     total > 0 ? Math.round((done / total) * 100) : 0;
 
                 setProgress(percent);
-                dispatch(setMessage(`Synchronizing... ${done} / ${total}`));
+                const msgState = {
+                    1: 'Downloading',
+                    2: 'Migrating',
+                }[step]
+
+                const msgLocal = `${msgState}... ${done} / ${total}`
+                const msgStep = `Step ${step}/2: ${msgLocal}`
+                setMsg(msgLocal);
+                dispatch(setMessage(msgLocal));
                 // setMsg(`Synchronizing... ${done} / ${total}`);
-                if (percent >= 100) {
+                updateSync(
+                    'fp',
+                    'loading',
+                    "",
+                    msgLocal,
+                    step
+                );
+                if (percent >= 100 && step == 2) {
                     setLoading(false);
                     setHasClicked("success");
                     dispatch(setProcess("success"));
                     dispatch(setMessage("Sinkronisasi selesai"));
+                    updateSync(
+                        'fp',
+                        "success",
+                        "",
+                        msgLocal,
+                        step
+                    );
 
                     if (intervalRef.current) {
                         clearInterval(intervalRef.current);
@@ -51,16 +73,18 @@ export default function useSyncing() {
         };
     }, []); // <- hook ini selalu dipanggil, ga pernah conditional
 
-    function updateSync(jenis, status, waktu, message) {
+    function updateSync(jenis, status, waktu, message, step) {
         dispatch(
             setSync({
                 jenis,
                 status,
                 waktu,
                 message,
+                step
             })
         );
     }
+
     const syncingData = async (jenisData) => {
         const listSync = {
             1: "fp",

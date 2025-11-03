@@ -3,7 +3,10 @@ import fullWaktuIndo from "@/Functions/waktuIndo";
 import useSyncing from "@/hooks/useSyncing";
 import { faXmarkCircle } from "@fortawesome/free-regular-svg-icons";
 import {
+    faArrowsRotate,
+    faCheck,
     faCheckCircle,
+    faDownload,
     faExclamationCircle,
     faSync,
 } from "@fortawesome/free-solid-svg-icons";
@@ -21,9 +24,11 @@ const Sync = ({ jenis, title }) => {
         2: face,
     };
     const active = listState[jenis];
-    const { status, message, waktu } = active;
+    const { status, message, waktu, step } = active;
     // const status = "loading";
     const newMsg = msg || message;
+    const showLoading = status === "loading"
+
 
     const IconState = () => {
         switch (status) {
@@ -48,7 +53,7 @@ const Sync = ({ jenis, title }) => {
         <div
             className={`transition-all duration-200 ease-in-out
                 ${
-                    status === "loading"
+                    showLoading
                         ? "absolute inset-0 flex items-center justify-center bg-gray-800/50 backdrop-blur-md z-50"
                         : "absolute left-0 bottom-0"
                 }
@@ -57,11 +62,52 @@ const Sync = ({ jenis, title }) => {
         >
             <div
                 className={`transition-all duration-200 ease-in rounded-lg p-4 flex items-center gap-2
-                    ${status == "loading" ? "bg-white" : "bg-neutral-50/0"}
+                    ${showLoading ? "bg-white" : "bg-neutral-50/0"}
                 `}
             >
-                {status == "loading" ? (
+                {showLoading ? (
                     <>
+                    <div className="flex flex-col">
+                    <div className="flex flex-col">
+
+                    
+
+<ol className="flex justify-center items-center w-full">
+    <li className="flex flex-col items-center text-blue-600 ">
+        <span className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full lg:h-12 lg:w-12 dark:bg-blue-800 shrink-0">
+            {step <= 1 ? 
+            <FontAwesomeIcon icon={ faDownload } bounce/>
+            :
+            <FontAwesomeIcon icon={ faCheck } />
+            }
+        </span>
+    </li>
+    <li className={`flex w-full items-center text-blue-600 dark:text-blue-500 after:content-[''] after:w-full after:h-1 after:border-b ${step>= 2?'after:border-blue-100' :'after:border-gray-100'} after:border-4 after:inline-block`}></li>
+    <li className="flex flex-col items-center">
+        <span className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full lg:h-12 lg:w-12 dark:bg-gray-700 shrink-0">
+            {step <= 2 ? 
+            <FontAwesomeIcon icon={ faArrowsRotate } spin/>
+            :
+            <FontAwesomeIcon icon={ faCheck } />
+            }
+        </span>
+    </li>
+</ol>
+<ol className="flex justify-center items-center w-full">
+    <li className="flex flex-col items-center">
+        <span className={`badge text-xs ${step <= 1 ? 'bg-gray-100 text-gray-600' :'bg-blue-100 text-blue-600'}`}>
+            Downloading
+        </span>
+    </li>
+    <li className="flex w-full items-center"></li>
+    <li className="flex flex-col items-center">
+        <span className={`badge text-xs ${step <= 2 ? 'bg-gray-100 text-gray-600' :'bg-blue-100 text-blue-600'}`}>
+            Migrating
+        </span>
+    </li>
+</ol>
+
+</div>
                         <ProgressBarFR
                             label={newMsg}
                             width="w-72"
@@ -69,6 +115,7 @@ const Sync = ({ jenis, title }) => {
                             color="gray-600"
                             size="sm"
                         />
+                    </div>
                     </>
                 ) : (
                     <>
