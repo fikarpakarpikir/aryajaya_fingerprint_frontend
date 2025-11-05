@@ -76,9 +76,9 @@ export function FPProvider({ children }) {
 
         const channel = window.Echo.channel("status-fp");
 
-    channel.error((err) => {
-        console.error("⚠️ Channel error:", err);
-    });
+        channel.error((err) => {
+            console.error("⚠️ Channel error:", err);
+        });
         const handler = (e) => {
             try {
                 const {
@@ -152,8 +152,6 @@ export function FPProvider({ children }) {
             setFloatButtonFitur(false);
         } catch (error) {
             console.error(error);
-            setActiveFP(false)
-            setMessage('Sensor Mati, Silakan Coba Klik Cek Alat')
             setGetMessage(false);
             setCountdownScanning(0);
         } finally {
@@ -215,7 +213,7 @@ export function FPProvider({ children }) {
         }
         try {
             const res = await axios.get(`${urlScanner}/check_fingerprint`);
-            console.log('ini');
+            console.log("ini");
             // setActiveFP(res.data.message ? true : false);
             // setMessage(
             //     res.data.message

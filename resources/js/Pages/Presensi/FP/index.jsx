@@ -23,6 +23,7 @@ import { fetchReg } from "./api";
 // import { fetchAlat } from "./api";
 import { FPProvider, useFPContext } from "@/context/FPContext";
 import { PlayerGIFLost } from "@/Components/PlayerGIF";
+import FingerSelector from "./FingerSelector";
 
 export function FPScanner() {
     const { props } = usePage();
@@ -64,7 +65,6 @@ export function FPScanner() {
     };
 
     useEffect(() => {
-
         // fetchData();
         fetchReg().then((data) => {
             setListKaryawans(data.listKaryawan);
@@ -91,6 +91,7 @@ export function FPScanner() {
                     onClick={() => setMaintenance(!maintenance)}
                 />
             </div>
+            <FingerSelector />
             {maintenance ? (
                 <NotifMaintenance />
             ) : (
