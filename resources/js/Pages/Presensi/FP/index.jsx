@@ -91,7 +91,7 @@ export function FPScanner() {
                     onClick={() => setMaintenance(!maintenance)}
                 />
             </div>
-            <FingerSelector />
+
             {maintenance ? (
                 <NotifMaintenance />
             ) : (

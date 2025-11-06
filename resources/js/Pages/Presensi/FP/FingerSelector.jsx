@@ -4,7 +4,21 @@ export default function FingerSelector({
     allowMultiple = false,
     onChange = () => {},
     initial = [],
+    preValue = [],
 }) {
+    /*
+     * NOTE: ID Jari
+     *  1. Jempol Kanan
+     *  2. Telunjuk Kanan
+     *  3. Tengah Kanan
+     *  4. Manis Kanan
+     *  5. Kelingking Kanan
+     *  6. Jempol Kiri
+     *  7. Telunjuk Kiri
+     *  8. Tengah Kiri
+     *  9. Manis Kiri
+     * 10. Kelingking Kiri
+     */
     const [selected, setSelected] = useState(() => {
         // normalize initial
         return Array.isArray(initial) ? initial : [initial];
@@ -33,7 +47,11 @@ export default function FingerSelector({
 
     const styleFor = (id) => {
         return {
-            fill: selected.includes(id) ? "#ffba00" : "#f3f1ff",
+            fill: preValue.includes(id)
+                ? "#177698"
+                : selected.includes(id)
+                ? "#ffba00"
+                : "#f3f1ff",
             stroke: selected.includes(id) ? "#ffba00" : "#cbd9F1",
             cursor: "pointer",
             transition: "all 160ms ease",
@@ -91,13 +109,13 @@ export default function FingerSelector({
                                 ry="18"
                                 width="40"
                                 height="80"
-                                style={styleFor("L-thumb")}
+                                style={styleFor(6)}
                                 tabIndex={0}
                                 role="button"
-                                aria-pressed={selected.includes("L-thumb")}
+                                aria-pressed={selected.includes(6)}
                                 aria-label="Ibu jari kiri"
-                                onClick={() => toggle("L-thumb")}
-                                onKeyDown={(e) => handleKey(e, "L-thumb")}
+                                onClick={() => toggle(6)}
+                                onKeyDown={(e) => handleKey(e, 6)}
                             />
                         </g>
 
@@ -110,13 +128,13 @@ export default function FingerSelector({
                                 ry="14"
                                 width="36"
                                 height="110"
-                                style={styleFor("L-index")}
+                                style={styleFor(7)}
                                 tabIndex={0}
                                 role="button"
-                                aria-pressed={selected.includes("L-index")}
+                                aria-pressed={selected.includes(7)}
                                 aria-label="Jari telunjuk kiri"
-                                onClick={() => toggle("L-index")}
-                                onKeyDown={(e) => handleKey(e, "L-index")}
+                                onClick={() => toggle(7)}
+                                onKeyDown={(e) => handleKey(e, 7)}
                             />
                         </g>
                         {/* Middle */}
@@ -128,13 +146,13 @@ export default function FingerSelector({
                                 ry="14"
                                 width="36"
                                 height="120"
-                                style={styleFor("L-middle")}
+                                style={styleFor(8)}
                                 tabIndex={0}
                                 role="button"
-                                aria-pressed={selected.includes("L-middle")}
+                                aria-pressed={selected.includes(8)}
                                 aria-label="Jari tengah kiri"
-                                onClick={() => toggle("L-middle")}
-                                onKeyDown={(e) => handleKey(e, "L-middle")}
+                                onClick={() => toggle(8)}
+                                onKeyDown={(e) => handleKey(e, 8)}
                             />
                         </g>
 
@@ -147,13 +165,13 @@ export default function FingerSelector({
                                 ry="13"
                                 width="34"
                                 height="104"
-                                style={styleFor("L-ring")}
+                                style={styleFor(9)}
                                 tabIndex={0}
                                 role="button"
-                                aria-pressed={selected.includes("L-ring")}
+                                aria-pressed={selected.includes(9)}
                                 aria-label="Jari manis kiri"
-                                onClick={() => toggle("L-ring")}
-                                onKeyDown={(e) => handleKey(e, "L-ring")}
+                                onClick={() => toggle(9)}
+                                onKeyDown={(e) => handleKey(e, 9)}
                             />
                         </g>
 
@@ -166,13 +184,13 @@ export default function FingerSelector({
                                 ry="12"
                                 width="30"
                                 height="86"
-                                style={styleFor("L-pinky")}
+                                style={styleFor(10)}
                                 tabIndex={0}
                                 role="button"
-                                aria-pressed={selected.includes("L-pinky")}
+                                aria-pressed={selected.includes(10)}
                                 aria-label="Kelingking kiri"
-                                onClick={() => toggle("L-pinky")}
-                                onKeyDown={(e) => handleKey(e, "L-pinky")}
+                                onClick={() => toggle(10)}
+                                onKeyDown={(e) => handleKey(e, 10)}
                             />
                         </g>
                     </g>
@@ -201,13 +219,13 @@ export default function FingerSelector({
                                 ry="18"
                                 width="40"
                                 height="80"
-                                style={styleFor("R-thumb")}
+                                style={styleFor(1)}
                                 tabIndex={0}
                                 role="button"
-                                aria-pressed={selected.includes("R-thumb")}
+                                aria-pressed={selected.includes(1)}
                                 aria-label="Ibu jari kanan"
-                                onClick={() => toggle("R-thumb")}
-                                onKeyDown={(e) => handleKey(e, "R-thumb")}
+                                onClick={() => toggle(1)}
+                                onKeyDown={(e) => handleKey(e, 1)}
                             />
                         </g>
 
@@ -220,13 +238,13 @@ export default function FingerSelector({
                                 ry="14"
                                 width="36"
                                 height="110"
-                                style={styleFor("R-index")}
+                                style={styleFor(2)}
                                 tabIndex={0}
                                 role="button"
-                                aria-pressed={selected.includes("R-index")}
+                                aria-pressed={selected.includes(2)}
                                 aria-label="Jari telunjuk kanan"
-                                onClick={() => toggle("R-index")}
-                                onKeyDown={(e) => handleKey(e, "R-index")}
+                                onClick={() => toggle(2)}
+                                onKeyDown={(e) => handleKey(e, 2)}
                             />
                         </g>
 
@@ -239,13 +257,13 @@ export default function FingerSelector({
                                 ry="14"
                                 width="36"
                                 height="120"
-                                style={styleFor("R-middle")}
+                                style={styleFor(3)}
                                 tabIndex={0}
                                 role="button"
-                                aria-pressed={selected.includes("R-middle")}
+                                aria-pressed={selected.includes(3)}
                                 aria-label="Jari tengah kanan"
-                                onClick={() => toggle("R-middle")}
-                                onKeyDown={(e) => handleKey(e, "R-middle")}
+                                onClick={() => toggle(3)}
+                                onKeyDown={(e) => handleKey(e, 3)}
                             />
                         </g>
 
@@ -258,13 +276,13 @@ export default function FingerSelector({
                                 ry="13"
                                 width="34"
                                 height="104"
-                                style={styleFor("R-ring")}
+                                style={styleFor(4)}
                                 tabIndex={0}
                                 role="button"
-                                aria-pressed={selected.includes("R-ring")}
+                                aria-pressed={selected.includes(4)}
                                 aria-label="Jari manis kanan"
-                                onClick={() => toggle("R-ring")}
-                                onKeyDown={(e) => handleKey(e, "R-ring")}
+                                onClick={() => toggle(4)}
+                                onKeyDown={(e) => handleKey(e, 4)}
                             />
                         </g>
                         {/* Pinky */}
@@ -276,36 +294,38 @@ export default function FingerSelector({
                                 ry="12"
                                 width="30"
                                 height="86"
-                                style={styleFor("R-pinky")}
+                                style={styleFor(5)}
                                 tabIndex={0}
                                 role="button"
-                                aria-pressed={selected.includes("R-pinky")}
+                                aria-pressed={selected.includes(5)}
                                 aria-label="Kelingking kanan"
-                                onClick={() => toggle("R-pinky")}
-                                onKeyDown={(e) => handleKey(e, "R-pinky")}
+                                onClick={() => toggle(5)}
+                                onKeyDown={(e) => handleKey(e, 5)}
                             />
                         </g>
                     </g>
+                    <text
+                        x="250"
+                        y="220"
+                        fontSize="14"
+                        fill="#475569"
+                        textAnchor="middle"
+                        fontWeight={"bold"}
+                    >
+                        Tangan Kiri
+                    </text>
+                    <text
+                        x="525"
+                        y="220"
+                        fontSize="14"
+                        fill="#475569"
+                        textAnchor="middle"
+                        fontWeight={"bold"}
+                    >
+                        Tangan Kanan
+                    </text>
                 </svg>
             </div>
-            <text
-                x="190"
-                y="260"
-                fontSize="14"
-                fill="#475569"
-                textAnchor="middle"
-            >
-                Tangan Kiri
-            </text>
-            <text
-                x="560"
-                y="260"
-                fontSize="14"
-                fill="#475569"
-                textAnchor="middle"
-            >
-                Tangan Kanan
-            </text>
         </div>
     );
 }
