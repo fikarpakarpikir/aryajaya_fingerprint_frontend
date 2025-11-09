@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => {
             //     usePolling: true,
             // },
             cors: true,
-            // origin: 'http://192.168.8.154:5173',
+            origin: 'http://192.168.8.154:5173',
         },
         optimizeDeps: {
             esbuildOptions: {

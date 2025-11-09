@@ -48,22 +48,22 @@ export default function FingerSelector({
     const styleFor = (id) => {
         return {
             fill: preValue.includes(id)
-                ? "#177698"
+                ? "#f7f5de"
                 : selected.includes(id)
                 ? "#ffba00"
-                : "#f3f1ff",
-            stroke: selected.includes(id) ? "#ffba00" : "#cbd9F1",
+                : "#fffaf1ff",
+            stroke: selected.includes(id) ? "#ffba00" : "#b89b5bff",
             cursor: "pointer",
             transition: "all 160ms ease",
         };
     };
 
     return (
-        <div className="p-4 bg-gray-50 rounded-xl w-full max-w-3xl mx-auto">
-            <h3 className="text-lg font-semibold mb-3">Pilih Jari</h3>
+        <div className="pt-2 bg-white rounded-xl w-full max-w-xl mx-auto">
+            <h3 className="text-lg font-semibold mb-1">Pilih Jari</h3>
             <div className="flex flex-col md:flex-row items-center gap-6">
                 <svg
-                    viewBox="0 0 760 320"
+                    viewBox="0 0 760 280"
                     width="100%"
                     height="auto"
                     role="img"
@@ -87,7 +87,7 @@ export default function FingerSelector({
                     </defs>
 
                     {/* LEFT HAND */}
-                    <g transform="translate(40,20) scale(1)">
+                    <g transform="translate(-30,-20) scale(1.2)">
                         {/* Palm */}
                         <rect
                             x="120"
@@ -196,7 +196,7 @@ export default function FingerSelector({
                     </g>
 
                     {/* RIGHT HAND */}
-                    <g transform="translate(380,20) scale(1)">
+                    <g transform="translate(380,-20) scale(1.2)">
                         {/* Palm */}
                         <rect
                             x="50"
@@ -305,9 +305,9 @@ export default function FingerSelector({
                         </g>
                     </g>
                     <text
-                        x="250"
-                        y="220"
-                        fontSize="14"
+                        x="220"
+                        y="200"
+                        fontSize="20"
                         fill="#475569"
                         textAnchor="middle"
                         fontWeight={"bold"}
@@ -315,9 +315,9 @@ export default function FingerSelector({
                         Tangan Kiri
                     </text>
                     <text
-                        x="525"
-                        y="220"
-                        fontSize="14"
+                        x="555"
+                        y="200"
+                        fontSize="20"
                         fill="#475569"
                         textAnchor="middle"
                         fontWeight={"bold"}
