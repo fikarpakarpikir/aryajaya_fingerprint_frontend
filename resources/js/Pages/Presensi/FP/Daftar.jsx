@@ -147,7 +147,10 @@ export default function Daftar() {
                                 <button
                                     type="submit"
                                     className="btn btn-primary mx-auto"
-                                    onClick={() => setScanning(true)}
+                                    onClick={() => {
+                                        handleSubmit();
+                                        setScanning(true);
+                                    }}
                                     disabled={!values?.idKar || !values.jariId}
                                 >
                                     Scan
