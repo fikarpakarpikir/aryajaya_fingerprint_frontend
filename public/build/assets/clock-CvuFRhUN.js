@@ -1,1 +1,0 @@
-import{c as e}from"./app-DrUh5lVW.js";const n=()=>{const[t,r]=e.useState(new Date);return e.useEffect(()=>{const s=setInterval(()=>{r(new Date)},1e3);return()=>clearInterval(s)},[]),t};export{n as C};
