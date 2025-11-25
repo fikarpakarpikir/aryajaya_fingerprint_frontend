@@ -164,16 +164,18 @@ export default function Daftar() {
             ) : (
                 <>
                     <div className="w-30 h-25 mx-auto text-wrap">
-                        {<RenderPlayerGIF status={status} message={message} />}
+                        <RenderPlayerGIF status={status} message={message} />
                     </div>
 
-                    <button
-                        type="submit"
-                        className="btn btn-primary mx-auto"
-                        onClick={() => setScanning(false)}
-                    >
-                        Daftar
-                    </button>
+                    {[3, 4].includes(status) && (
+                        <button
+                            type="submit"
+                            className="btn btn-primary mx-auto"
+                            onClick={() => setScanning(false)}
+                        >
+                            Daftar
+                        </button>
+                    )}
                 </>
             )}
         </>
