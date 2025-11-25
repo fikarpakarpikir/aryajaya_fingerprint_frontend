@@ -73,6 +73,7 @@ export default function Daftar() {
                         setScanning(true);
                         try {
                             getFitur(2, values.idKar, values.jariId);
+                            console.log(scanning)
                         } catch (error) {
                             console.error(error);
                         } finally {

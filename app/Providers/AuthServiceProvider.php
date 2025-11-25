@@ -23,7 +23,7 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         // $this->registerPolicies();
-        dd(Auth::user());
+        // dd(Auth::user());
         Inertia::share('auth.user', function () {
             if (Auth::check()) {
                 $user = Auth::user()->load('org'); // Ensure the `org` relationship is loaded
