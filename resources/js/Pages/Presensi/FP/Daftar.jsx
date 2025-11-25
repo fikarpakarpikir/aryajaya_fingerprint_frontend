@@ -69,18 +69,27 @@ export default function Daftar() {
                         idKar: "",
                         jariId: "",
                     }}
-                    onSubmit={(values) => {
+                    onSubmit={async (values) => {
                         setScanning(true);
                         try {
-                            getFitur(2, values.idKar, values.jariId);
-                            console.log(scanning)
+                            await getFitur(2, values.idKar, values.jariId); // tunggu sampai selesai
                         } catch (error) {
                             console.error(error);
                         } finally {
-                            setScanning(false);
+                            setScanning(false); // kembali setelah selesai
                         }
-                        // console.log(values);
                     }}
+                    // onSubmit={(values) => {
+                    //     setScanning(true);
+                    //     try {
+                    //         getFitur(2, values.idKar, values.jariId);
+                    //     } catch (error) {
+                    //         console.error(error);
+                    //     } finally {
+                    //         setScanning(false);
+                    //     }
+                    //     // console.log(values);
+                    // }}
                     validationSchema={Yup.object({
                         idKar: Yup.number().required("Harus dipilih"),
                     })}
@@ -137,7 +146,7 @@ export default function Daftar() {
                                 <button
                                     type="submit"
                                     className="btn btn-primary mx-auto"
-                                    onClick={handleSubmit}
+                                    onClick={() => setScanning(true)}
                                     disabled={!values?.idKar || !values.jariId}
                                 >
                                     Scan
@@ -153,9 +162,19 @@ export default function Daftar() {
                     )}
                 </Formik>
             ) : (
-                <div className="w-30 h-25 mx-auto text-wrap">
-                    {<RenderPlayerGIF status={status} message={message} />}
-                </div>
+                <>
+                    <div className="w-30 h-25 mx-auto text-wrap">
+                        {<RenderPlayerGIF status={status} message={message} />}
+                    </div>
+
+                    <button
+                        type="submit"
+                        className="btn btn-primary mx-auto"
+                        onClick={() => setScanning(false)}
+                    >
+                        Daftar
+                    </button>
+                </>
             )}
         </>
     );
