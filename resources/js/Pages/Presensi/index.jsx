@@ -38,9 +38,8 @@ const Presensi = () => {
         ["face", faCamera, FaceRecogPage, 2, "Face ID"],
     ];
 
-    
-const findMode = listMode.find((item) => item[0] === mode);
-const PageComponent = findMode[2];
+    const findMode = listMode.find((item) => item[0] === mode);
+    const PageComponent = findMode[2];
 
     useEffect(() => {
         dispatch(
@@ -77,8 +76,9 @@ const PageComponent = findMode[2];
                         <span className="text-sm font-bold text-neutral-500">
                             Mode
                         </span>
-                        {listMode.map((item) => (
+                        {listMode.map((item, i) => (
                             <button
+                                key={i}
                                 disabled={processState == "loading"}
                                 className={`${
                                     mode === item[0]

@@ -140,13 +140,13 @@ export function FPProvider({ children }) {
         }, time);
     }
 
-    const getFitur = async (fiturId, id_karyawan = 0) => {
+    const getFitur = async (fiturId, id_karyawan = 0, value = null) => {
         setLoading(true);
         setGetMessage(true);
         try {
             const res = await axios.post(
                 `${urlScanner}/fitur`,
-                { fiturId, id_karyawan },
+                { fiturId, id_karyawan, value },
                 { headers: { "Content-Type": "application/json" } }
             );
             setFloatButtonFitur(false);
@@ -207,7 +207,8 @@ export function FPProvider({ children }) {
 
     const fetchAlat = async () => {
         if (!urlScanner) {
-            setActiveFP(false);
+            // setActiveFP(false);
+            setActiveFP(true);
             setMessage("URL scanner tidak valid");
             return;
         }

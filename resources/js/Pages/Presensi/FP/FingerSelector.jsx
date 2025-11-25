@@ -41,14 +41,14 @@ export default function FingerSelector({
     function handleKey(e, id) {
         if (e.key === "Enter" || e.key === " ") {
             e.preventDefault();
-            toggleFinger(id);
+            if (!preValue.includes(id)) toggleFinger(id);
         }
     }
 
     const styleFor = (id) => {
         return {
             fill: preValue.includes(id)
-                ? "#f7f5de"
+                ? "#707070"
                 : selected.includes(id)
                 ? "#ffba00"
                 : "#fffaf1ff",
@@ -58,8 +58,163 @@ export default function FingerSelector({
         };
     };
 
+    const listJari = [
+        // === Tangan Kanan ===
+        {
+            id: 1,
+            x: 20,
+            y: 120,
+            rx: 18,
+            ry: 18,
+            w: 40,
+            h: 80,
+            label: "Ibu jari kanan",
+            tangan: "kanan",
+        },
+        {
+            id: 2,
+            x: 64,
+            y: 30,
+            rx: 14,
+            ry: 14,
+            w: 36,
+            h: 110,
+            label: "Jari telunjuk kanan",
+            tangan: "kanan",
+        },
+        {
+            id: 3,
+            x: 109,
+            y: 20,
+            rx: 14,
+            ry: 14,
+            w: 36,
+            h: 120,
+            label: "Jari tengah kanan",
+            tangan: "kanan",
+        },
+        {
+            id: 4,
+            x: 154,
+            y: 36,
+            rx: 13,
+            ry: 13,
+            w: 34,
+            h: 104,
+            label: "Jari manis kanan",
+            tangan: "kanan",
+        },
+        {
+            id: 5,
+            x: 196,
+            y: 54,
+            rx: 12,
+            ry: 12,
+            w: 30,
+            h: 86,
+            label: "Kelingking kanan",
+            tangan: "kanan",
+        },
+
+        // === Tangan Kiri ===
+        {
+            id: 6,
+            x: 290,
+            y: 120,
+            rx: 18,
+            ry: 18,
+            w: 40,
+            h: 80,
+            label: "Ibu jari kiri",
+            tangan: "kiri",
+        },
+        {
+            id: 7,
+            x: 250,
+            y: 30,
+            rx: 14,
+            ry: 14,
+            w: 36,
+            h: 110,
+            label: "Jari telunjuk kiri",
+            tangan: "kiri",
+        },
+        {
+            id: 8,
+            x: 205,
+            y: 20,
+            rx: 14,
+            ry: 14,
+            w: 36,
+            h: 120,
+            label: "Jari tengah kiri",
+            tangan: "kiri",
+        },
+        {
+            id: 9,
+            x: 163,
+            y: 36,
+            rx: 13,
+            ry: 13,
+            w: 34,
+            h: 104,
+            label: "Jari manis kiri",
+            tangan: "kiri",
+        },
+        {
+            id: 10,
+            x: 125,
+            y: 54,
+            rx: 12,
+            ry: 12,
+            w: 30,
+            h: 86,
+            label: "Kelingking kiri",
+            tangan: "kiri",
+        },
+    ];
+
+    const listLegend = [
+        { text: "Jari sudah terdaftar", color: "#707070" },
+        { text: "Jari dipilih untuk didaftarkan", color: "#ffba00" },
+        { text: "Jari belum terdaftar", color: "#fffaf1" },
+    ];
+
+    const Jari = ({ j }) => {
+        const disabled = preValue?.includes(j.id);
+        const isSelected = selected.includes(j.id);
+
+        return (
+            <g>
+                <rect
+                    key={j.id}
+                    x={j.x}
+                    y={j.y}
+                    rx={j.rx}
+                    ry={j.ry}
+                    width={j.w}
+                    height={j.h}
+                    style={styleFor(j.id)}
+                    tabIndex={disabled ? -1 : 0}
+                    role="button"
+                    aria-pressed={isSelected}
+                    aria-label={j.label}
+                    className={`transition-all ${
+                        disabled
+                            ? "cursor-not-allowed opacity-60 pointer-events-none"
+                            : "cursor-pointer"
+                    }`}
+                    onClick={!disabled ? () => toggle(j.id) : undefined}
+                    onKeyDown={
+                        !disabled ? (e) => handleKey(e, j.id) : undefined
+                    }
+                />
+            </g>
+        );
+    };
+
     return (
-        <div className="pt-2 bg-white rounded-xl w-full max-w-xl mx-auto">
+        <div className="pt-2 bg-white rounded-xl w-full max-w-xl mx-auto relative">
             <h3 className="text-lg font-semibold mb-1">Pilih Jari</h3>
             <div className="flex flex-col md:flex-row items-center gap-6">
                 <svg
@@ -100,99 +255,11 @@ export default function FingerSelector({
                             filter="url(#shadow)"
                         />
 
-                        {/* Thumb */}
-                        <g>
-                            <rect
-                                x="290"
-                                y="120"
-                                rx="18"
-                                ry="18"
-                                width="40"
-                                height="80"
-                                style={styleFor(6)}
-                                tabIndex={0}
-                                role="button"
-                                aria-pressed={selected.includes(6)}
-                                aria-label="Ibu jari kiri"
-                                onClick={() => toggle(6)}
-                                onKeyDown={(e) => handleKey(e, 6)}
-                            />
-                        </g>
-
-                        {/* Index */}
-                        <g>
-                            <rect
-                                x="250"
-                                y="30"
-                                rx="14"
-                                ry="14"
-                                width="36"
-                                height="110"
-                                style={styleFor(7)}
-                                tabIndex={0}
-                                role="button"
-                                aria-pressed={selected.includes(7)}
-                                aria-label="Jari telunjuk kiri"
-                                onClick={() => toggle(7)}
-                                onKeyDown={(e) => handleKey(e, 7)}
-                            />
-                        </g>
-                        {/* Middle */}
-                        <g>
-                            <rect
-                                x="205"
-                                y="20"
-                                rx="14"
-                                ry="14"
-                                width="36"
-                                height="120"
-                                style={styleFor(8)}
-                                tabIndex={0}
-                                role="button"
-                                aria-pressed={selected.includes(8)}
-                                aria-label="Jari tengah kiri"
-                                onClick={() => toggle(8)}
-                                onKeyDown={(e) => handleKey(e, 8)}
-                            />
-                        </g>
-
-                        {/* Ring */}
-                        <g>
-                            <rect
-                                x="163"
-                                y="36"
-                                rx="13"
-                                ry="13"
-                                width="34"
-                                height="104"
-                                style={styleFor(9)}
-                                tabIndex={0}
-                                role="button"
-                                aria-pressed={selected.includes(9)}
-                                aria-label="Jari manis kiri"
-                                onClick={() => toggle(9)}
-                                onKeyDown={(e) => handleKey(e, 9)}
-                            />
-                        </g>
-
-                        {/* Pinky */}
-                        <g>
-                            <rect
-                                x="125"
-                                y="54"
-                                rx="12"
-                                ry="12"
-                                width="30"
-                                height="86"
-                                style={styleFor(10)}
-                                tabIndex={0}
-                                role="button"
-                                aria-pressed={selected.includes(10)}
-                                aria-label="Kelingking kiri"
-                                onClick={() => toggle(10)}
-                                onKeyDown={(e) => handleKey(e, 10)}
-                            />
-                        </g>
+                        {listJari
+                            .filter((j) => j.tangan == "kiri")
+                            .map((j, i) => (
+                                <Jari j={j} key={i} />
+                            ))}
                     </g>
 
                     {/* RIGHT HAND */}
@@ -210,99 +277,11 @@ export default function FingerSelector({
                         />
 
                         {/* Fingers (right-hand: thumb on right side of palm) */}
-                        {/* Thumb */}
-                        <g>
-                            <rect
-                                x="20"
-                                y="120"
-                                rx="18"
-                                ry="18"
-                                width="40"
-                                height="80"
-                                style={styleFor(1)}
-                                tabIndex={0}
-                                role="button"
-                                aria-pressed={selected.includes(1)}
-                                aria-label="Ibu jari kanan"
-                                onClick={() => toggle(1)}
-                                onKeyDown={(e) => handleKey(e, 1)}
-                            />
-                        </g>
-
-                        {/* Index */}
-                        <g>
-                            <rect
-                                x="64"
-                                y="30"
-                                rx="14"
-                                ry="14"
-                                width="36"
-                                height="110"
-                                style={styleFor(2)}
-                                tabIndex={0}
-                                role="button"
-                                aria-pressed={selected.includes(2)}
-                                aria-label="Jari telunjuk kanan"
-                                onClick={() => toggle(2)}
-                                onKeyDown={(e) => handleKey(e, 2)}
-                            />
-                        </g>
-
-                        {/* Middle */}
-                        <g>
-                            <rect
-                                x="109"
-                                y="20"
-                                rx="14"
-                                ry="14"
-                                width="36"
-                                height="120"
-                                style={styleFor(3)}
-                                tabIndex={0}
-                                role="button"
-                                aria-pressed={selected.includes(3)}
-                                aria-label="Jari tengah kanan"
-                                onClick={() => toggle(3)}
-                                onKeyDown={(e) => handleKey(e, 3)}
-                            />
-                        </g>
-
-                        {/* Ring */}
-                        <g>
-                            <rect
-                                x="154"
-                                y="36"
-                                rx="13"
-                                ry="13"
-                                width="34"
-                                height="104"
-                                style={styleFor(4)}
-                                tabIndex={0}
-                                role="button"
-                                aria-pressed={selected.includes(4)}
-                                aria-label="Jari manis kanan"
-                                onClick={() => toggle(4)}
-                                onKeyDown={(e) => handleKey(e, 4)}
-                            />
-                        </g>
-                        {/* Pinky */}
-                        <g>
-                            <rect
-                                x="196"
-                                y="54"
-                                rx="12"
-                                ry="12"
-                                width="30"
-                                height="86"
-                                style={styleFor(5)}
-                                tabIndex={0}
-                                role="button"
-                                aria-pressed={selected.includes(5)}
-                                aria-label="Kelingking kanan"
-                                onClick={() => toggle(5)}
-                                onKeyDown={(e) => handleKey(e, 5)}
-                            />
-                        </g>
+                        {listJari
+                            .filter((j) => j.tangan == "kanan")
+                            .map((j, i) => (
+                                <Jari j={j} key={i} />
+                            ))}
                     </g>
                     <text
                         x="220"
@@ -311,6 +290,7 @@ export default function FingerSelector({
                         fill="#475569"
                         textAnchor="middle"
                         fontWeight={"bold"}
+                        style={{ userSelect: "none" }}
                     >
                         Tangan Kiri
                     </text>
@@ -321,10 +301,27 @@ export default function FingerSelector({
                         fill="#475569"
                         textAnchor="middle"
                         fontWeight={"bold"}
+                        style={{ userSelect: "none" }}
                     >
                         Tangan Kanan
                     </text>
                 </svg>
+            </div>
+            <div className="absolute -right-40 top-5 bg-zinc-200 p-2 rounded-lg">
+                {listLegend.map((legend, i) => (
+                    <div
+                        key={i}
+                        className="flex gap-2 items-center justify-start"
+                    >
+                        <span
+                            className={`flex w-2.5 h-2.5 rounded-full me-1.5 shrink-0`}
+                            style={{ backgroundColor: legend.color }}
+                        ></span>
+                        <span className="font-semibold text-sm">
+                            {legend.text}
+                        </span>
+                    </div>
+                ))}
             </div>
         </div>
     );

@@ -148,10 +148,11 @@ class FingerprintController extends Controller
             'template_id' => 'required',
             'template_dat' => 'required',
             'ip_alat' => 'required',
+            'jari_id' => 'required',
         ]);
         try {
             $alat = $this->getIdAlat($req->ip_alat);
-            if (Fingerprint::where('id_karyawan', $req->id_karyawan)->where('alat_id', $alat->id)->first()) {
+            if (Fingerprint::where('id_karyawan', $req->id_karyawan)->where('jari_id', $req->jari_id)->first()) {
                 return response()->json([
                     'message' => 'Gagal, Karyawan sudah terdaftar',
                     // 'data' => Fingerprint::where('id_karyawan', $req->id_karyawan)->first()
@@ -170,6 +171,7 @@ class FingerprintController extends Controller
                         'id_karyawan' => $req->id_karyawan,
                         'template_id' => $req->template_id,
                         'template_dat' => $filename,
+                        'jari_id' => $req->jari_id,
                     ]);
 
                     // Return the newly created fingerprint record in JSON format
@@ -347,7 +349,7 @@ class FingerprintController extends Controller
                 'done' => 'required|numeric',
                 'total' => 'required|numeric',
             ]);
-            
+
             // * NOTE step:
             // 1. downloading
             // 2. migrating
@@ -372,5 +374,4 @@ class FingerprintController extends Controller
 
         return $response->json();
     }
-
 }

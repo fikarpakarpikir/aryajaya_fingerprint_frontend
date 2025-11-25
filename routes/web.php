@@ -8,6 +8,7 @@ use App\Http\Controllers\AlatController;
 use App\Http\Controllers\SistemController;
 use App\Http\Controllers\BirokrasiController;
 use App\Http\Controllers\FaceRecognitionController;
+use App\Http\Controllers\FingerprintController;
 use App\Http\Controllers\PresensiController;
 use App\Http\Controllers\SinkronisasiController;
 
@@ -59,7 +60,8 @@ Route::group(['prefix' => 'Presensi', 'as' => 'Presensi.'], function () {
             // Route::delete('/face_rec/regist_face/delete/{id_kar}', 'delete_image')->name('face-rec.delete');
         });
     });
-    Route::group(['controller' => PresensiController::class], function () {
+    Route::group(['controller' => FingerprintController::class, 'prefix' => 'FP', 'as' => 'fp.'], function () {
+        Route::get('/', 'getKaryawanFingerprint')->name('getKaryawan');
         Route::post('/store', 'presensiStore')->name('store');
         Route::get('/presensi/riwayat/{id_kar}', 'Riwayat')->name('Riwayat');
     });
