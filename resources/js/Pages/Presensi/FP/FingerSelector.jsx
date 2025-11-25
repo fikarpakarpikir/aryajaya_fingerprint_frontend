@@ -220,7 +220,7 @@ export default function FingerSelector({
                 <svg
                     viewBox="0 0 760 280"
                     width="100%"
-                    height="auto"
+                    height="100%"
                     role="img"
                     aria-label="Diagram tangan kiri dan kanan dengan jari yang bisa dipilih"
                 >

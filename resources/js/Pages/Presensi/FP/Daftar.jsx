@@ -73,6 +73,7 @@ export default function Daftar() {
                         setScanning(true);
                         try {
                             await getFitur(2, values.idKar, values.jariId); // tunggu sampai selesai
+                            console.log("🚀 ~ Daftar ~ values:", values);
                         } catch (error) {
                             console.error(error);
                         } finally {
