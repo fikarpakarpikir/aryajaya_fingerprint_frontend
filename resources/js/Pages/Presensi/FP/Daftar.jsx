@@ -167,10 +167,6 @@ export default function Daftar() {
                 </Formik>
             ) : (
                 <>
-                    <div className="w-30 h-25 mx-auto text-wrap">
-                        <RenderPlayerGIF status={status} message={message} />
-                    </div>
-
                     {[3, 4].includes(status) && (
                         <button
                             type="submit"
@@ -182,6 +178,9 @@ export default function Daftar() {
                     )}
                 </>
             )}
+            <div className="w-30 h-25 mx-auto text-wrap">
+                <RenderPlayerGIF status={status} message={message} />
+            </div>
         </>
     );
 }
