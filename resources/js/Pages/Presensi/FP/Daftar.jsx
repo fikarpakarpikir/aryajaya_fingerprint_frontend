@@ -14,6 +14,7 @@ import FingerSelector from "./FingerSelector";
 export default function Daftar() {
     const dispatch = useDispatch();
     const { props } = usePage();
+    const [scanning, setScanning] = useState(false);
 
     const {
         getMessage,
@@ -62,89 +63,99 @@ export default function Daftar() {
             <span className="badge bg-primary text-white font-bold text-md px-8">
                 Daftar
             </span>
-            <Formik
-                initialValues={{
-                    idKar: "",
-                    jariId: "",
-                }}
-                onSubmit={(values) => {
-                    // sendData(values);
-                    getFitur(2, values.idKar, values.jariId);
-                    // console.log(values);
-                }}
-                validationSchema={Yup.object({
-                    idKar: Yup.number().required("Harus dipilih"),
-                })}
-            >
-                {({
-                    values,
-                    errors,
-                    touched,
-                    handleChange,
-                    handleBlur,
-                    handleSubmit,
-                    setFieldValue,
-                }) => (
-                    <form onSubmit={handleSubmit} className="row g-3">
-                        <Select2RS
-                            className="w-3/4 mx-auto"
-                            label="Nama Karyawan"
-                            id="idKar"
-                            data={dataSelect(
-                                listKaryawans?.filter(
-                                    (k) =>
-                                        listRegistereds?.filter(
-                                            (reg) => reg.id_karyawan == k.id
-                                        )?.length <= 2
-                                ),
-                                "id",
-                                "nama"
-                            )}
-                            name="idKar"
-                            error={errors.idKar}
-                            touched={touched.idKar}
-                            handleChange={(values) => {
-                                setFieldValue("idKar", values.value);
-                                handleChange;
-                            }}
-                            handleBlur={handleBlur}
-                            values={values.idKar}
-                            placeholder="Pilih Karyawan"
-                        />
-                        {values?.idKar && (
-                            <FingerSelector
-                                preValue={listRegistereds
-                                    ?.filter(
-                                        (reg) => reg.id_karyawan == values.idKar
-                                    )
-                                    ?.flatMap((r) => r.jari_id)}
-                                onChange={(e) => {
-                                    setFieldValue("jariId", e[0]);
+            {!scanning ? (
+                <Formik
+                    initialValues={{
+                        idKar: "",
+                        jariId: "",
+                    }}
+                    onSubmit={(values) => {
+                        setScanning(true);
+                        try {
+                            getFitur(2, values.idKar, values.jariId);
+                        } catch (error) {
+                            console.error(error);
+                        } finally {
+                            setScanning(false);
+                        }
+                        // console.log(values);
+                    }}
+                    validationSchema={Yup.object({
+                        idKar: Yup.number().required("Harus dipilih"),
+                    })}
+                >
+                    {({
+                        values,
+                        errors,
+                        touched,
+                        handleChange,
+                        handleBlur,
+                        handleSubmit,
+                        setFieldValue,
+                    }) => (
+                        <form onSubmit={handleSubmit} className="row g-3">
+                            <Select2RS
+                                className="w-3/4 mx-auto"
+                                label="Nama Karyawan"
+                                id="idKar"
+                                data={dataSelect(
+                                    listKaryawans?.filter(
+                                        (k) =>
+                                            listRegistereds?.filter(
+                                                (reg) => reg.id_karyawan == k.id
+                                            )?.length <= 2
+                                    ),
+                                    "id",
+                                    "nama"
+                                )}
+                                name="idKar"
+                                error={errors.idKar}
+                                touched={touched.idKar}
+                                handleChange={(values) => {
+                                    setFieldValue("idKar", values.value);
+                                    handleChange;
                                 }}
+                                handleBlur={handleBlur}
+                                values={values.idKar}
+                                placeholder="Pilih Karyawan"
                             />
-                        )}
-                        <div className="w-3/4 mx-auto mt-4">
-                            <button
-                                type="submit"
-                                className="btn btn-primary mx-auto"
-                                onClick={handleSubmit}
-                                disabled={!values?.idKar || !values.jariId}
-                            >
-                                Scan
-                            </button>
-                        </div>
-                        {values?.idKar && values.jariId && (
+                            {values?.idKar && (
+                                <FingerSelector
+                                    preValue={listRegistereds
+                                        ?.filter(
+                                            (reg) =>
+                                                reg.id_karyawan == values.idKar
+                                        )
+                                        ?.flatMap((r) => r.jari_id)}
+                                    onChange={(e) => {
+                                        setFieldValue("jariId", e[0]);
+                                    }}
+                                />
+                            )}
+                            <div className="w-3/4 mx-auto mt-4">
+                                <button
+                                    type="submit"
+                                    className="btn btn-primary mx-auto"
+                                    onClick={handleSubmit}
+                                    disabled={!values?.idKar || !values.jariId}
+                                >
+                                    Scan
+                                </button>
+                            </div>
+                            {/* {values?.idKar && values.jariId && (
                             <RenderPlayerGIF
                                 status={status}
                                 message={message}
                             />
-                        )}
-                    </form>
-                )}
-            </Formik>
-            <div className="w-30 h-25 mx-auto text-wrap">
-                {/* {renderPlayerGIF(status, message)} */}
-            </div>
+                        )} */}
+                        </form>
+                    )}
+                </Formik>
+            ) : (
+                <div className="w-30 h-25 mx-auto text-wrap">
+                    {<RenderPlayerGIF status={status} message={message} />}
+                </div>
+            )}
         </>
     );
 }
