@@ -186,7 +186,7 @@ export default function FingerSelector({
     ];
 
     const Jari = ({ j }) => {
-        const exists = list.includes(j.id);
+        const exists = preValue.includes(j.id);
 
         const disabled = isDeletable ? !exists : exists;
         const isSelected = selected.includes(j.id);
