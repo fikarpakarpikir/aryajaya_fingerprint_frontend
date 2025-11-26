@@ -52,7 +52,9 @@ export default function Daftar() {
             }
         };
 
-        fetchData();
+        if (listKaryawans?.length <= 0) {
+            fetchData();
+        }
     }, []);
     if (!listKaryawans) {
         return <div>Loading...</div>; // Add loading state

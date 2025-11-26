@@ -1,14 +1,57 @@
 import Select2RS from "@/Components/ReactStrap/Select2";
+import { useFPContext } from "@/context/FPContext";
 import dataSelect from "@/Functions/dataSelect";
 import { usePage } from "@inertiajs/react";
 import { Formik } from "formik";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import * as Yup from "yup";
+import FingerSelector from "./FingerSelector";
+import { useEffect } from "react";
+import axios from "axios";
+import { registeredReducer } from "@/redux/slices/FingerprintSlice";
 
 export default function Hapus() {
     const { props } = usePage();
+    const dispatch = useDispatch();
+    const {
+        getMessage,
+        message,
+        activeFP,
+        countdownScanning,
+        status,
+        listKaryawans,
+        setListKaryawans,
+        getFitur,
+    } = useFPContext();
     const { ip_alat: ipAlat, jenis_kehadiran: jenisKehadiran } = props;
     const { urlScanner } = useSelector((state) => state.fingerprints);
+    const { listRegistereds } = useSelector((state) => state.fingerprints);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const response = await axios.get(
+                    route("Presensi.fp.getKaryawan")
+                    // "http://127.0.0.1:8000/api/Karyawan/Presensi/Fingerprint"
+                    // `${
+                    //     import.meta.env.VITE_API_SERVER
+                    // }/Karyawan/Presensi/Fingerprint`
+                );
+                // const response = await axios.get("/Get/Karyawan/Fingerprint");
+                setListKaryawans(response.data.listKaryawan);
+                dispatch(registeredReducer(response.data.registered));
+                // console.log(
+                //     "🚀 ~ fetchData ~ response.data.registered:",
+                //     response.data.registered
+                // );
+            } catch (error) {
+                console.error("Error fetching user data:", error);
+            }
+        };
+        if (listKaryawans?.length <= 0) {
+            fetchData();
+        }
+    }, []);
     if (!listKaryawans) {
         return <div>Loading...</div>; // Add loading state
     }
@@ -21,10 +64,11 @@ export default function Hapus() {
             <Formik
                 initialValues={{
                     idKar: "",
+                    jariId: "",
                 }}
                 onSubmit={(values) => {
                     // sendData(values);
-                    getFitur(3, values.idKar);
+                    getFitur(3, values.idKar, values.jariId);
                     // console.log(values);
                 }}
                 validationSchema={Yup.object({
@@ -61,6 +105,18 @@ export default function Hapus() {
                             values={values.idKar}
                             placeholder="Pilih Karyawan"
                         />
+                        {values?.idKar && (
+                            <FingerSelector
+                                preValue={listRegistereds
+                                    ?.filter(
+                                        (reg) => reg.id_karyawan == values.idKar
+                                    )
+                                    ?.flatMap((r) => r.jari_id)}
+                                onChange={(e) => {
+                                    setFieldValue("jariId", e[0]);
+                                }}
+                            />
+                        )}
                         <div className="col-12 mt-3 d-flex">
                             <button
                                 type="submit"
