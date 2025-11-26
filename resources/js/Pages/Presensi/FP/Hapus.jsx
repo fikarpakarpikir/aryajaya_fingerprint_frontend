@@ -9,6 +9,7 @@ import FingerSelector from "./FingerSelector";
 import { useEffect } from "react";
 import axios from "axios";
 import { registeredReducer } from "@/redux/slices/FingerprintSlice";
+import { RenderPlayerGIF } from "@/Components/PlayerGIF";
 
 export default function Hapus() {
     const { props } = usePage();
@@ -130,7 +131,7 @@ export default function Hapus() {
                 )}
             </Formik>
             <div className="w-30 h-25 mx-auto text-wrap">
-                {renderPlayerGIF(status, message)}
+                <RenderPlayerGIF status={status} message={message} />
             </div>
         </>
     );
