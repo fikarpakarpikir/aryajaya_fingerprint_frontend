@@ -209,6 +209,7 @@ class FingerprintController extends Controller
         $req->validate([
             'id_karyawan' => 'required',
             'ip_alat' => 'required',
+            'jari_id' => 'required',
         ]);
 
         try {
@@ -216,6 +217,7 @@ class FingerprintController extends Controller
             return response()->json([
                 'data' => Fingerprint::where('id_karyawan', $req->id_karyawan)
                     ->where('alat_id', $alat->id)
+                    ->where('jari_id', $req->jari_id)
                     ->pluck('template_id')
                     ->first()
             ]);
@@ -261,12 +263,14 @@ class FingerprintController extends Controller
             'id_karyawan' => 'required',
             'template_id' => 'required',
             'ip_alat' => 'required',
+            'jari_id' => 'required',
         ]);
         try {
             $alat = $this->getIdAlat($req->ip_alat);
             $fp = Fingerprint::where('id_karyawan', $req->id_karyawan)
                 ->where('template_id', $req->template_id)
                 ->where('alat_id', $alat->id)
+                ->where('jari_id', $req->jari_id)
                 ->first();
             if ($fp) {
                 $filePath = 'assets/fingerprint/template/' . $fp->template_dat;
@@ -277,6 +281,7 @@ class FingerprintController extends Controller
                 Fingerprint::where('id_karyawan', $req->id_karyawan)
                     ->where('template_id', $req->template_id)
                     ->where('alat_id', $alat->id)
+                    ->where('jari_id', $req->jari_id)
                     ->delete();
                 return response()->json([
                     'message' => 'File delete successfully',
