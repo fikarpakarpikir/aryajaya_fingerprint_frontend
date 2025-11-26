@@ -5,6 +5,7 @@ export default function FingerSelector({
     onChange = () => {},
     initial = [],
     preValue = [],
+    isDeletable = false,
 }) {
     /*
      * NOTE: ID Jari
@@ -174,14 +175,20 @@ export default function FingerSelector({
         },
     ];
 
+    const [u, r] = isDeletable
+        ? ["Jari belum terdaftar", "Jari sudah terdaftar"]
+        : ["Jari sudah terdaftar", "Jari belum terdaftar"];
+
     const listLegend = [
-        { text: "Jari sudah terdaftar", color: "#707070" },
+        { text: u, color: "#707070" },
         { text: "Jari dipilih untuk didaftarkan", color: "#ffba00" },
-        { text: "Jari belum terdaftar", color: "#fffaf1" },
+        { text: r, color: "#fffaf1" },
     ];
 
     const Jari = ({ j }) => {
-        const disabled = preValue?.includes(j.id);
+        const exists = list.includes(j.id);
+
+        const disabled = isDeletable ? !exists : exists;
         const isSelected = selected.includes(j.id);
 
         return (

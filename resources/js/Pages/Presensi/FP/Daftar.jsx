@@ -63,7 +63,7 @@ export default function Daftar() {
     return (
         <>
             <span className="badge bg-primary text-white font-bold text-md px-8">
-                Daftar
+                Daftar Fingerprint
             </span>
             {!scanning ? (
                 <Formik

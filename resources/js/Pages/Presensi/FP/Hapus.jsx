@@ -59,7 +59,7 @@ export default function Hapus() {
     return (
         <>
             <span className="badge bg-red-500 text-white font-bold text-md px-8">
-                Hapus
+                Hapus Fingerprint
             </span>
 
             <Formik
@@ -87,11 +87,16 @@ export default function Hapus() {
                 }) => (
                     <form onSubmit={handleSubmit} className="row g-3">
                         <Select2RS
-                            className="col-6 mx-auto"
+                            className="w-3/4 mx-auto"
                             label="Nama Karyawan"
                             id="idKar"
                             data={dataSelect(
-                                listRegistereds,
+                                listKaryawans?.filter(
+                                    (k) =>
+                                        listRegistereds?.filter(
+                                            (reg) => reg.id_karyawan == k.id
+                                        )?.length > 0
+                                ),
                                 "id_karyawan",
                                 "org.nama"
                             )}
@@ -116,6 +121,7 @@ export default function Hapus() {
                                 onChange={(e) => {
                                     setFieldValue("jariId", e[0]);
                                 }}
+                                isDeletable
                             />
                         )}
                         <div className="col-12 mt-3 d-flex">
