@@ -97,8 +97,8 @@ export default function Hapus() {
                                             (reg) => reg.id_karyawan == k.id
                                         )?.length > 0
                                 ),
-                                "id_karyawan",
-                                "org.nama"
+                                "id",
+                                "nama"
                             )}
                             name="idKar"
                             error={errors.idKar}
