@@ -16,12 +16,19 @@ use Carbon\Carbon;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Storage;
 use App\Events\StatusFPEvent;
+use App\Services\AlatService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 
 // #[AsController]
 class FingerprintController extends Controller
 {
+    public $alat_id;
+
+    public function __construct()
+    {
+        $this->alat_id = AlatService::info();
+    }
     public  function getIdAlat($ip)
     {
         try {
@@ -64,12 +71,12 @@ class FingerprintController extends Controller
     {
         $req->validate([
             'template_id' => 'required|numeric',
-            'alat_id' => 'required|numeric',
+            // 'alat_id' => 'required|numeric',
         ]);
 
         // return response()->json(['ok' => true, 'data' => $req->all()]);
         $karyawan = Fingerprint::where('template_id', $req->template_id)
-            ->where('alat_id', $req->alat_id)
+            ->where('alat_id', $this->alat_id)
             ->first();
         // return response()->json(['message' =>  $req], 400);
 
@@ -160,12 +167,12 @@ class FingerprintController extends Controller
 
             if ($req->hasFile('template_dat')) {
                 try {
-                    $filename = 'template_' . $req->alat_id . '_' . $req->template_id . '.' . $req['template_dat']->getClientOriginalExtension();
+                    $filename = 'template_' . $this->alat_id . '_' . $req->template_id . '.' . $req['template_dat']->getClientOriginalExtension();
 
                     $req['template_dat']->move(public_path('assets/fingerprint/template/'), $filename);
 
                     $fingerprint = Fingerprint::create([
-                        'alat_id' => $req->alat_id,
+                        'alat_id' => $this->alat_id,
                         'id_karyawan' => $req->id_karyawan,
                         'template_id' => $req->template_id,
                         'template_dat' => $filename,
@@ -213,7 +220,7 @@ class FingerprintController extends Controller
         try {
             return response()->json([
                 'data' => Fingerprint::where('id_karyawan', $req->id_karyawan)
-                    ->where('alat_id', $req->alat_id)
+                    ->where('alat_id', $this->alat_id)
                     ->where('jari_id', $req->jari_id)
                     ->pluck('template_id')
                     ->first()
@@ -265,7 +272,7 @@ class FingerprintController extends Controller
         try {
             $fp = Fingerprint::where('id_karyawan', $req->id_karyawan)
                 ->where('template_id', $req->template_id)
-                ->where('alat_id', $req->alat_id)
+                ->where('alat_id', $this->alat_id)
                 ->where('jari_id', $req->jari_id)
                 ->first();
             if ($fp) {
@@ -276,7 +283,7 @@ class FingerprintController extends Controller
                 }
                 Fingerprint::where('id_karyawan', $req->id_karyawan)
                     ->where('template_id', $req->template_id)
-                    ->where('alat_id', $req->alat_id)
+                    ->where('alat_id', $this->alat_id)
                     ->where('jari_id', $req->jari_id)
                     ->delete();
                 return response()->json([
