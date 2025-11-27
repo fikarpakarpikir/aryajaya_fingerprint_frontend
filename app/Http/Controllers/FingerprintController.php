@@ -146,7 +146,7 @@ class FingerprintController extends Controller
             'id_karyawan' => 'required',
             'template_id' => 'required',
             'template_dat' => 'required',
-            'ip_alat' => 'required',
+            'alat_id' => 'required',
             'jari_id' => 'required',
         ]);
         try {
@@ -206,7 +206,7 @@ class FingerprintController extends Controller
     {
         $req->validate([
             'id_karyawan' => 'required',
-            'ip_alat' => 'required',
+            'alat_id' => 'required',
             'jari_id' => 'required',
         ]);
 

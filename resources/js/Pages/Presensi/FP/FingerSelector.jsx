@@ -51,12 +51,12 @@ export default function FingerSelector({
         const gray = "#707070";
         const white = "#fffaf1ff";
         return {
-            fill: preValue.includes(id)
+            fill: selected.includes(id)
+                ? orange
+                : preValue.includes(id)
                 ? isDeletable
                     ? white
                     : gray
-                : selected.includes(id)
-                ? orange
                 : gray,
             stroke: selected.includes(id) ? "#ffba00" : "#b89b5bff",
             cursor: "pointer",
