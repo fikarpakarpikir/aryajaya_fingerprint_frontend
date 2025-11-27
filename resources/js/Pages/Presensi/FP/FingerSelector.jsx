@@ -49,16 +49,15 @@ export default function FingerSelector({
     const styleFor = (id) => {
         const orange = "#ffba00";
         const gray = "#707070";
+        const white = "#fffaf1ff";
         return {
             fill: preValue.includes(id)
                 ? isDeletable
-                    ? orange
+                    ? white
                     : gray
                 : selected.includes(id)
-                ? isDeletable
-                    ? gray
-                    : orange
-                : "#fffaf1ff",
+                ? orange
+                : gray,
             stroke: selected.includes(id) ? "#ffba00" : "#b89b5bff",
             cursor: "pointer",
             transition: "all 160ms ease",

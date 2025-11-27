@@ -63,14 +63,13 @@ class FingerprintController extends Controller
     public function presensiStore(Request $req)
     {
         $req->validate([
-            'template_id' => 'required',
-            'ip_alat' => 'required',
+            'template_id' => 'required|numeric',
+            'alat_id' => 'required|numeric',
         ]);
 
         // return response()->json(['ok' => true, 'data' => $req->all()]);
-        $alat = $this->getIdAlat($req->ip_alat);
         $karyawan = Fingerprint::where('template_id', $req->template_id)
-            ->where('alat_id', $alat->id)
+            ->where('alat_id', $req->alat_id)
             ->first();
         // return response()->json(['message' =>  $req], 400);
 
@@ -151,7 +150,6 @@ class FingerprintController extends Controller
             'jari_id' => 'required',
         ]);
         try {
-            $alat = $this->getIdAlat($req->ip_alat);
             if (Fingerprint::where('id_karyawan', $req->id_karyawan)->where('jari_id', $req->jari_id)->first()) {
                 return response()->json([
                     'message' => 'Gagal, Karyawan sudah terdaftar',
@@ -162,12 +160,12 @@ class FingerprintController extends Controller
 
             if ($req->hasFile('template_dat')) {
                 try {
-                    $filename = 'template_' . $alat->id . '_' . $req->template_id . '.' . $req['template_dat']->getClientOriginalExtension();
+                    $filename = 'template_' . $req->alat_id . '_' . $req->template_id . '.' . $req['template_dat']->getClientOriginalExtension();
 
                     $req['template_dat']->move(public_path('assets/fingerprint/template/'), $filename);
 
                     $fingerprint = Fingerprint::create([
-                        'alat_id' => $alat->id,
+                        'alat_id' => $req->alat_id,
                         'id_karyawan' => $req->id_karyawan,
                         'template_id' => $req->template_id,
                         'template_dat' => $filename,
@@ -213,10 +211,9 @@ class FingerprintController extends Controller
         ]);
 
         try {
-            $alat = $this->getIdAlat($req->ip_alat);
             return response()->json([
                 'data' => Fingerprint::where('id_karyawan', $req->id_karyawan)
-                    ->where('alat_id', $alat->id)
+                    ->where('alat_id', $req->alat_id)
                     ->where('jari_id', $req->jari_id)
                     ->pluck('template_id')
                     ->first()
@@ -260,16 +257,15 @@ class FingerprintController extends Controller
     {
         // return $req->hasFile('template_dat');
         $req->validate([
-            'id_karyawan' => 'required',
-            'template_id' => 'required',
-            'ip_alat' => 'required',
-            'jari_id' => 'required',
+            'id_karyawan' => 'required|numeric',
+            'template_id' => 'required|numeric',
+            'alat_id' => 'required|numeric',
+            'jari_id' => 'required|numeric',
         ]);
         try {
-            $alat = $this->getIdAlat($req->ip_alat);
             $fp = Fingerprint::where('id_karyawan', $req->id_karyawan)
                 ->where('template_id', $req->template_id)
-                ->where('alat_id', $alat->id)
+                ->where('alat_id', $req->alat_id)
                 ->where('jari_id', $req->jari_id)
                 ->first();
             if ($fp) {
@@ -280,7 +276,7 @@ class FingerprintController extends Controller
                 }
                 Fingerprint::where('id_karyawan', $req->id_karyawan)
                     ->where('template_id', $req->template_id)
-                    ->where('alat_id', $alat->id)
+                    ->where('alat_id', $req->alat_id)
                     ->where('jari_id', $req->jari_id)
                     ->delete();
                 return response()->json([
