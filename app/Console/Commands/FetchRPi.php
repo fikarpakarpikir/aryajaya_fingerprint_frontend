@@ -3,17 +3,15 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Http;
 
-class FetchAlat extends Command
+class FetchRPi extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'alat:fetch';
+    protected $signature = 'rpi:fetch';
 
     /**
      * The console command description.
@@ -27,8 +25,8 @@ class FetchAlat extends Command
      */
     public function handle()
     {
-        $serial = trim(file_get_contents('/etc/rpi-serial'));
-        // $serial = trim(shell_exec("cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2"));
+        // $serial = trim(file_get_contents('/etc/rpi-serial'));
+        $serial = trim(shell_exec("cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2"));
 
         return $serial;
 
