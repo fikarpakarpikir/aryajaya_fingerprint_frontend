@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Http;
 
@@ -148,6 +149,7 @@ HELP;
         ])->post("{$this->apiAlat}/regist", [
             'title' => $title,
             'serial_number' => $serial,
+            'kode_akses' => Crypt::encrypt(env('APP_KEY'))
         ]);
 
         if ($response->failed()) {
