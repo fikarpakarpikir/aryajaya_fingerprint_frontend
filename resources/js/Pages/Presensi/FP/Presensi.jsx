@@ -17,7 +17,7 @@ export default function Presensi() {
         listKaryawans,
         getFitur,
     } = useFPContext();
-    const { ip_alat: ipAlat, jenis_kehadiran: jenisKehadiran } = props;
+
     const { urlScanner } = useSelector((state) => state.fingerprints);
 
     const [karyawan, setKaryawan] = useState(null);

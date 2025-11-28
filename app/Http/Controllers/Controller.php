@@ -49,6 +49,7 @@ class Controller extends BaseController
             return Inertia::render(
                 'Presensi/index',
                 [
+                    'ip_alat' => env('URL_FLASK'),
                     'alat_id' => $this->alatId,
                     'jenis_kehadiran' => Kehadiran::all(),
                     'last_sync' => [

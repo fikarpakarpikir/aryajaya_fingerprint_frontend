@@ -24,7 +24,7 @@ export default function Hapus() {
         setListKaryawans,
         getFitur,
     } = useFPContext();
-    const { ip_alat: ipAlat, jenis_kehadiran: jenisKehadiran } = props;
+
     const { urlScanner } = useSelector((state) => state.fingerprints);
     const { listRegistereds } = useSelector((state) => state.fingerprints);
 

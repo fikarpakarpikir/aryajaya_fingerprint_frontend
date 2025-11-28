@@ -28,7 +28,7 @@ import FingerSelector from "./FingerSelector";
 export function FPScanner() {
     const { props } = usePage();
     const { ip_alat: ipAlat, jenis_kehadiran: jenisKehadiran } = props;
-    const urlScanner = `//${ipAlat}`;
+    const urlScanner = ipAlat;
     const fullScreenRef = useFullScreenHandle();
     const dispatch = useDispatch();
     const {
