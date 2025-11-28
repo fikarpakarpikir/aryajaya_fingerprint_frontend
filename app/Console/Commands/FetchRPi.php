@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Http;
 
 class FetchRPi extends Command
 {
@@ -40,7 +42,7 @@ class FetchRPi extends Command
             return 1;
         }
 
-        File::put(public_path('device.json'), $response->body());
+        File∂::put(public_path('device.json'), $response->body());
 
         $this->info('Device info saved!');
         return 0;
