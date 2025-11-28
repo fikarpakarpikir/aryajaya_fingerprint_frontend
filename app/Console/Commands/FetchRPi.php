@@ -148,7 +148,8 @@ HELP;
         ])->post("{$this->apiAlat}/regist", [
             'title' => $title,
             'serial_number' => $serial,
-            'kode_akses' => Crypt::encrypt(env('APP_KEY'))
+            'kode_akses' => Crypt::encrypt(env('APP_KEY')),
+            'ip_alat' => request()->ip(),
         ]);
 
         if ($response->failed()) {
