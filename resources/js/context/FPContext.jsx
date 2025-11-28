@@ -207,14 +207,14 @@ export function FPProvider({ children }) {
 
     const fetchAlat = async () => {
         if (!urlScanner) {
-            // setActiveFP(false);
-            setActiveFP(true);
+            setActiveFP(false);
+            // setActiveFP(true);
             setMessage("URL scanner tidak valid");
             return;
         }
         try {
             const res = await axios.get(`${urlScanner}/check_fingerprint`);
-            console.log("ini");
+            // console.log("ini");
             // setActiveFP(res.data.message ? true : false);
             // setMessage(
             //     res.data.message
