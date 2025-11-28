@@ -92,8 +92,8 @@ HELP;
     {
         // $serial = trim(file_get_contents('/etc/rpi-serial'));
         // $serial = '123123';
-        $serial = '$this->getSeri()';
-        // $serial = $this->getSeri();
+        // $serial = '$this->getSeri()';
+        $serial = $this->getSeri();
 
         if (!$serial) {
             return $this->error('Tidak ada serial');
