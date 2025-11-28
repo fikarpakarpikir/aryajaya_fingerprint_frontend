@@ -30,8 +30,6 @@ class FetchRPi extends Command
         // $serial = trim(file_get_contents('/etc/rpi-serial'));
         $serial = trim(shell_exec("cat /proc/cpuinfo | grep Serial | cut -d ' ' -f 2"));
 
-        return $serial;
-
 
         $response = Http::post("{$this->apiServer}/Alat/info", [
             'serial' => $serial,
@@ -42,7 +40,7 @@ class FetchRPi extends Command
             return 1;
         }
 
-        File∂::put(public_path('device.json'), $response->body());
+        File::put(public_path('device.json'), $response->body());
 
         $this->info('Device info saved!');
         return 0;
