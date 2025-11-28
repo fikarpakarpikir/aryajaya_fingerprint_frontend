@@ -107,7 +107,7 @@ HELP;
         ]);
 
         if ($response->status() === 404) {
-            $this->error("Alat belum terdaftar");
+            $this->warn("Alat belum terdaftar");
             $c = $this->ask("Mau didaftarkan? y/n - atau langsung enter saja untuk Yes", 'y');
             switch ($c) {
                 case 'y':
@@ -122,7 +122,6 @@ HELP;
                     return 1;
                     break;
             }
-            return $this->regist();
         }
         if ($response->failed()) {
             $message = $response['message'] ?? $response['error'];
@@ -157,6 +156,7 @@ HELP;
             return $this->error("Gagal register. {$message}");
         }
 
+        File::put(public_path('device.json'), $response->body());
         return $this->info("Berhasil register device.");
     }
 }

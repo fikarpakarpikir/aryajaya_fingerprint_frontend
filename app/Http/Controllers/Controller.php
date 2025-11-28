@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\FingerprintController;
 use App\Models\Agama;
 use App\Models\Divisi;
 use App\Models\Dokumen;
@@ -25,17 +26,15 @@ use Inertia\Inertia;
 class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
-    public $apiServer, $ipAlat;
+    public $apiServer, $alatId;
 
     public function __construct()
     {
         $this->apiServer = env('VITE_API_SERVER');
         $ipAddress = env('APP_URL');
         // $ipAddress = request()->ip();
-        $port = request()->getPort();
-        $fullAddress = $ipAddress . ':' . $port;
-        $this->apiAlat = Alat::where('ip_device', $fullAddress)
-                        ->pluck('ip_alat')->first();
+        $fp = new FingerprintController();
+        $this->alatId = $fp->alat_id;
     }
 
     public function home()
@@ -50,7 +49,7 @@ class Controller extends BaseController
             return Inertia::render(
                 'Presensi/index',
                 [
-                    'ip_alat' => $this->apiAlat,
+                    'alat_id' => $this->alatId,
                     'jenis_kehadiran' => Kehadiran::all(),
                     'last_sync' => [
                         'fp' => $getSync(1),
