@@ -21,7 +21,13 @@ class FetchRPi extends Command
      * @var string
      */
     protected $description = 'Fetch device info from main server and store locally';
+    private $apiServer;
 
+    public function __construct()
+    {
+        parent::__construct();
+        $this->apiServer = config('app.api.server');
+    }
     /**
      * Execute the console command.
      */
