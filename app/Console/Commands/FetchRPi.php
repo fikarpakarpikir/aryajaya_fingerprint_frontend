@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Services\RPiService;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\File;
@@ -93,43 +94,28 @@ HELP;
         // $serial = trim(file_get_contents('/etc/rpi-serial'));
         // $serial = '123123';
         // $serial = '$this->getSeri()';
-        $serial = $this->getSeri();
+       $service = new RPiService();
 
-        if (!$serial) {
-            return $this->error('Tidak ada serial');
-        }
+        $serial = $service->getSerial();
+        if (!$serial) return $this->error('Tidak ada serial');
+
         $this->info("Your Serial: {$serial}");
 
-        $response = Http::withHeaders([
-            'Accept' => 'application/json'
-        ])->post("{$this->apiAlat}/info", [
-            'serial_number' => $serial,
-        ]);
+        $result = $service->fetch($serial);
 
-        if ($response->status() === 404) {
+        if (isset($result['status']) && $result['status'] == 404) {
             $this->warn("Alat belum terdaftar");
-            $c = $this->ask("Mau didaftarkan? y/n - atau langsung enter saja untuk Yes", 'y');
-            switch ($c) {
-                case 'y':
-                    return $this->regist($serial);
-                case 'n':
-                    return $this->warn("Ok, goodbye.");
-                    break;
+            $c = $this->ask("Mau didaftarkan? y/n", 'y');
 
-                default:
-                    $this->line("$c tidak ada dalam pilihan");
-                    $this->error("==================");
-                    return 1;
-                    break;
+            if ($c === 'y') {
+                return $this->regist($serial);
             }
-        }
-        if ($response->failed()) {
-            $message = $response['message'] ?? $response['error'];
-            $this->error("Failed to fetch device info: {$message}");
-            return 1;
+            return $this->warn("Ok, goodbye.");
         }
 
-        File::put(public_path('device.json'), $response->body());
+        if (isset($result['error'])) {
+            return $this->error("Failed: " . $result['error']);
+        }
 
         $this->info('Device info saved!');
         return 0;

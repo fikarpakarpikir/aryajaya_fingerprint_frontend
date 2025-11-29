@@ -1,9 +1,11 @@
 <?php
 
+use App\Console\Commands\FetchRPi;
 use App\Http\Controllers\API\UserController;
 use App\Http\Controllers\FingerprintController;
 use App\Http\Controllers\PresensiController;
 use App\Models\User;
+use App\Services\RPiService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -39,6 +41,18 @@ Route::group(['prefix' => 'Karyawan', 'as' => 'Kar.'], function () {
 // routes/api.php
 Route::post('/status-fingerprint', [FingerprintController::class, 'updateStatus'])->name('updateStatus');
 Route::post('/status-fingerprint-sync', [FingerprintController::class, 'updateStatusSync'])->name('updateStatusSync');
+Route::post('/device/fetch', function () {
+    $service = new RPiService();
+
+    $serial = $service->getSerial();
+    if (!$serial) {
+        return response()->json(['error' => 'Tidak ada serial'], 400);
+    }
+
+    $result = $service->fetch($serial);
+
+    return response()->json($result);
+});
 
 // Route::group(['as' => 'api.'], function () {
 //     Route::group(['prefix' => 'LMS'], function () {
