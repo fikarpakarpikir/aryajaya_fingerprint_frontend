@@ -27,8 +27,7 @@ const Sync = ({ jenis, title }) => {
     const { status, message, waktu, step } = active;
     // const status = "loading";
     const newMsg = msg || message;
-    const showLoading = status === "loading"
-
+    const showLoading = status === "loading";
 
     const IconState = () => {
         switch (status) {
@@ -67,55 +66,79 @@ const Sync = ({ jenis, title }) => {
             >
                 {showLoading ? (
                     <>
-                    <div className="flex flex-col">
-                    <div className="flex flex-col">
-
-                    
-
-<ol className="flex justify-center items-center w-full">
-    <li className="flex flex-col items-center text-blue-600 ">
-        <span className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full lg:h-12 lg:w-12 dark:bg-blue-800 shrink-0">
-            {step <= 1 ? 
-            <FontAwesomeIcon icon={ faDownload } bounce/>
-            :
-            <FontAwesomeIcon icon={ faCheck } />
-            }
-        </span>
-    </li>
-    <li className={`flex w-full items-center text-blue-600 dark:text-blue-500 after:content-[''] after:w-full after:h-1 after:border-b ${step>= 2?'after:border-blue-100' :'after:border-gray-100'} after:border-4 after:inline-block`}></li>
-    <li className="flex flex-col items-center">
-        <span className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full lg:h-12 lg:w-12 dark:bg-gray-700 shrink-0">
-            {step <= 2 ? 
-            <FontAwesomeIcon icon={ faArrowsRotate } spin/>
-            :
-            <FontAwesomeIcon icon={ faCheck } />
-            }
-        </span>
-    </li>
-</ol>
-<ol className="flex justify-center items-center w-full">
-    <li className="flex flex-col items-center">
-        <span className={`badge text-xs ${step <= 1 ? 'bg-gray-100 text-gray-600' :'bg-blue-100 text-blue-600'}`}>
-            Downloading
-        </span>
-    </li>
-    <li className="flex w-full items-center"></li>
-    <li className="flex flex-col items-center">
-        <span className={`badge text-xs ${step <= 2 ? 'bg-gray-100 text-gray-600' :'bg-blue-100 text-blue-600'}`}>
-            Migrating
-        </span>
-    </li>
-</ol>
-
-</div>
-                        <ProgressBarFR
-                            label={newMsg}
-                            width="w-72"
-                            progress={progress}
-                            color="gray-600"
-                            size="sm"
-                        />
-                    </div>
+                        <div className="flex flex-col">
+                            <div className="flex flex-col">
+                                <ol className="flex justify-center items-center w-full">
+                                    <li className="flex flex-col items-center text-blue-600 ">
+                                        <span className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full lg:h-12 lg:w-12 dark:bg-blue-800 shrink-0">
+                                            {step <= 1 ? (
+                                                <FontAwesomeIcon
+                                                    icon={faDownload}
+                                                    bounce
+                                                />
+                                            ) : (
+                                                <FontAwesomeIcon
+                                                    icon={faCheck}
+                                                />
+                                            )}
+                                        </span>
+                                    </li>
+                                    <li
+                                        className={`flex w-full items-center text-blue-600 dark:text-blue-500 after:content-[''] after:w-full after:h-1 after:border-b ${
+                                            step >= 2
+                                                ? "after:border-blue-100"
+                                                : "after:border-gray-100"
+                                        } after:border-4 after:inline-block`}
+                                    ></li>
+                                    <li className="flex flex-col items-center">
+                                        <span className="flex items-center justify-center w-10 h-10 bg-gray-100 rounded-full lg:h-12 lg:w-12 dark:bg-gray-700 shrink-0">
+                                            {step <= 2 ? (
+                                                <FontAwesomeIcon
+                                                    icon={faArrowsRotate}
+                                                    spin
+                                                />
+                                            ) : (
+                                                <FontAwesomeIcon
+                                                    icon={faCheck}
+                                                />
+                                            )}
+                                        </span>
+                                    </li>
+                                </ol>
+                                <ol className="flex justify-center items-center w-full">
+                                    <li className="flex flex-col items-center">
+                                        <span
+                                            className={`badge text-xs ${
+                                                step <= 1
+                                                    ? "bg-gray-100 text-gray-600"
+                                                    : "bg-blue-100 text-blue-600"
+                                            }`}
+                                        >
+                                            Downloading
+                                        </span>
+                                    </li>
+                                    <li className="flex w-full items-center"></li>
+                                    <li className="flex flex-col items-center">
+                                        <span
+                                            className={`badge text-xs ${
+                                                step <= 2
+                                                    ? "bg-gray-100 text-gray-600"
+                                                    : "bg-blue-100 text-blue-600"
+                                            }`}
+                                        >
+                                            Migrating
+                                        </span>
+                                    </li>
+                                </ol>
+                            </div>
+                            <ProgressBarFR
+                                label={newMsg}
+                                width="w-72"
+                                progress={progress}
+                                color="gray-600"
+                                size="sm"
+                            />
+                        </div>
                     </>
                 ) : (
                     <>

@@ -21,40 +21,46 @@ export default function useSyncing() {
 
         const handler = (e) => {
             try {
-                const { done, total, step, status } = e;
+                const { done, total, step, status, jenis_data } = e;
+
+                const jenis = {
+                    1: "fp",
+                    2: "face",
+                }[jenis_data];
                 const percent =
                     total > 0 ? Math.round((done / total) * 100) : 0;
 
                 setProgress(percent);
                 const msgState = {
-                    1: 'Downloading',
-                    2: 'Migrating',
-                }[step]
+                    1: "Downloading",
+                    2: "Migrating",
+                    3: "Selesai",
+                }[step];
 
-                const msgLocal = `${msgState}... ${done} / ${total}`
-                const msgStep = `Step ${step}/2: ${msgLocal}`
+                const msgLocal = `${msgState}... ${done} / ${total}`;
+                const msgStep = `Step ${step}/2: ${msgLocal}`;
                 setMsg(msgLocal);
                 dispatch(setMessage(msgLocal));
                 // setMsg(`Synchronizing... ${done} / ${total}`);
-                updateSync(
-                    'fp',
-                    'loading',
-                    "",
-                    msgLocal,
-                    step
-                );
-                if (percent >= 100 && step == 2) {
+                let statusSync = "loading";
+                updateSync(jenis, statusSync, "", msgLocal, step);
+                if (step == 3) {
                     setLoading(false);
-                    setHasClicked("success");
-                    dispatch(setProcess("success"));
-                    dispatch(setMessage("Sinkronisasi selesai"));
-                    updateSync(
-                        'fp',
-                        "success",
-                        "",
-                        msgLocal,
-                        step
-                    );
+                    if (percent >= 100) {
+                        statusSync = "success";
+                        setHasClicked(statusSync);
+                        dispatch(setProcess(statusSync));
+                        dispatch(setMessage("Sinkronisasi selesai"));
+                        updateSync(jenis, statusSync, "", msgLocal, step);
+                    } else {
+                        statusSync = "success not all";
+                        setHasClicked(statusSync);
+                        dispatch(setProcess(statusSync));
+                        dispatch(
+                            setMessage("Sinkronisasi selesai tapi tidak semua")
+                        );
+                        updateSync(jenis, statusSync, "", msgLocal, step);
+                    }
 
                     if (intervalRef.current) {
                         clearInterval(intervalRef.current);
@@ -80,7 +86,7 @@ export default function useSyncing() {
                 status,
                 waktu,
                 message,
-                step
+                step,
             })
         );
     }

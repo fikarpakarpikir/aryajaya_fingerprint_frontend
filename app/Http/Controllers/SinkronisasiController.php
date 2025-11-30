@@ -93,6 +93,13 @@ class SinkronisasiController extends Controller
 
                             $dat = Http::get($item['dat_url']);
                             if ($dat->successful()) {
+                                broadcast(new SyncProgressEvent([
+                                    'jenis_data'        => 1,
+                                    'done'              => $done,
+                                    'total'             => count($unreg),
+                                    'id_karyawan'       => $id,
+                                    'step'              => 1,
+                                ]));
                                 file_put_contents("$path/$template", $dat->body());
 
 
@@ -115,13 +122,19 @@ class SinkronisasiController extends Controller
                                 'done'              => $done,
                                 'total'             => count($unreg),
                                 'id_karyawan'       => $id,
-                                'step'              => 1,
+                                'step'              => 2,
                             ]));
                         }
+                        broadcast(new SyncProgressEvent([
+                            'jenis_data'        => 1,
+                            'done'              => $done,
+                            'total'             => count($unreg),
+                            'id_karyawan'       => $id,
+                            'step'              => 3,
+                        ]));
                         try {
                             (new FingerprintController())->getFitur(4);
-                            $step =2;
-
+                            $step = 2;
                         } catch (\Throwable $th) {
                             return $th->getMessage();
                         }
@@ -211,6 +224,14 @@ class SinkronisasiController extends Controller
                             $foto = Http::get($item['foto_url']);
                             // dd($foto->successful());
                             if ($foto->successful()) {
+                                broadcast(new SyncProgressEvent([
+                                    'jenis_data'        => 2,
+                                    'done'              => $done,
+                                    'total'             => count($unreg),
+                                    'id_karyawan'       => $id,
+                                    'ekspresi_wajah_id' => $exp,
+                                    'step'              => 1,
+                                ]));
                                 file_put_contents("$path/$exp.png", $foto->body());
 
                                 FaceRecognition::updateOrCreate(
@@ -235,8 +256,17 @@ class SinkronisasiController extends Controller
                                 'total'             => count($unreg),
                                 'id_karyawan'       => $id,
                                 'ekspresi_wajah_id' => $exp,
+                                'step'              => 2,
                             ]));
                         }
+                        broadcast(new SyncProgressEvent([
+                            'jenis_data'        => 2,
+                            'done'              => $done,
+                            'total'             => count($unreg),
+                            'id_karyawan'       => $id,
+                            'ekspresi_wajah_id' => $exp,
+                            'step'              => 3,
+                        ]));
 
                         break;
 
@@ -280,8 +310,6 @@ class SinkronisasiController extends Controller
                     'total' => $totalUnreg,
                     'done' => $done,
                 ]);
-
-
             }
             if ($res->failed()) {
                 $sync->update([

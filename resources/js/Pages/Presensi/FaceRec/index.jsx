@@ -94,9 +94,10 @@ function FaceRecog() {
     const newWidth = viewportWidth * 0.7; // Adjust this value as needed
     const [isCameraDenied, setIsCameraDenied] = useState(false);
 
-    usePresensiCheck(presensi);
+    // usePresensiCheck(presensi);
     useFaceDetection(faceMyDetect);
     useCameraAndModels(dataUser, { loadModels, fetchData });
+
     async function fetchData() {
         try {
             const images = [];
@@ -163,8 +164,6 @@ function FaceRecog() {
                 } else {
                     setShowConfirm(true);
                 }
-
-                // Pastikan faceMyDetect() hanya dipanggil setelah semua model dan dataFaceID siap
             }
         } catch (error) {
             console.error("Gagal memuat model:", error);
