@@ -7,6 +7,8 @@ use App\Models\Auth\FaceRecognition;
 use App\Models\Fingerprint;
 use App\Models\Sinkronisasi;
 use App\Http\Controllers\FingerprintController;
+use App\Models\Dokumen;
+use App\Models\Karyawan;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -32,6 +34,7 @@ class SinkronisasiController extends Controller
             'started_at' => 'nullable|date',
             'finished_at' => 'nullable|date|after_or_equal:started_at',
         ]);
+        $req['karyawan_registered'] =  Karyawan::all()->pluck('id')->toArray() ?? [];
 
         DB::beginTransaction();
         try {
@@ -44,11 +47,80 @@ class SinkronisasiController extends Controller
                 'started_at' => now(),
             ]);
             if ($res->successful()) {
-                $data = $res->json();
-                $total = count($data);
+                $json = $res->json();
+
+                $data = $json['sync'];
+                $kar_unregist = $json['kar'];
                 $done = 0;
                 $unreg = [];
                 $step = 1;
+                if (count($kar_unregist) > 0) {
+
+                    foreach ($kar_unregist as $kar) {
+                        broadcast(new SyncProgressEvent([
+                            'jenis_data'        => 1,
+                            'done'              => $done,
+                            'total'             => count($unreg),
+                            'id_karyawan'       => $kar['id'],
+                            'step'              => 1,
+                        ]));
+
+                        // 1. SIMPAN DATA KARYAWAN UTAMA
+                        $karyawan = Karyawan::updateOrCreate(
+                            ['id' => $kar['id']],
+                            [
+                                'nama'   => $kar['nama'],
+                                'tempat_lahir'   => $kar['tempat_lahir'],
+                                'tanggal_lahir'   => $kar['tanggal_lahir'],
+                                'no_hp'  => $kar['no_hp'],
+                                'jenis_kelamin'  => $kar['jenis_kelamin'],
+                                'kode_agama'  => $kar['kode_agama'],
+                                'kode_nikah'  => $kar['kode_nikah'],
+                                'anak'   => $kar['anak'],
+                                'role'   => $kar['role'],
+                                'status_aktif'   => $kar['status_aktif'],
+                                // tambahkan field lain sesuai tabel
+                            ]
+                        );
+
+                        // 3. SIMPAN DOKUMEN (MANY)
+                        if (isset($kar['dokumen'])) {
+                            $dokumen = collect($kar['dokumen'])->map(function ($d) use ($kar) {
+                                return [
+                                    'id'            => $d['id'] ?? null,
+                                    'karyawan_id'   => $kar['id'],
+                                    'jenis_data_id' => $d['jenis_data_id'],
+                                    'file'          => $d['file'],
+                                    'no_identity'   => $d['no_identity'],
+                                ];
+                            });
+
+                            // simpan dengan upsert — PALING CEPAT
+                            Dokumen::upsert(
+                                $dokumen->toArray(),
+                                ['id'], // unique column
+                                ['file', 'no_identity', 'jenis_data_id'] // update columns
+                            );
+                        }
+
+                        if (isset($kar['pegawai'])) {
+                            $karyawan->pegawai()->updateOrCreate(
+                                [
+                                    'id' => $kar['pegawai']['id'] ?? null,
+                                    'id_karyawan' => $kar['id'] ?? null
+                                ],
+                                [
+                                    'masuk'              => $kar['pegawai']['masuk'],
+                                    'kode_status_kerja'  => $kar['pegawai']['kode_status_kerja'],
+                                    'kode_golongan'      => $kar['pegawai']['kode_golongan'],
+                                    'kode_struktural'    => $kar['pegawai']['kode_struktural'],
+                                    'kode_fungsional'    => $kar['pegawai']['kode_fungsional'],
+                                    'fungsional'    => $kar['pegawai']['fungsional'],
+                                ]
+                            );
+                        }
+                    }
+                }
                 switch ($req->jenis_data) {
                     case 1:
                         $ids = collect($data)->map(fn($item) => [
@@ -98,7 +170,7 @@ class SinkronisasiController extends Controller
                                     'done'              => $done,
                                     'total'             => count($unreg),
                                     'id_karyawan'       => $id,
-                                    'step'              => 1,
+                                    'step'              => 2,
                                 ]));
                                 file_put_contents("$path/$template", $dat->body());
 
@@ -122,7 +194,7 @@ class SinkronisasiController extends Controller
                                 'done'              => $done,
                                 'total'             => count($unreg),
                                 'id_karyawan'       => $id,
-                                'step'              => 2,
+                                'step'              => 3,
                             ]));
                         }
                         broadcast(new SyncProgressEvent([
@@ -130,7 +202,7 @@ class SinkronisasiController extends Controller
                             'done'              => $done,
                             'total'             => count($unreg),
                             'id_karyawan'       => $id,
-                            'step'              => 3,
+                            'step'              => 4,
                         ]));
                         try {
                             (new FingerprintController())->getFitur(4);
@@ -230,7 +302,7 @@ class SinkronisasiController extends Controller
                                     'total'             => count($unreg),
                                     'id_karyawan'       => $id,
                                     'ekspresi_wajah_id' => $exp,
-                                    'step'              => 1,
+                                    'step'              => 2,
                                 ]));
                                 file_put_contents("$path/$exp.png", $foto->body());
 
@@ -256,7 +328,7 @@ class SinkronisasiController extends Controller
                                 'total'             => count($unreg),
                                 'id_karyawan'       => $id,
                                 'ekspresi_wajah_id' => $exp,
-                                'step'              => 2,
+                                'step'              => 3,
                             ]));
                         }
                         broadcast(new SyncProgressEvent([
@@ -265,7 +337,7 @@ class SinkronisasiController extends Controller
                             'total'             => count($unreg),
                             'id_karyawan'       => $id,
                             'ekspresi_wajah_id' => $exp,
-                            'step'              => 3,
+                            'step'              => 4,
                         ]));
 
                         break;

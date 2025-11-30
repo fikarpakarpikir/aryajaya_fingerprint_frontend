@@ -32,9 +32,10 @@ export default function useSyncing() {
 
                 setProgress(percent);
                 const msgState = {
-                    1: "Downloading",
-                    2: "Migrating",
-                    3: "Selesai",
+                    1: "Sinkronisasi Data Karyawan",
+                    2: "Downloading",
+                    3: "Migrating",
+                    4: "Selesai",
                 }[step];
 
                 const msgLocal = `${msgState}... ${done} / ${total}`;
@@ -44,7 +45,7 @@ export default function useSyncing() {
                 // setMsg(`Synchronizing... ${done} / ${total}`);
                 let statusSync = "loading";
                 updateSync(jenis, statusSync, "", msgLocal, step);
-                if (step == 3) {
+                if (step == 4) {
                     setLoading(false);
                     if (percent >= 100) {
                         statusSync = "success";

@@ -102,22 +102,22 @@ function FaceRecog() {
         try {
             const images = [];
 
-            for (let i = 1; i <= 2; i++) {
-                const img = await faceapi.fetchImage(
-                    `/assets/face_rec/${dataUser.id}/${i}.png`
-                );
+            // for (let i = 1; i <= 2; i++) {
+            //     const img = await faceapi.fetchImage(
+            //         `/assets/face_rec/${dataUser.id}/${i}.png`
+            //     );
 
-                // Pastikan gambar telah dimuat sebelum diproses
-                await img.decode();
-                images.push(img);
-            }
+            //     // Pastikan gambar telah dimuat sebelum diproses
+            //     await img.decode();
+            //     images.push(img);
+            // }
 
-            // console.log(images, dataUser?.face, dataUser?.face.length);
-            if (images.length > 1) {
-                setDataFaceID(images);
-                return images;
-            }
-            // setShowCamera(true);
+            // // console.log(images, dataUser?.face, dataUser?.face.length);
+            // if (images.length > 1) {
+            //     setDataFaceID(images);
+            //     return images;
+            // }
+            setShowCamera(true);
         } catch (error) {
             console.error("Error fetching user data:", error);
         }
