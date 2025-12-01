@@ -20,7 +20,7 @@ class Karyawan extends Model
 
     protected $guarded = ['id'];
 
-    protected $with = ['dokumen',  'face'];
+    protected $with = ['dokumen'];
     protected $appends = ['encId'];
 
     public function getEncIdAttribute()

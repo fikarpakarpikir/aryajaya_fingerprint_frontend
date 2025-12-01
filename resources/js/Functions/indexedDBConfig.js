@@ -46,7 +46,7 @@ export const useFaceApiCache = () => {
                 const cachedBlob = await getModel(key);
 
                 if (cachedBlob) {
-                    console.log("Mengambil dari IndexedDB:", key);
+                    // console.log("Mengambil dari IndexedDB:", key);
                     return new Response(cachedBlob);
                 } else {
                     const response = await originalFetch(url, ...args);

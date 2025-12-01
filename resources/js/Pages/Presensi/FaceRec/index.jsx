@@ -1,5 +1,5 @@
 import * as faceapi from "face-api.js";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import LoadingSystem from "@/Components/pre-load/loading-system";
 import { timeDiff } from "@/Functions/fullDateDiff";
@@ -27,13 +27,22 @@ import useFaceDetection from "@/hooks/useFaceDetection";
 import usePresensiCheck from "@/hooks/usePresensiCheck";
 import { RealTimeClock } from "../Clock";
 import { FaceProvider, useFaceContext } from "@/context/FaceContext";
-import { faSync } from "@fortawesome/free-solid-svg-icons";
+import { faSun, faSync, faVideo } from "@fortawesome/free-solid-svg-icons";
 import fullWaktuIndo from "@/Functions/waktuIndo";
 import SyncFaceID from "../Sync";
 
 function FaceRecog() {
-    const props = usePage().props;
-    const org = usePage().props?.org;
+    const DETECTION_INTERVAL_MS = 1000; // 1s per check (ubah kalau perlu)
+    const MATCH_DISTANCE_THRESHOLD = 0.45; // rekomendasi: 0.4-0.6 tergantung model/data
+    const TINY_OPTIONS = new faceapi.TinyFaceDetectorOptions({
+        inputSize: 224,
+        scoreThreshold: 0.5,
+    });
+
+    const { props } = usePage();
+    const { karyawans, face_recs } = props;
+    const isReadyToShowCam = !true;
+
     const {
         videoRef,
         loading,
@@ -42,128 +51,149 @@ function FaceRecog() {
         setMessage,
         subMessage,
         setSubMessage,
+        isLoadedModels,
+        setIsLoadedModels,
+        dataFaceID,
+        setDataFaceID,
     } = useFaceContext();
 
     const isSendingRef = useRef(false);
+    const labeledDescriptorsRef = useRef(null);
+    const faceMatcherRef = useRef(null);
+    const canvasRef = useRef(null);
+
+    const [faceMatcher, setFaceMatcher] = useState(null);
+    const [recognizedFaces, setRecognizedFaces] = useState([]);
+    const [results, setResults] = useState([]);
+
     const hasDetectedRef = useRef(false);
     useFaceApiCache();
-    const [dataUser, setDataUser] = useState(org);
-    const [dataFaceID, setDataFaceID] = useState([]);
-    const [jadwal, setJadwal] = useState(props.jadwalKerja?.jadwal?.[0]);
-    const [cekJadwal, setCekJadwal] = useState(props.jadwalKerja?.cek);
-    const [presensi, setPresensi] = useState(props.jadwalKerja?.presensi?.[0]);
 
     const [showCamera, setShowCamera] = useState(false);
     const [done, setDone] = useState(false);
     const [buttonRefresh, setButtonRefresh] = useState(false);
-    const [notif, setNotif] = useState(false);
-    const [notifKosong, setNotifKosong] = useState(false);
     const [notifError, setNotifError] = useState(false);
     const [messageError, setMessageError] = useState(
         "Pemindaian mengalami masalah"
     );
     // const jarakWaktu = timeDiff(jadwal?.mulai, waktuSekarang);
-    const jarakWaktu = timeDiff(jadwal?.mulai, new Date());
-    const [diffHours, setDiffHours] = useState(jarakWaktu.hours);
-    const [diffMinutes, setDiffMinutes] = useState(jarakWaktu.minutes);
-    const [scanned, setScanned] = useState(false);
-    const [resultScanned, setResultScanned] = useState(null);
     const [loadingProgress, setLoadingProgress] = useState(0);
-    const [akurasiScan, setAkurasiScan] = useState(0);
-    const [brightnessCam, setBrightnessCam] = useState(1);
-    const [speedNetwork, setSpeedNetwork] = useState(null);
-    const [isLoadedModels, setIsLoadedModels] = useState(false);
 
-    const [isMustRegist, setIsMustRegist] = useState(
-        dataUser?.face?.length < 2
-    );
-    const [activeWait, setActiveWait] = useState(false);
+    const [brightnessCam, setBrightnessCam] = useState(1);
+
     const [countDown, setCountdown] = useState(false);
     const [countDownNumber, setCountdownNumber] = useState(3);
-    const [flash, setFlash] = useState(false);
-    const [next, setNext] = useState(false);
-    const [showConfirm, setShowConfirm] = useState(false);
-    const [screenshotNeutral, setScreenshotNeutral] = useState(null); // State to store the screenshot
-    const [screenshotHappy, setScreenshotHappy] = useState(null); // State to store the screenshot
     const [videoStopped, setVideoStopped] = useState(false);
 
-    const viewportWidth =
-        window.innerWidth ||
-        document.documentElement.clientWidth ||
-        document.body.clientWidth;
-    const newWidth = viewportWidth * 0.7; // Adjust this value as needed
     const [isCameraDenied, setIsCameraDenied] = useState(false);
+    // const viewportWidth =
+    //     window.innerWidth ||
+    //     document.documentElement.clientWidth ||
+    //     document.body.clientWidth;
+    // const newWidth = viewportWidth * 0.7; // Adjust this value as needed
 
-    // usePresensiCheck(presensi);
-    useFaceDetection(faceMyDetect);
-    useCameraAndModels(dataUser, { loadModels, fetchData });
+    // LOAD FROM USEEFFECT
+    useEffect(() => {
+        if (isReadyToShowCam) fetchData();
+    }, []);
+    useEffect(() => {
+        if (dataFaceID && dataFaceID.length > 0) {
+            loadModels();
+        }
+    }, [dataFaceID]);
+    useEffect(() => {
+        if (showCamera) {
+            faceMyDetect();
+        }
+    }, [showCamera]);
+
+    // OPEN YOU FACE WEBCAM
+    const startVideo = () => {
+        navigator.mediaDevices
+            .getUserMedia({ video: true, audio: false })
+            .then((currentStream) => {
+                videoRef.current.srcObject = currentStream;
+                videoRef.current.onloadedmetadata = () => {
+                    if (isCameraDenied) setIsCameraDenied(false);
+                    faceMyDetect();
+                    setLoading(false);
+                    setMessage("Kamera aktif, sedang dalam pemindaian...");
+                    setSubMessage("---");
+                };
+            })
+            .catch((err) => {
+                console.log(err);
+            });
+    };
 
     async function fetchData() {
-        try {
-            const images = [];
-
-            // for (let i = 1; i <= 2; i++) {
-            //     const img = await faceapi.fetchImage(
-            //         `/assets/face_rec/${dataUser.id}/${i}.png`
-            //     );
-
-            //     // Pastikan gambar telah dimuat sebelum diproses
-            //     await img.decode();
-            //     images.push(img);
-            // }
-
-            // // console.log(images, dataUser?.face, dataUser?.face.length);
-            // if (images.length > 1) {
-            //     setDataFaceID(images);
-            //     return images;
-            // }
-            setShowCamera(true);
-        } catch (error) {
-            console.error("Error fetching user data:", error);
+        // try {
+        if (!face_recs || face_recs.length === 0) {
+            console.warn("No face_recs provided.");
+            setMessageError("Tidak Face ID yang terdaftar");
+            return;
         }
+
+        // Load and decode all images in parallel
+        const imgs = await Promise.all(
+            face_recs.map(async (item) => {
+                const url = `/assets/face_rec/${item.id_karyawan}/${item.foto}.png`;
+                const img = await faceapi.fetchImage(url);
+                // ensure decoded
+                if (img.decode) await img.decode();
+                return { img, id_karyawan: item.id_karyawan, foto: item.foto };
+            })
+        );
+
+        // we will keep an array of images per label if you have multiple images per label later
+        setDataFaceID(imgs);
+        setShowCamera(true);
+        // } catch (error) {
+        //     console.error("Error fetching user data:", error);
+        // }
     }
 
+    // LOAD MODELS FROM FACE API
     async function loadModels() {
         const models = [
             "tinyFaceDetector",
             "faceLandmark68Net",
             "faceRecognitionNet",
-            "faceExpressionNet",
+            "ssdMobilenetv1",
         ];
-
-        if (!isMustRegist) {
-            models.push("ssdMobilenetv1");
-        }
 
         try {
             setMessage("Memuat model...");
             setLoadingProgress(0);
             let totalLoaded = 0;
 
-            await Promise.all(
-                models.map((modelName) =>
-                    faceapi.nets[modelName].loadFromUri("/models").then(() => {
-                        totalLoaded++; // Tambah setelah satu model selesai
-                        setLoadingProgress(
-                            Math.round((totalLoaded / models.length) * 100)
-                        );
-                        setMessage(
-                            `Model ${modelName} telah dimuat (${totalLoaded}/${models.length})`
-                        );
-                    })
-                )
-            );
+            if (isReadyToShowCam) {
+                await Promise.all(
+                    models.map((modelName) =>
+                        faceapi.nets[modelName]
+                            .loadFromUri("/models")
+                            .then(() => {
+                                totalLoaded++; // Tambah setelah satu model selesai
+                                setLoadingProgress(
+                                    Math.round(
+                                        (totalLoaded / models.length) * 100
+                                    )
+                                );
+                                setMessage(
+                                    `Model ${modelName} telah dimuat (${totalLoaded}/${models.length})`
+                                );
+                            })
+                    )
+                );
+            }
 
             // Semua model selesai dimuat
             if (totalLoaded === models.length) {
                 setIsLoadedModels(true);
                 setMessage("Semua model telah dimuat. Tunggu...");
-                if (!isMustRegist) {
-                    setShowCamera(true);
-                    startVideo();
-                } else {
-                    setShowConfirm(true);
-                }
+
+                setShowCamera(true);
+                startVideo();
             }
         } catch (error) {
             console.error("Gagal memuat model:", error);
@@ -171,568 +201,190 @@ function FaceRecog() {
         }
     }
 
-    const startVideo = () => {
-        navigator.mediaDevices
-            .getUserMedia({
-                video: {
-                    width: { min: 576, ideal: 720, max: 1080 },
-                    height: { min: 576, ideal: 720, max: 1080 },
-                    facingMode: "user",
-                },
-            })
-            .then((currentStream) => {
-                videoRef.current.srcObject = currentStream;
-                videoRef.current.onloadedmetadata = () => {
-                    if (isCameraDenied) setIsCameraDenied(false);
-                    setLoading(false);
-                    setMessage(
-                        "Kamera aktif, Wajah Anda sedang dalam pemindaian..."
-                    );
-                    setSubMessage("---");
-                };
-            })
-            .catch((err) => {
-                console.log(err);
-                setMessage(
-                    "Kamera harus diizinkan. Silakan klik Izinkan Kamera"
+    const faceMyDetect = async () => {
+        const labelFace = await getLabeledFaceDescriptions();
+        if (!labelFace || labelFace.length === 0) {
+            console.warn("⚠ Tidak ada face descriptor yang berhasil diload!");
+            return []; // stop faceMyDetect supaya tidak error
+        }
+        const faceMatcher = new faceapi.FaceMatcher(labelFace);
+        const canvas = faceapi.createCanvasFromMedia(videoRef.current);
+        canvasRef.current.innerHTML = ""; // bersihkan
+        canvasRef.current.appendChild(canvas);
+        const displaySize = {
+            width: videoRef.current.videoWidth,
+            height: videoRef.current.videoHeight,
+        };
+        setInterval(async () => {
+            const detections = await faceapi
+                .detectAllFaces(
+                    videoRef.current,
+                    new faceapi.TinyFaceDetectorOptions({ inputSize: 160 })
+                )
+                .withFaceLandmarks()
+                .withFaceDescriptors();
+            // .withFaceLandmarks();
+
+            // DRAW YOU FACE IN WEBCAM
+            // faceapi.matchDimensions(canvasRef.current, {
+            //     width: videoRef.current.videoWidth,
+            //     height: videoRef.current.videoHeight,
+            // });
+
+            const resized = faceapi.resizeResults(detections, displaySize);
+            canvas
+                .getContext("2d")
+                .clearRect(0, 0, canvas.width, canvas.height);
+            faceapi.draw.drawDetections(canvas, resized);
+
+            const results = resized.map((d) => {
+                return faceMatcher.findBestMatch(d?.descriptor);
+            });
+
+            const newRecognizedFaces = [...recognizedFaces];
+
+            results.forEach((result, i) => {
+                if (result.label === "unknown") return;
+
+                const box = resized[i].detection.box;
+                const faceId = `${result.label}_${i}`;
+
+                // Cek apakah wajah ini sudah ada
+                const existingIndex = newRecognizedFaces.findIndex(
+                    (face) => face.id === faceId
                 );
 
-                if (!isCameraDenied) {
-                    setIsCameraDenied(true);
+                if (existingIndex === -1) {
+                    // Wajah baru, tambahkan
+                    newRecognizedFaces.push({
+                        id: faceId,
+                        label: result.label,
+                        box: box,
+                        lastSeen: Date.now(),
+                    });
+                } else {
+                    // Update posisi wajah yang sudah ada
+                    newRecognizedFaces[existingIndex] = {
+                        ...newRecognizedFaces[existingIndex],
+                        box: box,
+                        lastSeen: Date.now(),
+                    };
                 }
             });
+            // const filteredFaces = newRecognizedFaces.filter(
+            //     (face) => Date.now() - face.lastSeen < 2000
+            // );
+
+            setRecognizedFaces(newRecognizedFaces);
+
+            // Gambar semua wajah yang dilacak
+            newRecognizedFaces.forEach((face) => {
+                const drawBox = new faceapi.draw.DrawBox(face.box, {
+                    label: face.label,
+                    boxColor: "#00FF00",
+                });
+                drawBox.draw(canvas);
+            });
+
+            // // Gambar bounding box untuk wajah yang tidak dikenal
+            // resized.forEach((det, i) => {
+            //     if (results[i].label === "unknown") {
+            //         const drawBox = new faceapi.draw.DrawBox(
+            //             det.detection.box,
+            //             {
+            //                 label: "unknown",
+            //                 boxColor: "#FF0000",
+            //             }
+            //         );
+            //         drawBox.draw(canvas);
+            //     }
+            // });
+            // faceapi.draw.drawFaceLandmarks(canvasRef.current, resized);
+        }, 1000);
     };
 
     async function getLabeledFaceDescriptions() {
-        const labels = [dataUser.nama];
+        const labels = face_recs.map((item) => ({
+            id: item.id_karyawan,
+            nama: karyawans.find((k) => k.id == item.id_karyawan)?.nama,
+        }));
 
         // console.log(dataFaceID);
         if (!dataFaceID?.length) {
             console.warn("Data Face ID atau gambar tidak ditemukan.");
-            return;
+            return [];
         }
 
         try {
-            setSubMessage("Memuat data Face ID...");
+            setSubMessage("Memproses data Face ID...");
 
-            return Promise.all(
+            const labeled = await Promise.all(
                 labels.map(async (label) => {
                     const descriptions = [];
-
-                    for (let i = 0; i < dataFaceID.length; i++) {
-                        setSubMessage(`Sedang memindai dengan data ${i + 1}`);
-
-                        // Pastikan gambar dalam format yang sesuai
-                        const imgElement = dataFaceID[i];
-
-                        // Tunggu hingga deteksi selesai
+                    for (let i = 1; i <= 2; i++) {
+                        const img = dataFaceID.find(
+                            (d) => d.id_karyawan == label.id && d.foto == i
+                        )?.img;
                         const detections = await faceapi
-                            .detectSingleFace(imgElement)
+                            .detectSingleFace(
+                                img,
+                                new faceapi.TinyFaceDetectorOptions()
+                            )
                             .withFaceLandmarks()
                             .withFaceDescriptor();
-
-                        if (detections) {
-                            descriptions.push(detections.descriptor);
-                        } else {
+                        if (!detections) {
                             console.warn(
-                                `Wajah tidak terdeteksi pada gambar ke-${i + 1}`
+                                `Wajah tidak ditemukan untuk ID ${label.id} foto ${i}`
                             );
+                            continue; // sangat penting agar tidak crash
                         }
+                        if (detections)
+                            descriptions.push(detections?.descriptor);
                     }
-
+                    if (descriptions.length === 0) {
+                        console.warn(
+                            `Tidak ada descriptor valid untuk ID ${label.id}`
+                        );
+                        return null; // ← penting
+                    }
                     return new faceapi.LabeledFaceDescriptors(
-                        label,
+                        label.nama,
                         descriptions
                     );
                 })
             );
+            const validLabeled = labeled.filter(Boolean); // buang null
+            return validLabeled;
         } catch (error) {
             console.error("Error saat memproses data Face ID:", error);
         }
     }
 
-    const createFormData = (coord) => {
-        const form = new FormData();
-        form.append("jenis", cekJadwal);
-        Number(cekJadwal) === 1 && form.append("id", presensi?.id);
-        form.append("id_karyawan", dataUser.id);
-        form.append("id_jaker", jadwal.id);
-        form.append("long", coord.longitude);
-        form.append("lat", coord.latitude);
-        return form;
-    };
-
-    const createFormRegist = (foto, idFace) => {
-        const data = new FormData();
-        const idKar = dataUser.id;
-        for (let i = 0; i < foto.length; i++) {
-            data.append("image[]", foto[i]);
-            data.append("id_face[]", idFace[i]);
-        }
-        data.append("id_karyawan", idKar);
-
-        // console.log('foto:' + foto,'ID:' +  idKar,'idface:' +  idFace);
-        return data;
-    };
-
-    const sendScreenshotToServer = async () => {
-        try {
-            const foto = [screenshotNeutral, screenshotHappy];
-            const idFace = [1, 2];
-            const data = createFormRegist(foto, idFace);
-            const handleClose = () => {
-                isSendingRef.current = false;
-                setDone(true);
-                setLoading(false);
-                setTimeout(() => {
-                    location.reload();
-                }, 3000);
-            };
-
-            await sendDataGeneral({
-                data: data,
-                route: route("Presensi.face_rec.store"),
-                handleClose: handleClose,
-                waitUntilFinish: true,
-                messageFailedReducer: processMessageFailedReducer,
-                prosesReducer: processStateReducer,
-                onProgress: setLoadingProgress,
-            });
-        } catch (error) {
-            setButtonRefresh(true);
-            setNotifError(true);
-            setDone(false);
-            setSubMessage(
-                "Ada kesalahan dalam pengiriman data ke server, silakan hubungi tim IT"
-            );
-            console.log("====================================");
-            console.log("Error response: ", error);
-            console.log("====================================");
-            isSendingRef.current = false;
-        }
-    };
-
-    const sendPresensi = async (data) => {
-        if (isSendingRef.current) return; // Prevent duplicate execution
-        isSendingRef.current = true;
-        try {
-            const sendData = await sendDataGeneral({
-                data: data,
-                route: route("Presensi.store"),
-                handleClose: () => setDone(true),
-                waitUntilFinish: true,
-                onProgress: setLoadingProgress,
-            });
-            // setLoading(true)
-
-            if (sendData.status === 200) {
-                // location.reload();
-                // setLoading(false)
-                isSendingRef.current = false;
-                setDone(true);
-                setTimeout(() => {
-                    // location.reload()
-                    // window.open('/')
-                    location.replace("/");
-                }, 5000);
-            } else {
-                setButtonRefresh(true);
-                setNotifError(true);
-                setDone(false);
-                setSubMessage(sendData.data?.error);
-
-                console.log("====================================");
-                console.log("Error response: ", sendData);
-                console.log("====================================");
-            }
-        } catch (error) {
-            setButtonRefresh(true);
-            setNotifError(true);
-            setDone(false);
-            setSubMessage(
-                error.data?.error ??
-                    "Ada kesalahan dalam pengiriman data ke server, silakan hubungi tim IT"
-            );
-            console.log("====================================");
-            console.log("Error response: ", error);
-            console.log("====================================");
-            isSendingRef.current = false;
-        }
-    };
-
-    async function faceMyDetect() {
-        let countError = 7;
-        let kurangCahaya = 15;
-        let i = 5;
-        let intervalPresensi; // Define intervalPresensi in a wider scope
-        // startVideo();
-        setMessage("Wajah Anda sedang dalam pemindaian");
-        setSubMessage("---");
-
-        if (videoRef) {
-            intervalPresensi = setInterval(async () => {
-                try {
-                    const labeledFaceDescriptors =
-                        await getLabeledFaceDescriptions();
-                    const faceMatcher = new faceapi.FaceMatcher(
-                        labeledFaceDescriptors
-                    );
-                    const detections = await faceapi
-                        .detectAllFaces(
-                            videoRef.current,
-                            new faceapi.TinyFaceDetectorOptions()
-                        )
-                        .withFaceLandmarks()
-                        .withFaceDescriptors()
-                        .withFaceExpressions();
-
-                    const displaySize = {
-                        width: videoRef.current.videoWidth,
-                        height: videoRef.current.videoHeight,
-                    };
-                    const resizedDetections = faceapi.resizeResults(
-                        detections,
-                        displaySize
-                    );
-
-                    const results = resizedDetections.map((d) => {
-                        return faceMatcher.findBestMatch(d?.descriptor);
-                    });
-                    // console.log(
-                    //     results,
-                    //     results[0]._label,
-                    //     results[0]._label == dataUser.nama
-                    // );
-
-                    if (results.length > 0 && results[0]) {
-                        if (results[0]._label == dataUser.nama) {
-                            setAkurasiScan(
-                                Number(results[0]._distance).toFixed(4) * 200
-                            );
-                            if (results[0]._distance >= 0.37) {
-                                // console.log("====================================");
-                                // console.log(detections[0].expressions.neutral);
-                                // console.log("====================================");
-                                // if (detections[0].expressions.happy >= 0.8) {
-                                // DEVELOPING USE NEUTRAL
-                                const expression = detections[0].expressions;
-                                if (
-                                    expression.neutral >= 0.75 ||
-                                    expression.happy >= 0.65
-                                ) {
-                                    // j--;
-                                    setResultScanned(results);
-                                    setScanned(true);
-                                    // console.log("oke");
-                                    try {
-                                        if (navigator.geolocation) {
-                                            navigator.geolocation.getCurrentPosition(
-                                                function (position) {
-                                                    const data = createFormData(
-                                                        position.coords
-                                                    );
-                                                    sendPresensi(data);
-                                                    setShowCamera(false);
-                                                    // console.log(data);
-                                                    //   setLatitude(position.coords.latitude);
-                                                    //   setLongitude(position.coords.longitude);
-                                                    setMessage(
-                                                        "Hai " +
-                                                            dataUser.nama +
-                                                            ". Presensi anda sedang di proses, silakan tunggu"
-                                                    );
-                                                    videoRef.current.pause();
-                                                    videoRef.current.srcObject
-                                                        .getTracks()
-                                                        .forEach((track) => {
-                                                            track.stop();
-                                                        });
-                                                },
-                                                function (error) {
-                                                    switch (error.code) {
-                                                        case error.PERMISSION_DENIED:
-                                                            alert(
-                                                                "Izin lokasi ditolak oleh pengguna."
-                                                            );
-                                                            break;
-                                                        case error.POSITION_UNAVAILABLE:
-                                                            // alert(
-                                                            //     "Lokasi tidak tersedia."
-                                                            // );
-                                                            const data =
-                                                                createFormData({
-                                                                    longitude: 107.6327055,
-                                                                    latitude:
-                                                                        -6.9550149,
-                                                                });
-                                                            sendPresensi(data);
-                                                            setShowCamera(
-                                                                false
-                                                            );
-                                                            // console.log(data);
-                                                            //   setLatitude(position.coords.latitude);
-                                                            //   setLongitude(position.coords.longitude);
-                                                            setMessage(
-                                                                "Hai " +
-                                                                    dataUser.nama +
-                                                                    ". Presensi anda sedang di proses, silakan tunggu"
-                                                            );
-                                                            videoRef.current.pause();
-                                                            videoRef.current.srcObject
-                                                                .getTracks()
-                                                                .forEach(
-                                                                    (track) => {
-                                                                        track.stop();
-                                                                    }
-                                                                );
-                                                            break;
-                                                        case error.TIMEOUT:
-                                                            alert(
-                                                                "Permintaan lokasi melebihi waktu tunggu."
-                                                            );
-                                                            break;
-                                                        case error.UNKNOWN_ERROR:
-                                                        default:
-                                                            alert(
-                                                                "Terjadi kesalahan saat mengambil lokasi."
-                                                            );
-                                                            break;
-                                                    }
-                                                    clearInterval(
-                                                        intervalPresensi
-                                                    );
-                                                },
-                                                {
-                                                    enableHighAccuracy: true, // <= opsi penting untuk lokasi lebih akurat
-                                                    timeout: 10000, // maksimal 10 detik menunggu
-                                                    maximumAge: 0, // jangan gunakan cache lokasi lama
-                                                }
-                                            );
-                                            clearInterval(intervalPresensi);
-                                        } else {
-                                            alert(
-                                                "Geolocation is not supported by your browser."
-                                            );
-                                        }
-                                    } catch (error) {
-                                        console.log(error);
-                                    }
-                                }
-                            } else {
-                                kurangCahaya--;
-                                if (kurangCahaya > 7 && kurangCahaya <= 9) {
-                                    setMessage(
-                                        "Pastikan wajah mendapatkan cahaya yang cukup"
-                                    );
-                                } else if (
-                                    kurangCahaya > 5 &&
-                                    kurangCahaya <= 7
-                                ) {
-                                    setMessage(
-                                        "Silakan cari posisi yang cukup cahaya"
-                                    );
-                                } else if (
-                                    kurangCahaya > 0 &&
-                                    kurangCahaya <= 5
-                                ) {
-                                    setMessage(
-                                        "Jika masih tidak terdeteksi, sistem akan merefresh otomatis dalam 5 detik"
-                                    );
-                                } else if (kurangCahaya <= 0) {
-                                    location.reload();
-                                }
-                            }
-                        } else {
-                            setMessage(
-                                "Pastikan tidak ada orang lain yang tertangkap kamera"
-                            );
-                        }
-                    } else {
-                        setMessage("Pastikan wajah berada di dalam lingkaran");
-                    }
-                } catch (error) {
-                    // Handle the error when face detection fails
-                    countError--;
-                    console.log(countError);
-                    if (countError <= 0) {
-                        clearInterval(intervalPresensi);
-                        setLoading(false);
-                        setShowCamera(false);
-                        setNotifError(true);
-                        setMessageError("Pemindaian Gagal");
-                        setSubMessage(
-                            "silakan cek jaringan atau kecerahan tempat ada"
-                        );
-                        console.error("Face detection error:", error);
-                        videoRef.current.pause();
-                        videoRef.current.srcObject
-                            .getTracks()
-                            .forEach((track) => {
-                                track.stop();
-                            });
-                        setTimeout(() => {
-                            location.reload();
-                        }, 5000);
-                    }
-                }
-            }, 3000);
-        }
-    }
-
-    const faceMyExp = (idEks_in) => {
-        let i = 3;
-        let expression, threshold;
-        const interval1 = setInterval(async () => {
-            // console.log("ini");
-            const detections = await faceapi
-                .detectAllFaces(
-                    videoRef.current,
-                    new faceapi.TinyFaceDetectorOptions()
-                )
-                .withFaceLandmarks()
-                .withFaceExpressions();
-
-            if (idEks_in == 1) {
-                setMessage("Anda harus berekspresi biasa saja (netral)");
-                expression = "neutral";
-                threshold = 0.85;
-            } else if (idEks_in == 2) {
-                setMessage("Anda harus senyum");
-                expression = "happy";
-                threshold = 0.81;
-            }
-            // console.log("====================================");
-            // console.log(detections[0].expressions[expression]);
-            // console.log("====================================");
-            setAkurasiScan(
-                Number(detections[0]?.expressions[expression]).toFixed(2) * 100
-            );
-            if (
-                detections.length > 0 &&
-                detections[0].expressions[expression] >= threshold
-            ) {
-                setSubMessage("-");
-                setCountdown(true);
-                setCountdownNumber(i);
-
-                if (i == 1) {
-                    setFlash(true);
-                }
-                if (i == 0) {
-                    setFlash(false);
-                }
-
-                if (i <= -1) {
-                    setActiveWait(false);
-                    setLoadingProgress(0);
-                    setCountdown(false);
-                    const canvas = document.createElement("canvas");
-                    canvas.width = videoRef.current.videoWidth;
-                    canvas.height = videoRef.current.videoHeight;
-                    const ctx = canvas.getContext("2d");
-                    ctx.drawImage(
-                        videoRef.current,
-                        0,
-                        0,
-                        canvas.width,
-                        canvas.height
-                    );
-
-                    const squareSize = Math.min(canvas.width, canvas.height);
-                    const xOffset = (canvas.width - squareSize) / 2;
-                    const yOffset = (canvas.height - squareSize) / 2;
-
-                    const squareCanvas = document.createElement("canvas");
-                    squareCanvas.width = squareSize;
-                    squareCanvas.height = squareSize;
-                    const squareCtx = squareCanvas.getContext("2d");
-                    squareCtx.drawImage(
-                        canvas,
-                        xOffset,
-                        yOffset,
-                        squareSize,
-                        squareSize,
-                        0,
-                        0,
-                        squareSize,
-                        squareSize
-                    );
-
-                    const screenshotDataUrl =
-                        squareCanvas.toDataURL("image/png");
-                    videoRef.current.pause();
-                    videoRef.current.srcObject.getTracks().forEach((track) => {
-                        track.stop();
-                    });
-                    switch (idEks_in) {
-                        case 1:
-                            setScreenshotNeutral(screenshotDataUrl);
-                            setNext(true);
-                            break;
-                        case 2:
-                            setScreenshotHappy(screenshotDataUrl);
-                            setShowCamera(false);
-                            break;
-
-                        default:
-                            break;
-                    }
-                    clearInterval(interval1);
-                }
-                i--;
-            } else {
-                setSubMessage(
-                    "Silakan berkedip atau gerakanna kepala Anda sedikit"
-                );
-            }
-
-            if (videoStopped) {
-                setScreenshotNeutral(null);
-                setVideoStopped(false);
-                // restartVideo();
-                clearInterval(interval1);
-            }
-        }, 1000);
-    };
-
-    const siap = (idEks) => {
-        setShowConfirm(false);
-        setNext(false);
-        setShowCamera(true);
-        startVideo();
-
-        // await loadModels(); // Ensure models are fully loaded before proceeding
-
-        if (isLoadedModels && videoRef) {
-            // console.log("ini");
-            faceMyExp(idEks);
-        }
-    };
-
-    const restartVideo = (idEks) => {
-        // Reset the video stream by reloading it
-        // videoRef.current.srcObject = null;
-        setNext(false);
-        startVideo();
-        setShowCamera(true);
-
-        if (isLoadedModels && videoRef) {
-            // console.log("ini");
-            faceMyExp(idEks);
-        }
-        switch (idEks) {
-            case 1:
-                setScreenshotNeutral(null);
-                setScreenshotHappy(null);
-                break;
-            case 2:
-                setScreenshotHappy(null);
-                break;
-
-            default:
-                break;
-        }
-        setShowConfirm(false);
+    const ListScanned = () => {
+        return (
+            <>
+                <div className="mt-8 pl-2 flex flex-col justify-between w-48 min-h-[85%] shadow">
+                    {recognizedFaces?.length > 0 ? (
+                        <div>
+                            <span>Hasil Deteksi:</span>
+                            <ul className="list-outside list-decimal text-start ml-5">
+                                {recognizedFaces.map((item) => (
+                                    <li>{item.label}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    ) : (
+                        "Belum ada yang terdeteksi"
+                    )}
+                    <button
+                        className="btn btn-primary"
+                        disabled={!recognizedFaces?.length}
+                    >
+                        Kirim
+                    </button>
+                </div>
+            </>
+        );
     };
 
     return (
@@ -740,139 +392,23 @@ function FaceRecog() {
             {isCameraDenied && <NotifCameraNotAllowed show={isCameraDenied} />}
             {loading && <LoadingSystem />}
 
-            {!notifError &&
-                !done &&
-                !notifKosong &&
-                !notif &&
-                !showConfirm &&
-                !screenshotHappy && (
-                    <LoadingProgressBar
-                        progress={loadingProgress}
-                        message={message}
-                        subMessage={subMessage}
-                    />
-                )}
-            {showConfirm && <NotifRulesDaftar handleSiap={() => siap(1)} />}
-
-            {/* {isLoadedModels && "OK"} */}
-
-            {next && screenshotNeutral && (
-                <div className="mx-auto bg-white xl:w-2/3 lg:w-1/3 md:w-2/3 sm:w-1/2 w-full text-center shadow rounded-lg p-3">
-                    <div className="py-4">
-                        Apa anda mau menjadikan foto ini sebagai Face ID pertama
-                        anda?
-                    </div>
-                    <button
-                        className="btn-tertiary me-2 font-bold"
-                        onClick={() => restartVideo(1)}
-                    >
-                        Tidak, Scan Ulang
-                    </button>
-                    <button
-                        onClick={() => siap(2)}
-                        className="btn-primary font-bold text-white"
-                    >
-                        Lanjut
-                    </button>
-                </div>
+            {!notifError && !done && (
+                <LoadingProgressBar
+                    progress={loadingProgress}
+                    message={message}
+                    subMessage={subMessage}
+                />
             )}
-            {!showCamera &&
-                screenshotNeutral &&
-                screenshotHappy &&
-                !done &&
-                !notifError && (
-                    <>
-                        <div className="mx-auto bg-white xl:w-2/3 lg:w-1/3 md:w-2/3 sm:w-1/2 w-full text-center shadow rounded-lg p-3">
-                            <div className="py-4">
-                                Apa anda mau menjadikan foto ini sebagai Face ID
-                                kedua anda?
-                            </div>
-                            <div className="flex justify-center gap-3">
-                                <button
-                                    type="button"
-                                    className="btn-tertiary font-bold"
-                                    onClick={() => restartVideo(1)}
-                                >
-                                    Tidak, Ulangi dari awal
-                                </button>
-                                <button
-                                    type="button"
-                                    className="btn-tertiary font-bold"
-                                    onClick={() => restartVideo(2)}
-                                >
-                                    Tidak, Scan Ulang
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => sendScreenshotToServer()}
-                                    className="btn-success font-bold text-white"
-                                >
-                                    OK
-                                </button>
-                            </div>
-                        </div>
-                        <div className="md:w-1/2 w-full grid md:grid-cols-2 gap-3 mx-auto my-2 text-center">
-                            {[
-                                {
-                                    exp: "Netral",
-                                    source: screenshotNeutral,
-                                    alt: "Screenshot Neural",
-                                },
-                                {
-                                    exp: "Senyum",
-                                    source: screenshotHappy,
-                                    alt: "Screenshot Happy",
-                                },
-                            ].map(({ exp, source, alt }, i) => (
-                                <div
-                                    className="bg-white rounded-lg shadow p-1"
-                                    key={i}
-                                >
-                                    <span>Ekspresi: {exp}</span>
-                                    <img
-                                        className="rounded-lg -scale-x-100"
-                                        src={source}
-                                        alt={alt}
-                                    />
-                                </div>
-                            ))}
-                        </div>
-                    </>
-                )}
             {showCamera && (
                 <>
                     <div
-                        className="items-center mx-auto rounded-lg p-3 my-6 bg-white"
-                        style={{
-                            width: `${newWidth > 568 ? 500 : newWidth}px`,
-                            height: `${newWidth > 568 ? 500 : newWidth}px`,
-                        }}
+                        className="items-center mx-auto rounded-lg my-6 bg-white shadow -lg w-[60%] h-fit"
+                        // style={{
+                        //     width: `${newWidth > 568 ? 500 : newWidth}px`,
+                        //     height: `${newWidth > 568 ? 500 : newWidth}px`,
+                        // }}
                     >
                         <div className="relative w-full h-full rounded-lg">
-                            {countDown && (
-                                <div className="absolute z-40 inset-0 p-1 mt-3 text-center ">
-                                    <span className="fs-6 font-bold badge text-white px-8 bg-amber-500 mt-5">
-                                        Tahan posisi
-                                    </span>
-                                    <div
-                                        id="status_hasil"
-                                        className="text-center mt-10"
-                                    >
-                                        <span
-                                            id="count"
-                                            className="text-7xl opacity-80 font-bold text-white"
-                                        >
-                                            {countDownNumber}
-                                        </span>
-                                    </div>
-                                </div>
-                            )}
-
-                            <img
-                                src="/assets/instruments/circle-frame-white.png"
-                                id="frame"
-                                className="absolute rounded-lg w-full h-full opacity-70 z-30 shadow-lg"
-                            />
                             <video
                                 className="cam-face-recog -scale-x-100 w-full h-full rounded-lg"
                                 crossOrigin="anonymous"
@@ -884,39 +420,33 @@ function FaceRecog() {
                                     filter: `brightness(${brightnessCam})`,
                                 }}
                             ></video>
+                            <canvas
+                                className="absolute top-0 left-0 z-10 -scale-x-100"
+                                ref={canvasRef}
+                                width={videoRef.current?.videoWidth}
+                                height={videoRef.current?.videoHeight}
+                            />
+                            <div className="absolute -right-48 top-0 h-full">
+                                <ListScanned />
+                            </div>
                         </div>
                     </div>
-                    <div className="max-w-[500px] mx-auto">
-                        <div className="relative mt-6 bg-white shadow py-2 px-4 rounded-lg">
-                            Kecepatan Internet Anda:{" "}
-                            {Number(speedNetwork).toFixed(2)} Mbps
-                        </div>
 
-                        {akurasiScan > 0 && (
-                            <div className="relative mt-2 bg-white shadow py-2 px-4 rounded-lg">
-                                Akurasi: {akurasiScan.toFixed(2)}%
-                                <span className="ms-3">
-                                    {akurasiScan >= 75 ? (
-                                        <span className="bg-green-500 rounded-full text-white px-2 py-1 font-bold">
-                                            Bagus
-                                        </span>
-                                    ) : (
-                                        <span className="bg-orange-400 rounded-full text-white px-2 py-1 font-bold">
-                                            Kurang Bagus
-                                        </span>
-                                    )}
-                                </span>
-                            </div>
-                        )}
-
-                        <div className="relative mt-2 bg-white shadow py-2 px-4 rounded-lg">
-                            <label
-                                htmlFor="brightness-range"
-                                className="block text-sm font-medium text-gray-900 dark:text-white"
-                            >
-                                Atur Kecerahan:{" "}
-                                {Math.round(brightnessCam * 100)}%
-                            </label>
+                    <div className="absolute left-0 inset-y-0 my-auto h-[325px] bg-white border-r-2 border-primary shadow py-2 px-1 rounded-lg flex flex-col items-center justify-between gap-2">
+                        <label
+                            htmlFor="brightness-range"
+                            className="text-sm font-medium text-gray-900
+                                flex flex-col gap-2 mt-3"
+                        >
+                            {/* Atur <br /> Kecerahan: */}
+                            <FontAwesomeIcon
+                                icon={faSun}
+                                size="2xl"
+                                className="text-amber-500"
+                            />
+                            {Math.round(brightnessCam * 100)}%
+                        </label>
+                        <div className="flex items-center gap-4 mt-4">
                             <input
                                 id="brightness-range"
                                 type="range"
@@ -927,25 +457,31 @@ function FaceRecog() {
                                 onChange={(e) =>
                                     setBrightnessCam(parseFloat(e.target.value))
                                 }
-                                className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700"
+                                className="w-48 h-2 -rotate-90 -m-24
+                                    bg-gray-200 rounded-lg
+                                    accent-amber-500
+                                    appearance-none cursor-pointer"
                             />
-                            <div className="flex justify-between mt-2 text-sm text-gray-500 dark:text-gray-400">
+                            <div className="flex flex-col-reverse text-start justify-between h-48 text-sm text-gray-500 ">
                                 <span>0</span>
-                                <span className="ms-4">50</span>
-                                <span className="ms-2">100</span>
+                                <span>50</span>
+                                <span>100</span>
                                 <span>150</span>
                                 <span>200</span>
                             </div>
                         </div>
+                        <span className="text-gray-500 italic text-2xs">
+                            Atur Kecerahan
+                        </span>
                     </div>
                 </>
             )}
+            {/* <button onClick={testDetect}>Test Detect</button> */}
 
             {!notifError && done && (
                 <>
                     <div className="text-center mx-auto md:w-1/2 w-full bg-white rounded-lg p-3 shadow mb-3 border-green-500 border-x-2">
-                        {isMustRegist ? "Pendaftaran Face ID" : "Presensi"} Anda
-                        telah Berhasil
+                        Presensi telah Berhasil
                         <br />
                         <FontAwesomeIcon
                             icon={faCircleCheck}
@@ -955,29 +491,6 @@ function FaceRecog() {
                         Halaman akan me-refresh otomatis, silakan tunggu
                     </div>
                 </>
-            )}
-            {(notif || notifKosong) && (
-                <div className="text-center mx-auto md:w-1/2 w-full bg-white rounded-lg p-3 shadow mb-3 border-primary border-x-2">
-                    {notif ? (
-                        <NotifGeneral
-                            subMessage={subMessage}
-                            message={message}
-                        />
-                    ) : (
-                        <>
-                            <span className="bg-primary text-white rounded-full font-bold px-2 py-1">
-                                Anda hari ini tidak ada jadwal kerja
-                            </span>
-                            <br />
-                            <FontAwesomeIcon
-                                icon={faCircleCheck}
-                                className="fa-flip fa-4x text-success m-2"
-                            />
-                        </>
-                    )}
-                    <br />
-                    Anda akan dikembalikan ke laman beranda
-                </div>
             )}
             {!done && notifError && (
                 <div className="text-center mx-auto md:w-1/2 w-full bg-white rounded-lg p-3 shadow mb-3 border-red-600 border-x-2">
@@ -994,6 +507,21 @@ function FaceRecog() {
                     silakan refresh halaman untuk mencoba lagi
                 </div>
             )}
+            <button
+                className={`${
+                    showCamera ? "btn-primary" : "btn-danger"
+                } border border-5 border-white text-white absolute w-12 h-12 end-0 bottom-0 mb-4 me-3 z-40 rounded-full`}
+                onClick={() => {
+                    setShowCamera(!showCamera);
+                    if (!showCamera) {
+                        startVideo();
+                    } else {
+                        stopVideo();
+                    }
+                }}
+            >
+                <FontAwesomeIcon icon={faVideo} size="lg" />
+            </button>
             <RefreshButton buttonRefresh={buttonRefresh} />
         </>
     );

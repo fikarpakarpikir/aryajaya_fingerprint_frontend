@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\FingerprintController;
 use App\Models\Agama;
+use App\Models\Auth\FaceRecognition;
 use App\Models\Divisi;
 use App\Models\Dokumen;
 use App\Models\JadwalKerja;
+use App\Models\Karyawan;
 use App\Models\Kehadiran;
 use App\Models\MacamKehadiran;
 use App\Models\Sinkronisasi;
@@ -52,6 +54,8 @@ class Controller extends BaseController
                     'ip_alat' => env('URL_FLASK'),
                     'alat_id' => $this->alatId,
                     'jenis_kehadiran' => Kehadiran::all(),
+                    'karyawans' => Karyawan::all(),
+                    'face_recs' => FaceRecognition::all(),
                     'last_sync' => [
                         'fp' => $getSync(1),
                         'face' => $getSync(2),
