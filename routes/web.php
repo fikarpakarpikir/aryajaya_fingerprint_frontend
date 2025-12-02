@@ -52,6 +52,9 @@ Route::get('/', [Controller::class, 'home'])->name('home');
 Route::post('/logout', [AccessController::class, 'logout'])->name('logout');
 
 Route::group(['prefix' => 'Presensi', 'as' => 'Presensi.'], function () {
+    Route::group(['controller' => PresensiController::class], function () {
+        Route::post('/send', 'send')->name('send');
+    });
     Route::group(['prefix' => 'Face_Recognition', 'as' => 'face_rec.'], function () {
         Route::group(['controller' => FaceRecognitionController::class], function () {
             Route::get('/', 'index')->name('index');

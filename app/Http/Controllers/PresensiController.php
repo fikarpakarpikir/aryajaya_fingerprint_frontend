@@ -12,6 +12,7 @@ use DatePeriod;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\Facades\Http;
 use Inertia\Inertia;
 
 class PresensiController extends Controller
@@ -175,6 +176,39 @@ class PresensiController extends Controller
             ->get();
     }
 
+    public function send(Request $req)
+    {
+        try {
+            $valid = $req->validate([
+                'long' => 'required',
+                'lat' => 'required',
+                // 'id_karyawan' => 'required',
+                'id_karyawan' => 'required|array',
+                'id_karyawan.*' => 'string',
+            ]);
+
+            $lat = $valid['lat'];
+            $long = $valid['long'];
+
+            $url = "$this->apiServer/Karyawan/Presensi/multiPresensi";
+            // $res = Http::post($url, $req);
+            $res = Http::withHeaders([
+                'Accept' => 'application/json'
+            ])->post($url, $req);
+            if ($res->failed()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal menghubungi server presensi',
+                    'error' => $res->json(),
+                ], $res->status());
+            }
+
+            return response()->json($res->json(), $res->status());
+        } catch (\Throwable $th) {
+            throw $th;
+        }
+        // return $code;
+    }
     public static function presensiStore(Request $req)
     {
         try {

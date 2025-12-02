@@ -27,7 +27,17 @@ import useFaceDetection from "@/hooks/useFaceDetection";
 import usePresensiCheck from "@/hooks/usePresensiCheck";
 import { RealTimeClock } from "../Clock";
 import { FaceProvider, useFaceContext } from "@/context/FaceContext";
-import { faSun, faSync, faVideo } from "@fortawesome/free-solid-svg-icons";
+import {
+    faCheckCircle,
+    faExclamationCircle,
+    faPause,
+    faPlay,
+    faSun,
+    faSync,
+    faVideo,
+    faXmark,
+    faXmarkCircle,
+} from "@fortawesome/free-solid-svg-icons";
 import fullWaktuIndo from "@/Functions/waktuIndo";
 import SyncFaceID from "../Sync";
 
@@ -41,7 +51,7 @@ function FaceRecog() {
 
     const { props } = usePage();
     const { karyawans, face_recs } = props;
-    const isReadyToShowCam = !true;
+    const isReadyToShowCam = true;
 
     const {
         videoRef,
@@ -61,8 +71,9 @@ function FaceRecog() {
     const labeledDescriptorsRef = useRef(null);
     const faceMatcherRef = useRef(null);
     const canvasRef = useRef(null);
+    const detectInterval = useRef(null);
 
-    const [faceMatcher, setFaceMatcher] = useState(null);
+    const [playVideo, setPlayVideo] = useState(false);
     const [recognizedFaces, setRecognizedFaces] = useState([]);
     const [results, setResults] = useState([]);
 
@@ -71,6 +82,8 @@ function FaceRecog() {
 
     const [showCamera, setShowCamera] = useState(false);
     const [done, setDone] = useState(false);
+    const [listSuccess, setListSuccess] = useState([]);
+
     const [buttonRefresh, setButtonRefresh] = useState(false);
     const [notifError, setNotifError] = useState(false);
     const [messageError, setMessageError] = useState(
@@ -107,6 +120,21 @@ function FaceRecog() {
         }
     }, [showCamera]);
 
+    useEffect(() => {
+        return () => {
+            stopVideo();
+            setLoading(false);
+            setShowCamera(false);
+            setPlayVideo(false);
+            setDone(false);
+            if (detectInterval.current) {
+                clearInterval(detectInterval.current);
+                detectInterval.current = null;
+            }
+            console.log("FaceRecogPage STOP");
+        };
+    }, []);
+
     // OPEN YOU FACE WEBCAM
     const startVideo = () => {
         navigator.mediaDevices
@@ -115,6 +143,7 @@ function FaceRecog() {
                 videoRef.current.srcObject = currentStream;
                 videoRef.current.onloadedmetadata = () => {
                     if (isCameraDenied) setIsCameraDenied(false);
+                    if (!playVideo) setPlayVideo(true);
                     faceMyDetect();
                     setLoading(false);
                     setMessage("Kamera aktif, sedang dalam pemindaian...");
@@ -207,6 +236,10 @@ function FaceRecog() {
             console.warn("⚠ Tidak ada face descriptor yang berhasil diload!");
             return []; // stop faceMyDetect supaya tidak error
         }
+        if (detectInterval.current) {
+            clearInterval(detectInterval.current);
+            detectInterval.current = null;
+        }
         const faceMatcher = new faceapi.FaceMatcher(labelFace);
         const canvas = faceapi.createCanvasFromMedia(videoRef.current);
         canvasRef.current.innerHTML = ""; // bersihkan
@@ -215,7 +248,7 @@ function FaceRecog() {
             width: videoRef.current.videoWidth,
             height: videoRef.current.videoHeight,
         };
-        setInterval(async () => {
+        detectInterval.current = setInterval(async () => {
             const detections = await faceapi
                 .detectAllFaces(
                     videoRef.current,
@@ -258,6 +291,8 @@ function FaceRecog() {
                     // Wajah baru, tambahkan
                     newRecognizedFaces.push({
                         id: faceId,
+                        karId: karyawans.find((k) => k.nama == result.label)
+                            ?.id,
                         label: result.label,
                         box: box,
                         lastSeen: Date.now(),
@@ -360,6 +395,64 @@ function FaceRecog() {
         }
     }
 
+    function stopVideo() {
+        if (videoRef?.current?.srcObject) {
+            const stream = videoRef.current.srcObject;
+            stream.getTracks().forEach((track) => track.stop());
+            videoRef.current.srcObject = null;
+            if (playVideo) setPlayVideo(false);
+        }
+        if (videoRef.current && videoRef.current.srcObject) {
+            videoRef.current.srcObject.getTracks().forEach((t) => t.stop());
+            videoRef.current.srcObject = null;
+            console.log("Camera stopped");
+        }
+    }
+
+    function pauseVideo() {
+        videoRef.current.pause();
+        if (playVideo) setPlayVideo(false);
+    }
+    const resumeVideo = async () => {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+            audio: false,
+        });
+        videoRef.current.srcObject = stream;
+        videoRef.current.onloadedmetadata = () => {
+            videoRef.current.play();
+        };
+        if (!playVideo) setPlayVideo(true);
+    };
+
+    const handleSendPrensensi = async () => {
+        const data = new FormData();
+        recognizedFaces.forEach((r) => data.append("id_karyawan[]", r.karId));
+        console.log(
+            "🚀 ~ handleSendPrensensi ~ recognizedFaces:",
+            recognizedFaces
+        );
+        data.append("long", 107.6327055);
+        data.append("lat", -6.9550149);
+
+        const res = await sendDataGeneral({
+            data,
+            route: route("Presensi.send"),
+            handleClose: () => {
+                setDone(true);
+                stopVideo();
+                setShowCamera(false);
+            },
+            slicer: () => {},
+            useRedux: false,
+        });
+
+        setListSuccess(res.data);
+        console.log("🚀 ~ handleSendPrensensi ~ res:", res);
+    };
+
+    const getNama = (id) => karyawans?.find((k) => k.id == id)?.nama;
+
     const ListScanned = () => {
         return (
             <>
@@ -376,12 +469,39 @@ function FaceRecog() {
                     ) : (
                         "Belum ada yang terdeteksi"
                     )}
-                    <button
-                        className="btn btn-primary"
-                        disabled={!recognizedFaces?.length}
-                    >
-                        Kirim
-                    </button>
+                    <div className="flex flex-col gap-2">
+                        <button
+                            className="btn btn-primary bg-neutral-500"
+                            onClick={() => {
+                                if (playVideo) {
+                                    pauseVideo();
+                                    setPlayVideo(false);
+                                } else {
+                                    resumeVideo();
+                                    setPlayVideo(true);
+                                }
+                            }}
+                        >
+                            {playVideo ? (
+                                <span className="flex justify-center items-center gap-2">
+                                    <FontAwesomeIcon icon={faPause} />
+                                    Pause
+                                </span>
+                            ) : (
+                                <span className="flex justify-center items-center gap-2">
+                                    <FontAwesomeIcon icon={faPlay} />
+                                    Play
+                                </span>
+                            )}
+                        </button>
+                        <button
+                            className="btn btn-primary"
+                            disabled={!recognizedFaces?.length}
+                            onClick={handleSendPrensensi}
+                        >
+                            Kirim
+                        </button>
+                    </div>
                 </div>
             </>
         );
@@ -488,7 +608,52 @@ function FaceRecog() {
                             className="fa-flip fa-4x text-success m-2"
                         />
                         <br />
-                        Halaman akan me-refresh otomatis, silakan tunggu
+                        <span>Hasil Presensi:</span>
+                        <div className="flex flex-col gap-2 mb-4">
+                            {listSuccess.map((item, i) => (
+                                <li
+                                    className="flex justify-between items-center shadow px-2 py-1 rounded-lg"
+                                    key={i}
+                                >
+                                    <span>
+                                        {i + 1}. {getNama(item.id_karyawan)}
+                                    </span>
+                                    <span
+                                        className={`font-bold text-lg ${
+                                            [0, 1].includes(Number(item.cek))
+                                                ? "text-green-500"
+                                                : item.cek == 2
+                                                ? "text-amber-500"
+                                                : "text-red-500"
+                                        }`}
+                                    >
+                                        <FontAwesomeIcon
+                                            icon={
+                                                [0, 1].includes(
+                                                    Number(item.cek)
+                                                )
+                                                    ? faCheckCircle
+                                                    : item.cek == 2
+                                                    ? faExclamationCircle
+                                                    : faXmarkCircle
+                                            }
+                                        />
+                                    </span>
+                                </li>
+                            ))}
+                        </div>
+                        <button
+                            onClick={() => {
+                                setListSuccess([]);
+                                setDone(false);
+                                setShowCamera(true);
+                                startVideo();
+                                setRecognizedFaces([]);
+                            }}
+                            className="btn btn-primary"
+                        >
+                            Presensi Lagi
+                        </button>
                     </div>
                 </>
             )}
