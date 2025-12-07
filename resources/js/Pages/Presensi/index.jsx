@@ -33,7 +33,7 @@ const Presensi = () => {
     const { processState } = useSelector((state) => state.process.default);
 
     // const [mode, setMode] = useState("fp");
-    const [mode, setMode] = useState("face");
+    const [mode, setMode] = useState("fp");
     const listMode = [
         ["fp", faFingerprint, FPScannerPage, 1, "Fingerprint"],
         ["face", faCamera, FaceRecogPage, 2, "Face ID"],
