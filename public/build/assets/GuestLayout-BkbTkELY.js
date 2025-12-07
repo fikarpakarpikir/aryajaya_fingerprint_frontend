@@ -1,0 +1,1 @@
+import{j as e}from"./app-Dd2Z-7CB.js";function s({children:t}){return e.jsx("div",{className:"flex min-h-screen flex-col justify-center items-center bg-gradient-to-tr from-primary to-neutral-400 sm:justify-center sm:pt-0",children:e.jsx("div",{className:"mt-1 w-full overflow-hidden relative bg-white p-4 shadow-md sm:max-w-5xl sm:m-0 rounded-lg",children:t})})}export{s as G};

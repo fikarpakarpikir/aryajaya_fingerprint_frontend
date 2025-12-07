@@ -1,0 +1,1 @@
+import{j as t}from"./app-Dd2Z-7CB.js";const n=({buttonRefresh:e})=>e&&t.jsx("div",{className:"text-center",children:t.jsx("button",{onClick:()=>location.reload(),className:"btn-primary font-bold rounded-full mx-auto text-center",children:"Refresh halaman"})});export{n as RefreshButton};
