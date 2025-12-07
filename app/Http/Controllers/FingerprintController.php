@@ -24,9 +24,12 @@ use Illuminate\Support\Facades\Http;
 class FingerprintController extends Controller
 {
     public $alat_id;
+    protected $apiAlat;
 
+    
     public function __construct()
     {
+        $this->apiAlat = config('app.api.server') . '/Alat';
         $this->alat_id = AlatService::info();
     }
     public  function getIdAlat($ip)
