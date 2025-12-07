@@ -1,82 +1,82 @@
 {
-  "_FPContext-DiZDfX-P.js": {
-    "file": "assets/FPContext-DiZDfX-P.js",
+  "_FPContext-DVQhnGqr.js": {
+    "file": "assets/FPContext-DVQhnGqr.js",
     "name": "FPContext",
     "imports": [
       "resources/js/app.jsx",
-      "_index-pYSftkOC.js"
+      "_index-D9t-NDW5.js"
     ]
   },
-  "_FaceContext-CSqCEzZM.js": {
-    "file": "assets/FaceContext-CSqCEzZM.js",
+  "_FaceContext-Cmlu7Dt0.js": {
+    "file": "assets/FaceContext-Cmlu7Dt0.js",
     "name": "FaceContext",
     "imports": [
       "resources/js/app.jsx",
-      "_ToggleSwitch-ByfHFrFP.js"
+      "_ToggleSwitch-D-Djj9Qe.js"
     ]
   },
-  "_GuestLayout-BkbTkELY.js": {
-    "file": "assets/GuestLayout-BkbTkELY.js",
+  "_GuestLayout-JaLh2hsM.js": {
+    "file": "assets/GuestLayout-JaLh2hsM.js",
     "name": "GuestLayout",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_InputLabel-lQJ03nAo.js": {
-    "file": "assets/InputLabel-lQJ03nAo.js",
+  "_InputLabel-DG_S6saP.js": {
+    "file": "assets/InputLabel-DG_S6saP.js",
     "name": "InputLabel",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_ProgressBar-C8y8wCti.js": {
-    "file": "assets/ProgressBar-C8y8wCti.js",
+  "_ProgressBar-C0ZVx4gz.js": {
+    "file": "assets/ProgressBar-C0ZVx4gz.js",
     "name": "ProgressBar",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_TextInput-DFdAAy2X.js": {
-    "file": "assets/TextInput-DFdAAy2X.js",
+  "_TextInput-y-k_p44m.js": {
+    "file": "assets/TextInput-y-k_p44m.js",
     "name": "TextInput",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_ToggleSwitch-ByfHFrFP.js": {
-    "file": "assets/ToggleSwitch-ByfHFrFP.js",
+  "_ToggleSwitch-D-Djj9Qe.js": {
+    "file": "assets/ToggleSwitch-D-Djj9Qe.js",
     "name": "ToggleSwitch",
     "imports": [
       "resources/js/app.jsx",
-      "_floating-ui.dom-BxeXO0rm.js"
+      "_floating-ui.dom-CC8_5oek.js"
     ]
   },
-  "_clock-DIAmSA-j.js": {
-    "file": "assets/clock-DIAmSA-j.js",
+  "_clock-C6JQaUOT.js": {
+    "file": "assets/clock-C6JQaUOT.js",
     "name": "clock",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_dataSelect-Dlr-KohK.js": {
-    "file": "assets/dataSelect-Dlr-KohK.js",
+  "_dataSelect-Hg1lT2BP.js": {
+    "file": "assets/dataSelect-Hg1lT2BP.js",
     "name": "dataSelect",
     "imports": [
       "resources/js/app.jsx",
-      "_index.esm-BuMalGis.js",
-      "_floating-ui.dom-BxeXO0rm.js",
-      "_InputLabel-lQJ03nAo.js"
+      "_index.esm-9gojCHXn.js",
+      "_floating-ui.dom-CC8_5oek.js",
+      "_InputLabel-DG_S6saP.js"
     ]
   },
-  "_dayjs.min-B1St_QVU.js": {
-    "file": "assets/dayjs.min-B1St_QVU.js",
+  "_dayjs.min-DVN7FNft.js": {
+    "file": "assets/dayjs.min-DVN7FNft.js",
     "name": "dayjs.min",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_floating-ui.dom-BxeXO0rm.js": {
-    "file": "assets/floating-ui.dom-BxeXO0rm.js",
+  "_floating-ui.dom-CC8_5oek.js": {
+    "file": "assets/floating-ui.dom-CC8_5oek.js",
     "name": "floating-ui.dom",
     "imports": [
       "resources/js/app.jsx"
@@ -86,51 +86,51 @@
     "file": "assets/index-9mY2zEvB.js",
     "name": "index"
   },
-  "_index-cJPv0CwZ.js": {
-    "file": "assets/index-cJPv0CwZ.js",
-    "name": "index"
-  },
-  "_index-pYSftkOC.js": {
-    "file": "assets/index-pYSftkOC.js",
+  "_index-D9t-NDW5.js": {
+    "file": "assets/index-D9t-NDW5.js",
     "name": "index",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_index.esm-BuMalGis.js": {
-    "file": "assets/index.esm-BuMalGis.js",
+  "_index-cJPv0CwZ.js": {
+    "file": "assets/index-cJPv0CwZ.js",
+    "name": "index"
+  },
+  "_index.esm-9gojCHXn.js": {
+    "file": "assets/index.esm-9gojCHXn.js",
     "name": "index.esm",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_index.modern-BPAPiLIJ.js": {
-    "file": "assets/index.modern-BPAPiLIJ.js",
+  "_index.modern-CVLAu0fw.js": {
+    "file": "assets/index.modern-CVLAu0fw.js",
     "name": "index.modern",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_resizeResults-CroDtIiX.js": {
-    "file": "assets/resizeResults-CroDtIiX.js",
+  "_resizeResults-B9MlhEQ8.js": {
+    "file": "assets/resizeResults-B9MlhEQ8.js",
     "name": "resizeResults",
     "imports": [
-      "_FaceContext-CSqCEzZM.js"
+      "_FaceContext-Cmlu7Dt0.js"
     ]
   },
-  "_sendDataGeneral-BBefCrgK.js": {
-    "file": "assets/sendDataGeneral-BBefCrgK.js",
+  "_sendDataGeneral-D8QLj4VW.js": {
+    "file": "assets/sendDataGeneral-D8QLj4VW.js",
     "name": "sendDataGeneral",
     "imports": [
       "resources/js/app.jsx"
     ]
   },
-  "_useFaceDetection-CGFISTvE.js": {
-    "file": "assets/useFaceDetection-CGFISTvE.js",
+  "_useFaceDetection-Dwzs_hdN.js": {
+    "file": "assets/useFaceDetection-Dwzs_hdN.js",
     "name": "useFaceDetection",
     "imports": [
       "resources/js/app.jsx",
-      "_FaceContext-CSqCEzZM.js"
+      "_FaceContext-Cmlu7Dt0.js"
     ]
   },
   "_waktuIndo-fxKw8i-s.js": {
@@ -138,63 +138,63 @@
     "name": "waktuIndo"
   },
   "resources/js/Pages/Auth/Login.jsx": {
-    "file": "assets/Login-Cc3gzFpE.js",
+    "file": "assets/Login-DV_SWnl6.js",
     "name": "Login",
     "src": "resources/js/Pages/Auth/Login.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_TextInput-DFdAAy2X.js",
-      "_ToggleSwitch-ByfHFrFP.js",
-      "_InputLabel-lQJ03nAo.js",
-      "_sendDataGeneral-BBefCrgK.js",
-      "_GuestLayout-BkbTkELY.js",
+      "_TextInput-y-k_p44m.js",
+      "_ToggleSwitch-D-Djj9Qe.js",
+      "_InputLabel-DG_S6saP.js",
+      "_sendDataGeneral-D8QLj4VW.js",
+      "_GuestLayout-JaLh2hsM.js",
       "_index-cJPv0CwZ.js",
-      "_index.esm-BuMalGis.js",
-      "_floating-ui.dom-BxeXO0rm.js"
+      "_index.esm-9gojCHXn.js",
+      "_floating-ui.dom-CC8_5oek.js"
     ]
   },
   "resources/js/Pages/Auth/Register.jsx": {
-    "file": "assets/Register-CPBa-9BH.js",
+    "file": "assets/Register-B1a0ZXFe.js",
     "name": "Register",
     "src": "resources/js/Pages/Auth/Register.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_InputLabel-lQJ03nAo.js",
-      "_TextInput-DFdAAy2X.js",
-      "_GuestLayout-BkbTkELY.js"
+      "_InputLabel-DG_S6saP.js",
+      "_TextInput-y-k_p44m.js",
+      "_GuestLayout-JaLh2hsM.js"
     ]
   },
   "resources/js/Pages/Presensi/Clock.jsx": {
-    "file": "assets/Clock-kF4k25PU.js",
+    "file": "assets/Clock-DS4UkTjN.js",
     "name": "Clock",
     "src": "resources/js/Pages/Presensi/Clock.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_clock-DIAmSA-j.js",
+      "_clock-C6JQaUOT.js",
       "_waktuIndo-fxKw8i-s.js"
     ]
   },
   "resources/js/Pages/Presensi/FP/Daftar.jsx": {
-    "file": "assets/Daftar-CsV8pZfD.js",
+    "file": "assets/Daftar-BMqYZr_h.js",
     "name": "Daftar",
     "src": "resources/js/Pages/Presensi/FP/Daftar.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_FPContext-DiZDfX-P.js",
-      "_dataSelect-Dlr-KohK.js",
-      "_index.esm-BuMalGis.js",
+      "_FPContext-DVQhnGqr.js",
+      "_dataSelect-Hg1lT2BP.js",
+      "_index.esm-9gojCHXn.js",
       "resources/js/Pages/Presensi/FP/FingerSelector.jsx",
-      "_index-pYSftkOC.js",
-      "_floating-ui.dom-BxeXO0rm.js",
-      "_InputLabel-lQJ03nAo.js"
+      "_index-D9t-NDW5.js",
+      "_floating-ui.dom-CC8_5oek.js",
+      "_InputLabel-DG_S6saP.js"
     ]
   },
   "resources/js/Pages/Presensi/FP/FingerSelector.jsx": {
-    "file": "assets/FingerSelector-BSmm-aGo.js",
+    "file": "assets/FingerSelector-0Gsh_wz9.js",
     "name": "FingerSelector",
     "src": "resources/js/Pages/Presensi/FP/FingerSelector.jsx",
     "isDynamicEntry": true,
@@ -203,95 +203,95 @@
     ]
   },
   "resources/js/Pages/Presensi/FP/Hapus.jsx": {
-    "file": "assets/Hapus-DNg--3SM.js",
+    "file": "assets/Hapus-D3njuIuw.js",
     "name": "Hapus",
     "src": "resources/js/Pages/Presensi/FP/Hapus.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_dataSelect-Dlr-KohK.js",
-      "_FPContext-DiZDfX-P.js",
-      "_index.esm-BuMalGis.js",
+      "_dataSelect-Hg1lT2BP.js",
+      "_FPContext-DVQhnGqr.js",
+      "_index.esm-9gojCHXn.js",
       "resources/js/Pages/Presensi/FP/FingerSelector.jsx",
-      "_floating-ui.dom-BxeXO0rm.js",
-      "_InputLabel-lQJ03nAo.js",
-      "_index-pYSftkOC.js"
+      "_floating-ui.dom-CC8_5oek.js",
+      "_InputLabel-DG_S6saP.js",
+      "_index-D9t-NDW5.js"
     ]
   },
   "resources/js/Pages/Presensi/FP/Presensi.jsx": {
-    "file": "assets/Presensi-BrS0dD5O.js",
+    "file": "assets/Presensi-DT0a_RJg.js",
     "name": "Presensi",
     "src": "resources/js/Pages/Presensi/FP/Presensi.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_FPContext-DiZDfX-P.js",
-      "_index-pYSftkOC.js"
+      "_FPContext-DVQhnGqr.js",
+      "_index-D9t-NDW5.js"
     ]
   },
   "resources/js/Pages/Presensi/FP/index.jsx": {
-    "file": "assets/index-gMppvqEI.js",
+    "file": "assets/index-CD03tK9F.js",
     "name": "index",
     "src": "resources/js/Pages/Presensi/FP/index.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_index.modern-BPAPiLIJ.js",
+      "_index.modern-CVLAu0fw.js",
       "resources/js/Pages/Presensi/FP/Presensi.jsx",
       "resources/js/Pages/Presensi/FP/Daftar.jsx",
       "resources/js/Pages/Presensi/FP/Hapus.jsx",
       "_index-cJPv0CwZ.js",
       "resources/js/Pages/Presensi/Maintenance.jsx",
-      "_FPContext-DiZDfX-P.js",
-      "_dataSelect-Dlr-KohK.js",
-      "_index.esm-BuMalGis.js",
-      "_floating-ui.dom-BxeXO0rm.js",
-      "_InputLabel-lQJ03nAo.js",
+      "_FPContext-DVQhnGqr.js",
+      "_dataSelect-Hg1lT2BP.js",
+      "_index.esm-9gojCHXn.js",
+      "_floating-ui.dom-CC8_5oek.js",
+      "_InputLabel-DG_S6saP.js",
       "resources/js/Pages/Presensi/FP/FingerSelector.jsx",
-      "_index-pYSftkOC.js"
+      "_index-D9t-NDW5.js"
     ]
   },
   "resources/js/Pages/Presensi/FPScanner.jsx": {
-    "file": "assets/FPScanner-B3Kiyf9M.js",
+    "file": "assets/FPScanner-B7SCxtNu.js",
     "name": "FPScanner",
     "src": "resources/js/Pages/Presensi/FPScanner.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_index-pYSftkOC.js",
+      "_index-D9t-NDW5.js",
       "_waktuIndo-fxKw8i-s.js",
-      "_clock-DIAmSA-j.js",
-      "_index.esm-BuMalGis.js",
-      "_dataSelect-Dlr-KohK.js",
-      "_index.modern-BPAPiLIJ.js",
+      "_clock-C6JQaUOT.js",
+      "_index.esm-9gojCHXn.js",
+      "_dataSelect-Hg1lT2BP.js",
+      "_index.modern-CVLAu0fw.js",
       "_index-cJPv0CwZ.js",
-      "_floating-ui.dom-BxeXO0rm.js",
-      "_InputLabel-lQJ03nAo.js"
+      "_floating-ui.dom-CC8_5oek.js",
+      "_InputLabel-DG_S6saP.js"
     ]
   },
   "resources/js/Pages/Presensi/FaceRec/LoadingProgressBar.jsx": {
-    "file": "assets/LoadingProgressBar-BF6d4zeM.js",
+    "file": "assets/LoadingProgressBar-C9D5YtOm.js",
     "name": "LoadingProgressBar",
     "src": "resources/js/Pages/Presensi/FaceRec/LoadingProgressBar.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_ProgressBar-C8y8wCti.js"
+      "_ProgressBar-C0ZVx4gz.js"
     ]
   },
   "resources/js/Pages/Presensi/FaceRec/NotifCameraNotAllowed.jsx": {
-    "file": "assets/NotifCameraNotAllowed-BDCXOsMc.js",
+    "file": "assets/NotifCameraNotAllowed-5BPBWkCf.js",
     "name": "NotifCameraNotAllowed",
     "src": "resources/js/Pages/Presensi/FaceRec/NotifCameraNotAllowed.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_ToggleSwitch-ByfHFrFP.js",
-      "_floating-ui.dom-BxeXO0rm.js"
+      "_ToggleSwitch-D-Djj9Qe.js",
+      "_floating-ui.dom-CC8_5oek.js"
     ]
   },
   "resources/js/Pages/Presensi/FaceRec/NotifGeneral.jsx": {
-    "file": "assets/NotifGeneral-CnvjUn-H.js",
+    "file": "assets/NotifGeneral-eYF1bFAe.js",
     "name": "NotifGeneral",
     "src": "resources/js/Pages/Presensi/FaceRec/NotifGeneral.jsx",
     "isDynamicEntry": true,
@@ -301,7 +301,7 @@
     ]
   },
   "resources/js/Pages/Presensi/FaceRec/NotifRulesDaftar.jsx": {
-    "file": "assets/NotifRulesDaftar-CKQhX8E1.js",
+    "file": "assets/NotifRulesDaftar-5cPq4_ih.js",
     "name": "NotifRulesDaftar",
     "src": "resources/js/Pages/Presensi/FaceRec/NotifRulesDaftar.jsx",
     "isDynamicEntry": true,
@@ -310,7 +310,7 @@
     ]
   },
   "resources/js/Pages/Presensi/FaceRec/RefreshButton.jsx": {
-    "file": "assets/RefreshButton-CC5In6Tg.js",
+    "file": "assets/RefreshButton-B9e98Mfd.js",
     "name": "RefreshButton",
     "src": "resources/js/Pages/Presensi/FaceRec/RefreshButton.jsx",
     "isDynamicEntry": true,
@@ -319,136 +319,136 @@
     ]
   },
   "resources/js/Pages/Presensi/FaceRec/index copy 2.jsx": {
-    "file": "assets/index copy 2-Bm0UoXBK.js",
+    "file": "assets/index copy 2-bZlQmjWV.js",
     "name": "index copy 2",
     "src": "resources/js/Pages/Presensi/FaceRec/index copy 2.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_FaceContext-CSqCEzZM.js",
+      "_FaceContext-Cmlu7Dt0.js",
       "_index-9mY2zEvB.js",
       "resources/js/Pages/Presensi/FaceRec/NotifCameraNotAllowed.jsx",
       "resources/js/Pages/Presensi/FaceRec/LoadingProgressBar.jsx",
       "resources/js/Pages/Presensi/FaceRec/RefreshButton.jsx",
-      "_useFaceDetection-CGFISTvE.js",
+      "_useFaceDetection-Dwzs_hdN.js",
       "_index-cJPv0CwZ.js",
-      "_dayjs.min-B1St_QVU.js",
-      "_ToggleSwitch-ByfHFrFP.js",
-      "_floating-ui.dom-BxeXO0rm.js",
-      "_ProgressBar-C8y8wCti.js"
+      "_dayjs.min-DVN7FNft.js",
+      "_ToggleSwitch-D-Djj9Qe.js",
+      "_floating-ui.dom-CC8_5oek.js",
+      "_ProgressBar-C0ZVx4gz.js"
     ]
   },
   "resources/js/Pages/Presensi/FaceRec/index copy.jsx": {
-    "file": "assets/index copy-D57EYoJ5.js",
+    "file": "assets/index copy-B4o4lTFS.js",
     "name": "index copy",
     "src": "resources/js/Pages/Presensi/FaceRec/index copy.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_FaceContext-CSqCEzZM.js",
-      "_resizeResults-CroDtIiX.js",
+      "_FaceContext-Cmlu7Dt0.js",
+      "_resizeResults-B9MlhEQ8.js",
       "_index-9mY2zEvB.js",
-      "_sendDataGeneral-BBefCrgK.js",
+      "_sendDataGeneral-D8QLj4VW.js",
       "resources/js/Pages/Presensi/FaceRec/NotifRulesDaftar.jsx",
       "resources/js/Pages/Presensi/FaceRec/NotifCameraNotAllowed.jsx",
       "resources/js/Pages/Presensi/FaceRec/LoadingProgressBar.jsx",
       "resources/js/Pages/Presensi/FaceRec/NotifGeneral.jsx",
       "resources/js/Pages/Presensi/FaceRec/RefreshButton.jsx",
-      "_useFaceDetection-CGFISTvE.js",
+      "_useFaceDetection-Dwzs_hdN.js",
       "_index-cJPv0CwZ.js",
-      "_dayjs.min-B1St_QVU.js",
-      "_ToggleSwitch-ByfHFrFP.js",
-      "_floating-ui.dom-BxeXO0rm.js",
-      "_ProgressBar-C8y8wCti.js"
+      "_dayjs.min-DVN7FNft.js",
+      "_ToggleSwitch-D-Djj9Qe.js",
+      "_floating-ui.dom-CC8_5oek.js",
+      "_ProgressBar-C0ZVx4gz.js"
     ]
   },
   "resources/js/Pages/Presensi/FaceRec/index.jsx": {
-    "file": "assets/index-DGOBREEN.js",
+    "file": "assets/index-Bqk0Zhes.js",
     "name": "index",
     "src": "resources/js/Pages/Presensi/FaceRec/index.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_FaceContext-CSqCEzZM.js",
-      "_resizeResults-CroDtIiX.js",
+      "_FaceContext-Cmlu7Dt0.js",
+      "_resizeResults-B9MlhEQ8.js",
       "_index-9mY2zEvB.js",
-      "_sendDataGeneral-BBefCrgK.js",
+      "_sendDataGeneral-D8QLj4VW.js",
       "resources/js/Pages/Presensi/FaceRec/NotifCameraNotAllowed.jsx",
       "resources/js/Pages/Presensi/FaceRec/LoadingProgressBar.jsx",
       "resources/js/Pages/Presensi/FaceRec/RefreshButton.jsx",
       "_index-cJPv0CwZ.js",
-      "_dayjs.min-B1St_QVU.js",
-      "_ToggleSwitch-ByfHFrFP.js",
-      "_floating-ui.dom-BxeXO0rm.js",
-      "_ProgressBar-C8y8wCti.js"
+      "_dayjs.min-DVN7FNft.js",
+      "_ToggleSwitch-D-Djj9Qe.js",
+      "_floating-ui.dom-CC8_5oek.js",
+      "_ProgressBar-C0ZVx4gz.js"
     ]
   },
   "resources/js/Pages/Presensi/Maintenance.jsx": {
-    "file": "assets/Maintenance-Ob9MPPuA.js",
+    "file": "assets/Maintenance-DIot_vbT.js",
     "name": "Maintenance",
     "src": "resources/js/Pages/Presensi/Maintenance.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_index-pYSftkOC.js"
+      "_index-D9t-NDW5.js"
     ]
   },
   "resources/js/Pages/Presensi/Sync.jsx": {
-    "file": "assets/Sync-CIBuTq2F.js",
+    "file": "assets/Sync-CC0pzEpc.js",
     "name": "Sync",
     "src": "resources/js/Pages/Presensi/Sync.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_ProgressBar-C8y8wCti.js",
+      "_ProgressBar-C0ZVx4gz.js",
       "_waktuIndo-fxKw8i-s.js",
-      "_sendDataGeneral-BBefCrgK.js",
-      "_dayjs.min-B1St_QVU.js",
+      "_sendDataGeneral-D8QLj4VW.js",
+      "_dayjs.min-DVN7FNft.js",
       "_index-9mY2zEvB.js",
       "_index-cJPv0CwZ.js"
     ]
   },
   "resources/js/Pages/Presensi/index.jsx": {
-    "file": "assets/index-C8kGkFeg.js",
+    "file": "assets/index-CEYNDc-0.js",
     "name": "index",
     "src": "resources/js/Pages/Presensi/index.jsx",
     "isDynamicEntry": true,
     "imports": [
       "resources/js/app.jsx",
-      "_GuestLayout-BkbTkELY.js",
+      "_GuestLayout-JaLh2hsM.js",
       "resources/js/Pages/Presensi/FaceRec/index.jsx",
       "resources/js/Pages/Presensi/Clock.jsx",
-      "_index.modern-BPAPiLIJ.js",
+      "_index.modern-CVLAu0fw.js",
       "_index-cJPv0CwZ.js",
       "resources/js/Pages/Presensi/Sync.jsx",
       "resources/js/Pages/Presensi/FP/index.jsx",
-      "_ToggleSwitch-ByfHFrFP.js",
-      "_FaceContext-CSqCEzZM.js",
-      "_resizeResults-CroDtIiX.js",
+      "_ToggleSwitch-D-Djj9Qe.js",
+      "_FaceContext-Cmlu7Dt0.js",
+      "_resizeResults-B9MlhEQ8.js",
       "_index-9mY2zEvB.js",
-      "_sendDataGeneral-BBefCrgK.js",
+      "_sendDataGeneral-D8QLj4VW.js",
       "resources/js/Pages/Presensi/FaceRec/NotifCameraNotAllowed.jsx",
       "resources/js/Pages/Presensi/FaceRec/LoadingProgressBar.jsx",
-      "_ProgressBar-C8y8wCti.js",
+      "_ProgressBar-C0ZVx4gz.js",
       "resources/js/Pages/Presensi/FaceRec/RefreshButton.jsx",
-      "_dayjs.min-B1St_QVU.js",
-      "_clock-DIAmSA-j.js",
+      "_dayjs.min-DVN7FNft.js",
+      "_clock-C6JQaUOT.js",
       "_waktuIndo-fxKw8i-s.js",
       "resources/js/Pages/Presensi/FP/Presensi.jsx",
-      "_FPContext-DiZDfX-P.js",
-      "_index-pYSftkOC.js",
+      "_FPContext-DVQhnGqr.js",
+      "_index-D9t-NDW5.js",
       "resources/js/Pages/Presensi/FP/Daftar.jsx",
-      "_dataSelect-Dlr-KohK.js",
-      "_index.esm-BuMalGis.js",
-      "_floating-ui.dom-BxeXO0rm.js",
-      "_InputLabel-lQJ03nAo.js",
+      "_dataSelect-Hg1lT2BP.js",
+      "_index.esm-9gojCHXn.js",
+      "_floating-ui.dom-CC8_5oek.js",
+      "_InputLabel-DG_S6saP.js",
       "resources/js/Pages/Presensi/FP/FingerSelector.jsx",
       "resources/js/Pages/Presensi/FP/Hapus.jsx",
       "resources/js/Pages/Presensi/Maintenance.jsx"
     ]
   },
   "resources/js/app.jsx": {
-    "file": "assets/app-Dd2Z-7CB.js",
+    "file": "assets/app-34yb_BLx.js",
     "name": "app",
     "src": "resources/js/app.jsx",
     "isEntry": true,

@@ -1,11 +1,12 @@
 import axios from "axios";
 
 // Ambil base URL dari environment
-// const API_BASE = import.meta.env.VITE_API_SERVER;
-const API_BASE = config("app.api.server");
+const API_BASE = import.meta.env.VITE_API_SERVER;
+// const API_BASE = config("app.api.server");
 
 export const fetchReg = async () => {
-    // console.log(API_BASE);
+    console.log("🚀 ~ import.meta.env:", import.meta.env);
+    console.log(API_BASE);
     try {
         const response = await axios.get(
             `${API_BASE}/Karyawan/Presensi/Fingerprint`
