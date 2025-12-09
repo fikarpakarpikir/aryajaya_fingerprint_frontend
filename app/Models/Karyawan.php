@@ -18,7 +18,12 @@ class Karyawan extends Model
 {
     use Notifiable;
 
-    protected $guarded = ['id'];
+    // protected $guarded = ['id'];
+protected $fillable = [
+    'id', 'nama', 'tempat_lahir', 'tanggal_lahir', 'no_hp',
+    'jenis_kelamin', 'kode_agama', 'kode_nikah', 'anak',
+    'role', 'status_aktif'
+];
 
     protected $with = ['dokumen'];
     protected $appends = ['encId'];

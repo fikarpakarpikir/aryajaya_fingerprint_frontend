@@ -48,7 +48,6 @@ class SinkronisasiController extends Controller
             ]);
             if ($res->successful()) {
                 $json = $res->json();
-
                 $data = $json['sync'];
                 $kar_unregist = $json['kar'];
                 $done = 0;
@@ -58,11 +57,11 @@ class SinkronisasiController extends Controller
 
                     foreach ($kar_unregist as $kar) {
                         broadcast(new SyncProgressEvent([
-                            'jenis_data'        => 1,
-                            'done'              => $done,
-                            'total'             => count($unreg),
-                            'id_karyawan'       => $kar['id'],
-                            'step'              => 1,
+                            'jenis_data'  => 1,
+                            'done'        => $done,
+                            'total'       => count($kar_unregist),
+                            'id_karyawan' => $kar['id'],
+                            'step'        => 1,
                         ]));
 
                         // 1. SIMPAN DATA KARYAWAN UTAMA

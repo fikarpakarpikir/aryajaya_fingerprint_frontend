@@ -164,15 +164,24 @@ function FaceRecog() {
         }
 
         // Load and decode all images in parallel
-        const imgs = await Promise.all(
-            face_recs.map(async (item) => {
-                const url = `/assets/face_rec/${item.id_karyawan}/${item.foto}.png`;
-                const img = await faceapi.fetchImage(url);
-                // ensure decoded
-                if (img.decode) await img.decode();
-                return { img, id_karyawan: item.id_karyawan, foto: item.foto };
-            })
-        );
+        const imgs = [];
+
+    for (const item of face_recs) {
+        const url = `/assets/face_rec/${item.id_karyawan}/${item.foto}.png`;
+        try {
+            const img = await faceapi.fetchImage(url);
+            imgs.push({
+                img,
+                id_karyawan: item.id_karyawan,
+                foto: item.foto,
+            });
+
+            // beri napas CPU Raspberry Pi
+            await new Promise((r) => setTimeout(r, 5));
+        } catch (err) {
+            console.error("Gagal load image:", url, err);
+        }
+    }
 
         // we will keep an array of images per label if you have multiple images per label later
         setDataFaceID(imgs);

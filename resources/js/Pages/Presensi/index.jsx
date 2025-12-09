@@ -36,7 +36,7 @@ const Presensi = () => {
     const [mode, setMode] = useState("fp");
     const listMode = [
         ["fp", faFingerprint, FPScannerPage, 1, "Fingerprint"],
-        ["face", faCamera, FaceRecogPage, 2, "Face ID"],
+        // ["face", faCamera, FaceRecogPage, 2, "Face ID"],
     ];
 
     const findMode = listMode.find((item) => item[0] === mode);
