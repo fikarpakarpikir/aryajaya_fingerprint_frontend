@@ -32,18 +32,18 @@ if (file_exists($maintenance = __DIR__ . '/../storage/framework/maintenance.php'
 // Determine correct .env file based on context
 $envFile = '.env'; // Default
 
-if (PHP_SAPI === 'cli-server') {
-    // CLI context (e.g., artisan)
-    // if (env('LARAVEL_ENV') === 'dev') {
-    $envFile = '.env.dev';
-    // }
-} else {
-    // Web context (e.g., HTTP request)
-    $host = $_SERVER['HTTP_HOST'] ?? '';
-    if (in_array($host, ['127.0.0.1', '127.0.0.1:8000'])) {
-        $envFile = '.env.dev';
-    }
-}
+// if (PHP_SAPI === 'cli-server') {
+//     // CLI context (e.g., artisan)
+//     // if (env('LARAVEL_ENV') === 'dev') {
+//     $envFile = '.env.dev';
+//     // }
+// } else {
+//     // Web context (e.g., HTTP request)
+//     $host = $_SERVER['HTTP_HOST'] ?? '';
+//     if (in_array($host, ['127.0.0.1', '127.0.0.1:8000'])) {
+//         $envFile = '.env.dev';
+//     }
+// }
 // dd($envFile);
 
 // // Bootstrap Laravel dan inject env file
