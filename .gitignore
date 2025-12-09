@@ -4,6 +4,7 @@
 /public/assets/foto_profil
 /public/assets/face_rec*
 /public/assets/file_sertif
+/public/assets/fingerprint*
 /public/assets/soal
 /public/assets/file_pg
 /public/assets/peraturan_perusahaan
@@ -29,7 +30,6 @@ yarn-error.log
 /.zed
 
 /node_modules/.cache/babel-loader
-/public/assets/fingerprint
 .env.testing
 /node_modules*
 data_dummy*
