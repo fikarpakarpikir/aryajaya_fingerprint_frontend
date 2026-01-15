@@ -30,7 +30,7 @@ class FingerprintController extends Controller
     public function __construct()
     {
         $this->apiAlat = config('app.api.server') . '/Alat';
-        $this->alat_id = AlatService::info();
+        $this->alat_id = AlatService::info()->id;
     }
     public  function getIdAlat($ip)
     {
@@ -214,6 +214,7 @@ class FingerprintController extends Controller
 
     public function getTemplateId(Request $req)
     {
+
         $req->validate([
             'id_karyawan' => 'required',
             'alat_id' => 'required',
@@ -225,8 +226,7 @@ class FingerprintController extends Controller
                 'data' => Fingerprint::where('id_karyawan', $req->id_karyawan)
                     ->where('alat_id', $this->alat_id)
                     ->where('jari_id', $req->jari_id)
-                    ->pluck('template_id')
-                    ->first()
+                    ->value('template_id')
             ]);
         } catch (\Throwable $th) {
             throw $th;
