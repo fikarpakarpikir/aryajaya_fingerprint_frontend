@@ -1,9 +1,14 @@
 import { PlayerGIFLost, RenderPlayerGIF } from "@/Components/PlayerGIF";
 import { useFPContext } from "@/context/FPContext";
 import { usePage } from "@inertiajs/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { panggilanKaryawan } from "@/utils/fpUtils";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faImagePortrait } from "@fortawesome/free-solid-svg-icons";
+import fullWaktuIndo from "@/Functions/waktuIndo";
+import { BadgeClass } from "@/Components/BadgeClass";
+import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 
 export default function Presensi() {
     const { props } = usePage();
@@ -16,13 +21,49 @@ export default function Presensi() {
         status,
         listKaryawans,
         getFitur,
+        newData,
     } = useFPContext();
+    // console.log("🚀 ~ Presensi ~ newData:", newData);
 
     const { urlScanner } = useSelector((state) => state.fingerprints);
 
     const [karyawan, setKaryawan] = useState(null);
+    // const [karyawan, setKaryawan] = useState({
+    //     id: 11164,
+    //     id_karyawan: 4,
+    //     id_jaker: 7745,
+    //     mulai: "2026-01-15 23:04:50",
+    //     lokasi_longitude_mulai: "107.6327055",
+    //     lokasi_latitude_mulai: "-6.9550149",
+    //     selesai: null,
+    //     lokasi_longitude_selesai: null,
+    //     lokasi_latitude_selesai: null,
+    //     created_at: "2026-01-15T16:04:50.000000Z",
+    //     updated_at: "2026-01-15T16:04:50.000000Z",
+    //     org: {
+    //         id: 4,
+    //         nama: "Fikar Mohammad Istiqlalul Wathan",
+    //         encId: "eyJpdiI6ImtlMU0vZnJEMS9tb00yNnZKbUw3c2c9PSIsInZhbHVlIjoiYWQ1YjIra2x6YTRvVjA3R0loeGxNQT09IiwibWFjIjoiMjJkMWM0Y2ExODg4ZGQ4OWQ3MTAzNjJiNmI1YjhhOTFkMGMxMzhlMmE4MWIwOWE5MWVhM2U4ZmFkOTk1OTc4ZiIsInRhZyI6IiJ9",
+    //         dokumen: [
+    //             {
+    //                 id: 5,
+    //                 karyawan_id: 4,
+    //                 jenis_data_id: 1,
+    //                 file: "foto_profil_68638e85e616c.png",
+    //                 no_identity: null,
+    //                 created_at: "2025-02-14T02:27:13.000000Z",
+    //                 updated_at: "2025-07-01T07:30:13.000000Z",
+    //             },
+    //         ],
+    //     },
+    // });
     const [fotoProfil, setFotoProfil] = useState(null);
 
+    useEffect(() => {
+        if (newData) {
+            findKaryawan(newData);
+        }
+    }, [newData]);
     const findKaryawan = (newData) => {
         // console.log(newData);
         const kar = listKaryawans?.find(
@@ -40,6 +81,7 @@ export default function Presensi() {
     };
 
     const fetchFotoProfil = (file_path) => {
+        console.log("🚀 ~ fetchFotoProfil ~ file_path:", file_path);
         setFotoProfil(null);
         try {
             setFotoProfil(`/assets/foto_profil/${file_path}`);

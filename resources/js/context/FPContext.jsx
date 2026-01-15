@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 const FPContext = createContext({
     videoRef: null,
+    newData: null,
     hasDetectedRef: { current: false },
     listKaryawans: [],
     setListKaryawans: () => {},
@@ -98,9 +99,12 @@ export function FPProvider({ children }) {
                     case 1:
                         if (status === 4 || status === 3) {
                             setNewData(status === 4 ? newData : null);
-                            setTimeout(() => getFitur(1), 3000);
                             setGetMessage(false);
                             setCountdownScanning(0);
+                            // setTimeout(() => {
+                            //     getFitur(1)
+                            //     setNewData(null)
+                            // }, 5000);
                         }
                         break;
                     case 2:
@@ -234,6 +238,7 @@ export function FPProvider({ children }) {
         hasDetectedRef,
 
         // state
+        newData,
         listKaryawans,
         setListKaryawans,
         activeFP,

@@ -134,8 +134,18 @@ class SinkronisasiController extends Controller
 
                         $registered = Fingerprint::whereIn('id_karyawan', $ids->pluck('id_karyawan'))
                             ->whereIn('template_id', $ids->pluck('template_id'))
+                            ->whereIn('alat_id', $ids->pluck('alat_id'))
+                            // ->where(function ($q) use ($ids) {
+                            //     foreach ($ids as $item) {
+                            //         $q->orWhere(function ($sub) use ($item) {
+                            //             $sub->where('template_id', $item['template_id'])
+                            //                 ->where('alat_id', $item['alat_id']);
+                            //         });
+                            //     }
+                            // })
+                            // ->get()
                             ->get(['id_karyawan', 'template_id', 'template_dat', 'updated_at']);
-
+                        // ->value(['id_karyawan', 'template_id', 'template_dat', 'updated_at']);
                         $unreg = $ids->reject(function ($item) use ($registered, $req) {
                             $found = $registered->first(function ($r) use ($item) {
                                 return $r->id_karyawan == $item['id_karyawan']
@@ -150,6 +160,7 @@ class SinkronisasiController extends Controller
                             return Carbon::parse($found->updated_at)->greaterThanOrEqualTo($req['mulai']);
                             // return Carbon::parse($found->updated_at)->greaterThanOrEqualTo($item['updated_at']);
                         })->values()->all();
+                        // dd($registered);
                         // dd(($unreg));
                         foreach ($unreg as $item) {
                             $id = $item['id_karyawan'];

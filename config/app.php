@@ -133,6 +133,7 @@ return [
 
     'api' => [
         'server' => env('VITE_API_SERVER', '127.0.0.1:8000'),
+        'alat' => env('URL_FLASK', '127.0.0.1:8000'),
     ],
 
 ];

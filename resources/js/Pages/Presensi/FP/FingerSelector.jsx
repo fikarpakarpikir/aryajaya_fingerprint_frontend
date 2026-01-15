@@ -46,24 +46,6 @@ export default function FingerSelector({
         }
     }
 
-    const styleFor = (id) => {
-        const orange = "#ffba00";
-        const gray = "#707070";
-        const white = "#fffaf1ff";
-        return {
-            fill: selected.includes(id)
-                ? orange
-                : preValue.includes(id)
-                ? isDeletable
-                    ? white
-                    : gray
-                : gray,
-            stroke: selected.includes(id) ? "#ffba00" : "#b89b5bff",
-            cursor: "pointer",
-            transition: "all 160ms ease",
-        };
-    };
-
     const listJari = [
         // === Tangan Kanan ===
         {
@@ -180,14 +162,36 @@ export default function FingerSelector({
         },
     ];
 
-    const [u, r] = isDeletable
-        ? ["Jari belum terdaftar", "Jari sudah terdaftar"]
-        : ["Jari sudah terdaftar", "Jari belum terdaftar"];
+    const orange = "#ffba00";
+    const gray = "#707070";
+    const white = "#fffaf1ff";
+
+    const styleFor = (id) => {
+        return {
+            fill: selected.includes(id)
+                ? orange
+                : preValue.includes(id)
+                ? isDeletable
+                    ? white
+                    : gray
+                : isDeletable
+                ? gray
+                : white,
+            stroke: selected.includes(id) ? "#ffba00" : "#b89b5bff",
+            cursor: "pointer",
+            transition: "all 160ms ease",
+        };
+    };
+
+    const [u, r] = ["Jari sudah terdaftar", "Jari belum terdaftar"];
+    // const [u, r] = isDeletable
+    //     ? ["Jari sudah terdaftar", "Jari belum terdaftar"]
+    //     : ["Jari belum terdaftar", "Jari sudah terdaftar"];
 
     const listLegend = [
-        { text: u, color: "#707070" },
+        { text: u, color: isDeletable ? white : gray },
         { text: "Jari dipilih untuk didaftarkan", color: "#ffba00" },
-        { text: r, color: "#fffaf1" },
+        { text: r, color: isDeletable ? gray : white },
     ];
 
     const Jari = ({ j }) => {

@@ -26,10 +26,11 @@ class FingerprintController extends Controller
     public $alat_id;
     protected $apiAlat;
 
-    
+
     public function __construct()
     {
-        $this->apiAlat = config('app.api.server') . '/Alat';
+        // $this->apiAlat = config('app.api.server') . '/Alat';
+        $this->apiAlat = config('app.api.alat') . '/Alat';
         $this->alat_id = AlatService::info()->id;
     }
     public  function getIdAlat($ip)
@@ -217,16 +218,17 @@ class FingerprintController extends Controller
 
         $req->validate([
             'id_karyawan' => 'required',
-            'alat_id' => 'required',
+            // 'alat_id' => 'required',
             'jari_id' => 'required',
         ]);
 
         try {
             return response()->json([
                 'data' => Fingerprint::where('id_karyawan', $req->id_karyawan)
-                    ->where('alat_id', $this->alat_id)
-                    ->where('jari_id', $req->jari_id)
-                    ->value('template_id')
+                    // ->where('alat_id', $this->alat_id)
+                    // ->where('jari_id', $req->jari_id)
+                    // ->value('template_id')
+                    ->get()
             ]);
         } catch (\Throwable $th) {
             throw $th;
