@@ -98,7 +98,8 @@ export function FPProvider({ children }) {
                 switch (fiturId) {
                     case 1:
                         if (status === 4 || status === 3) {
-                            setNewData(status === 4 ? newData : null);
+                            // setNewData(status === 4 ? newData : null);
+                            setNewData(newData ?? null);
                             setGetMessage(false);
                             setCountdownScanning(0);
                             // setTimeout(() => {
@@ -151,7 +152,7 @@ export function FPProvider({ children }) {
             const res = await axios.post(
                 `${urlScanner}/fitur`,
                 { fiturId, id_karyawan, value },
-                { headers: { "Content-Type": "application/json" } }
+                { headers: { "Content-Type": "application/json" } },
             );
             setFloatButtonFitur(false);
         } catch (error) {
