@@ -185,20 +185,20 @@ class SinkronisasiController extends Controller
                                 file_put_contents("$path/$template", $dat->body());
 
 
-                                Fingerprint::updateOrCreate(
-                                    [
-                                        'id_karyawan' => $id,
-                                        'jari_id' => $jari,
-                                    ],
-                                    [
-                                        'alat_id' =>  $alat_id,
-                                        'template_id' =>  $template_id,
-                                        'template_dat' =>  $template,
-                                        'updated_at' => $item['updated_at'],
+                            }
+                            Fingerprint::updateOrCreate(
+                                [
+                                    'id_karyawan' => $id,
+                                    'jari_id' => $jari,
+                                ],
+                                [
+                                    'alat_id' =>  $alat_id,
+                                    'template_id' =>  $template_id,
+                                    'template_dat' =>  $template,
+                                    'updated_at' => $item['updated_at'],
                                     ]
                                 );
                                 $done++;
-                            }
                             broadcast(new SyncProgressEvent([
                                 'jenis_data'        => 1,
                                 'done'              => $done,
