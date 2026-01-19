@@ -173,7 +173,7 @@ class FingerprintController extends Controller
                 try {
                     $filename = 'template_' . $this->alat_id . '_' . $req->template_id . '.' . $req['template_dat']->getClientOriginalExtension();
 
-                    $req['template_dat']->move(public_path('assets/fingerprint/template/'), $filename);
+                    $req['template_dat']->move(public_path('assets/fingerprint/'), $filename);
 
                     $fingerprint = Fingerprint::create([
                         'alat_id' => $this->alat_id,
